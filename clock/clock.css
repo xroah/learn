@@ -62,7 +62,7 @@ div {
     background-color: #f16b41;
 }
 
-.clock-container .second-hand:after {
+.second-hand:after {
     content: "";
     display: block;
     position: absolute;
