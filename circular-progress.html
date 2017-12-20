@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Circular progress</title>
+    <style>
+        .progress,
+        .progress .left-bar,
+        .progress .right-bar {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            line-height: 180px;
+            border: 12px solid #eee;
+            box-sizing: border-box;
+            border-radius: 50%;
+            margin: 0 auto;
+            color: #42c794;
+            text-align: center;
+            font-size: 42px;
+        }
+
+        .progress .left-bar,
+        .progress .right-bar{
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            transform: rotate(-45deg);
+            animation: progress 6s linear;
+            /* animation-play-state: paused; */
+        }
+
+        .progress .right-bar {
+            border-right-color: #42c794;
+            border-bottom-color: #42c794;
+        }
+
+        .progress .left-bar {
+            border-right-color: transparent;
+            border-bottom-color:transparent;
+            animation-delay: 6s;
+            z-index: 1;
+        }
+
+        .progress .left-bar.spin {
+            border-left-color: #42c794;
+            border-top-color: #42c794;
+        }
+
+        .progress .percent-text {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+        }
+
+        .progress > input[type=range] {
+            display: none;
+            margin-top: 200px;
+        }
+
+        @keyframes progress {
+            0% {
+                transform: rotate(-225deg);
+            }
+            100% {
+                transform: ratate(-45deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress">
+        <div class="percent-text"></div>
+        <div class="right-bar"></div>
+        <div class="left-bar"></div>
+        <input type="range" id="range" value="100" max="100">
+    </div>
+    <script>
+        var left = document.getElementsByClassName("left-bar")[0],
+            right = document.getElementsByClassName("right-bar")[0],
+            range = document.getElementById("range"),
+            text = document.getElementsByClassName("percent-text")[0];
+            minDeg = -225;
+        right.addEventListener("animationend", function() {
+            left.classList.add("spin");
+        });
+        left.addEventListener("animationend", function() {
+            range.style.display = "inline-block";
+        });
+        range.onchange = function() {
+            var value = +this.value,
+                deg;
+            if (value > 50) {
+                deg = 180 / 50 * (value - 50) + minDeg;
+                right.style.transform = "rotate(-45deg)";
+                left.style.transform = "rotate(" + deg + "deg)";
+                left.classList.add("spin");
+            } else {
+                deg = 180 / 50 * value + minDeg;
+                right.style.transform = "rotate(" + deg + "deg)";
+                left.style.transform = "rotate(-45deg)";
+                left.classList.remove("spin");
+            }
+            text.innerHTML = value + "%";
+        }
+    </script>
+</body>
+</html>
