@@ -6,108 +6,81 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Circular progress</title>
     <style>
-        .progress,
-        .progress .left-bar,
-        .progress .right-bar {
-            position: relative;
+        div {
+            box-sizing: border-box;
+        }
+
+        .progress-container,
+        .progress-container .left-circle,
+        .progress-container .right-circle {
             width: 200px;
             height: 200px;
-            line-height: 180px;
-            border: 12px solid #eee;
-            box-sizing: border-box;
+            border: 20px solid #eee;
             border-radius: 50%;
+        }
+
+        .progress-container {
+            position: relative;
             margin: 0 auto;
-            color: #42c794;
-            text-align: center;
-            font-size: 42px;
         }
 
-        .progress .left-bar,
-        .progress .right-bar{
-            content: "";
+        .progress-container .left-box,
+        .progress-container .right-box {
             position: absolute;
-            top: -12px;
-            left: -12px;
-            transform: rotate(-45deg);
-            animation: progress 6s linear;
-            /* animation-play-state: paused; */
+            top: -20px;
+            overflow: hidden;
+            width: 100px;
+            height: 200px;
         }
 
-        .progress .right-bar {
-            border-right-color: #42c794;
-            border-bottom-color: #42c794;
-        }
-
-        .progress .left-bar {
-            border-right-color: transparent;
-            border-bottom-color:transparent;
-            animation-delay: 6s;
-            z-index: 1;
-        }
-
-        .progress .left-bar.spin {
-            border-left-color: #42c794;
-            border-top-color: #42c794;
-        }
-
-        .progress .percent-text {
+        .progress-container .left-circle,
+        .progress-container .right-circle {
             position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
             top: 0;
+            border-color: #42c794;
+            transform: rotate(-225deg);
+            animation: spin 1s linear forwards;
         }
 
-        .progress > input[type=range] {
-            display: none;
-            margin-top: 200px;
+        .progress-container .left-box {
+            left: -20px;
         }
 
-        @keyframes progress {
+        .progress-container .left-circle {
+            left: 0;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            animation-delay: 1s;
+        }
+
+        .progress-container .right-circle {
+            right: 0;
+            border-top-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .progress-container .right-box {
+            right: -20px;
+        }
+
+        @keyframes spin {
             0% {
                 transform: rotate(-225deg);
             }
             100% {
-                transform: ratate(-45deg);
+                transform: rotate(-45deg);
             }
         }
     </style>
 </head>
 <body>
-    <div class="progress">
-        <div class="percent-text"></div>
-        <div class="right-bar"></div>
-        <div class="left-bar"></div>
-        <input type="range" id="range" value="100" max="100">
+    <div class="progress-container">
+        <div class="left-box">
+            <div class="left-circle"></div>
+        </div>
+        <div class="right-box">
+            <div class="right-circle"></div>
+        </div>
     </div>
-    <script>
-        var left = document.getElementsByClassName("left-bar")[0],
-            right = document.getElementsByClassName("right-bar")[0],
-            range = document.getElementById("range"),
-            text = document.getElementsByClassName("percent-text")[0];
-            minDeg = -225;
-        right.addEventListener("animationend", function() {
-            left.classList.add("spin");
-        });
-        left.addEventListener("animationend", function() {
-            range.style.display = "inline-block";
-        });
-        range.onchange = function() {
-            var value = +this.value,
-                deg;
-            if (value > 50) {
-                deg = 180 / 50 * (value - 50) + minDeg;
-                right.style.transform = "rotate(-45deg)";
-                left.style.transform = "rotate(" + deg + "deg)";
-                left.classList.add("spin");
-            } else {
-                deg = 180 / 50 * value + minDeg;
-                right.style.transform = "rotate(" + deg + "deg)";
-                left.style.transform = "rotate(-45deg)";
-                left.classList.remove("spin");
-            }
-            text.innerHTML = value + "%";
-        }
-    </script>
 </body>
 </html>
