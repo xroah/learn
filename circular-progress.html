@@ -6,13 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Circular progress</title>
     <style>
-        div {
+        div,
+        div:after {
             box-sizing: border-box;
         }
 
         .progress-container,
-        .progress-container .left-circle,
-        .progress-container .right-circle {
+        .progress-container .left-box:after,
+        .progress-container .right-box:after {
             width: 200px;
             height: 200px;
             border: 20px solid #eee;
@@ -33,8 +34,10 @@
             height: 200px;
         }
 
-        .progress-container .left-circle,
-        .progress-container .right-circle {
+        .progress-container .left-box:after,
+        .progress-container .right-box:after {
+            content: '';
+            display: block;
             position: absolute;
             top: 0;
             border-color: #42c794;
@@ -46,14 +49,14 @@
             left: -20px;
         }
 
-        .progress-container .left-circle {
+        .progress-container .left-box:after {
             left: 0;
             border-right-color: transparent;
             border-bottom-color: transparent;
             animation-delay: 1s;
         }
 
-        .progress-container .right-circle {
+        .progress-container .right-box:after {
             right: 0;
             border-top-color: transparent;
             border-left-color: transparent;
@@ -75,12 +78,8 @@
 </head>
 <body>
     <div class="progress-container">
-        <div class="left-box">
-            <div class="left-circle"></div>
-        </div>
-        <div class="right-box">
-            <div class="right-circle"></div>
-        </div>
+        <div class="left-box"></div>
+        <div class="right-box"></div>
     </div>
 </body>
 </html>
