@@ -13,7 +13,8 @@
         }
 
         .radio,
-        .checkbox{
+        .checkbox,
+        .switch {
             display: none;
         }
 
@@ -25,7 +26,7 @@
         }
 
         .radio + span,
-        .checkbox + span{
+        .checkbox + span {
             position: relative;
             width: 1em;
             height: 1em;
@@ -43,7 +44,7 @@
             height: .5em;
             transform: translate(-50%, -50%) scale(0);
             transition: all .3s;
-            background: #00c895;
+            background-color: #00c895;
         }
 
         .radio:checked + span:after {
@@ -51,19 +52,25 @@
         }
 
         .checkbox + span {
-            border-radius: 3px;
+            border-radius: .2em;
+            transition: all .3s;
         }
 
         .checkbox + span:after {
             display: inline-block;
             position: absolute;
-            content: '';
+            content: "";
             width: 1em;
             line-height: 1em;
             text-align: center;
-            color: #00c895;
+            color: #fff;
             opacity: 0;
             transition: all .3s;
+        }
+
+        .checkbox:checked + span {
+            border-color: #00c895;
+            background-color: #00c895;
         }
 
         .checkbox:checked + span:after {
@@ -71,6 +78,41 @@
             opacity: 1;
         }
 
+        .switch + span {
+            position: relative;
+            display: inline-block;
+            width: 3em;
+            height: 1.5em;
+            border-radius: 2em;
+            box-shadow: 0 0 0 .1em #eee;
+            background-color: #fff;
+            transition: all .3s;
+            cursor: pointer;
+        }
+
+        .switch + span:after {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: -0.1em;
+            width: 1.5em;
+            height: 1.5em;
+            border-radius: 50%;
+            transform: scale(.9);
+            box-shadow: 0 0 .1em #ccc;
+            background-color: #fff;
+            transition: all .3s;
+        }
+
+        .switch:checked + span {
+            box-shadow: none;
+            background-color: #00c895;
+        }
+
+        .switch:checked + span:after {
+            left: 1.5em;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +127,11 @@
 <p>
     <label>
         <input type="checkbox" class="checkbox"><span></span>Checkbox
+    </label>
+</p>
+<p>
+    <label>
+        <input type="checkbox" class="switch"><span></span>
     </label>
 </p>
 </body>
