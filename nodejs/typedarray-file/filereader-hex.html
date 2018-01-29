@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件16进制上传服务器</title>
+</head>
+<body>
+<input type="file" id="file">
+<script>
+    let file = document.getElementById("file");
+    let xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", () => {
+        console.log(xhr.responseText);
+    })
+    file.addEventListener("change", function () {
+        let file = this.files[0];
+        let fr = new FileReader();
+        fr.readAsArrayBuffer(file);
+        fr.addEventListener("load", function () {
+            let hex = toHex(this.result);
+            post(hex);
+        })
+    });
+    function toHex(buffer) {
+        let hex = [];
+        let typedArr = new Uint8Array(buffer);
+        for(let i = 0, len = typedArr.length; i < len; i++) {
+            hex.push(typedArr[i]);
+        }
+        return hex;
+    }
+    function post(hex) {
+        xhr.open("POST", "/post", true);
+        xhr.send(JSON.stringify({file: hex}));
+    }
+</script>
+</body>
+</html>
