@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>POST请求</title>
+</head>
+<body>
+<form>
+    <p>用户名:<input type="text" id="userName"></p>
+    <p>密码:<input type="text" id="password"></p>
+    <button type="button" id="submit">提交</button>
+</form>
+<script>
+    let submit = document.getElementById("submit");
+    let userName = document.getElementById("userName");
+    let password = document.getElementById("password");
+    let xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", () => {
+console.log(xhr.responseText);
+    });
+    submit.addEventListener("click", () => {
+        xhr.open("post", "/post", true);
+        xhr.send(`userName=${userName.value}&password=${password.value}`);
+    });
+</script>
+</body>
+</html>
