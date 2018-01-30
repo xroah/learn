@@ -1,6 +1,7 @@
 let fs = require("fs");
 let http = require("http");
 let qs = require("querystring");
+const EXT = require("./ext.json");
 
 http.createServer((req, res) => {
     let url = req.url;
@@ -63,21 +64,45 @@ function parseFormData(data) {
     let result = {};
     let len = data.length;
     let split = "\r\n\r\n";
+    let head;
     if (len) {
-        let reg = /(\r\n)+/g;
         for (let i = 0; i < len; i++) {
             let item = data[i];
             if (item.indexOf("Content-Type") > -1) {
                 let index = item.indexOf(split) + split.length;
                 let head = item.slice(0, index);
                 let file = item.slice(index);
-                saveFile(head, file);
+               // saveFile(head, file);
+                parseFormName(head);
+            } else {
+                item = item.toString().split(";");
+                parseFormName(item);
+               // console.log(item.toString())
             }
          }
     }
 }
 
+function parseFormName(buf) {
+    let str = buf.toString();
+    //普通字符串的分号会变成逗号
+    let arr = str.split(/[;,]/);
+    let result = {};
+    let reg = /(?:\r\n)+/;
+    arr.shift();
+    console.log(arr);
+    if (arr.length > 1) {
+        let key = arr[0].split("=")[1];
+        let tmp = arr[1].split(reg);
+        let contentType = tmp.split(":")[1];
+        console.log(contentType);
+    } else {
+
+    }
+}
+
 function saveFile(head, file) {
+    console.log(head.toString())
     fs.writeFile(`${__dirname}/test.jpg`, file, err => {
         if (err) {
             throw err;
