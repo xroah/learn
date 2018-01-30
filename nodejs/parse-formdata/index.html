@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件读取为字符串上传</title>
+</head>
+<body>
+<input type="file" id="file">
+
+<script>
+    let file = document.getElementById("file");
+    let xhr = new XMLHttpRequest();
+    file.addEventListener("change", function () {
+        let f = this.files[0];
+        let fr = new FileReader();
+        let fm = new FormData();
+        fm.append("userName", "test");
+        fm.append("file", f);
+        fm.append("cn", "中文");
+        fr.readAsArrayBuffer(f);
+        xhr.open("POST", "/post", true);
+        xhr.send(fm);
+        fr.addEventListener("load", function () {
+
+            console.log(this.result)
+        });
+    });
+
+</script>
+</body>
+</html>
