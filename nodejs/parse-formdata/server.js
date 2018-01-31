@@ -1,6 +1,7 @@
 let fs = require("fs");
 let http = require("http");
-let qs = require("querystring");
+let crypto = require("crypto");
+let path = require("path");
 const EXT = require("./ext.json");
 
 http.createServer((req, res) => {
@@ -27,6 +28,7 @@ http.createServer((req, res) => {
         chunk.length += c.length;
     })
         .on("end", () => {
+            console.log(chunk.data)
             chunk = Buffer.concat(chunk.data, chunk.length);
             splitFormData(chunk, contentType);
         })
@@ -43,6 +45,31 @@ function getBoundary(ct) {
     }
     return `--${i}`;
 }
+
+/*
+   一个不含二进制文件的FormData格式如下（其中的分号nodejs中会变成逗号）
+   ------WebKitFormBoundary2UQUOBLuyuXKBJYP
+    Content-Disposition: form-data; name="userName"
+
+    test
+    */
+/*
+ 含有二进制文件的FormData格式如下
+ ------WebKitFormBoundary2UQUOBLuyuXKBJYP
+ Content-Disposition: form-data; name="userName"
+
+ test
+ ------WebKitFormBoundary2UQUOBLuyuXKBJYP
+ Content-Disposition: form-data; name="file"; filename="full-screen.svg"
+ Content-Type: image/svg+xml
+
+
+ ------WebKitFormBoundary2UQUOBLuyuXKBJYP--*/
+
+/*
+* nodejs post请求收到的数据都是buffer类型,
+* 根据以上FormData格式去解析数据
+* */
 
 function splitFormData(chunk, contentType) {
     if (chunk.length) {
@@ -61,10 +88,11 @@ function splitFormData(chunk, contentType) {
 }
 
 function parseFormData(data) {
-    let result = {};
+    let result = {
+        files: {}
+    };
     let len = data.length;
     let split = "\r\n\r\n";
-    let head;
     if (len) {
         for (let i = 0; i < len; i++) {
             let item = data[i];
@@ -72,40 +100,62 @@ function parseFormData(data) {
                 let index = item.indexOf(split) + split.length;
                 let head = item.slice(0, index);
                 let file = item.slice(index);
-               // saveFile(head, file);
-                parseFormName(head);
+                let parsed = parseFormName(head, true);
+                let key = parsed.key;
+                parsed[key].data = file;
+                parsed[key].size = file.length;
+                result.files[key] = parsed[key];
             } else {
                 item = item.toString().split(";");
-                parseFormName(item);
+                Object.assign(result, parseFormName(item))
                // console.log(item.toString())
             }
          }
+         console.log(result)
+        saveFile(result.files);
     }
 }
 
-function parseFormName(buf) {
-    let str = buf.toString();
-    //普通字符串的分号会变成逗号
-    let arr = str.split(/[;,]/);
+function parseFormName(buf, isFile) {
     let result = {};
+    let str = buf.toString();
+    str = str.replace(/Content-Disposition: form-data[;,]/, "");
     let reg = /(?:\r\n)+/;
-    arr.shift();
-    console.log(arr);
-    if (arr.length > 1) {
-        let key = arr[0].split("=")[1];
-        let tmp = arr[1].split(reg);
-        let contentType = tmp.split(":")[1];
-        console.log(contentType);
-    } else {
+    let quotReg = /['"]+/g;
+    let arr = str.split(reg);
+    arr.pop();
 
+    if (isFile) {
+        let tmp = arr[0].split(";");
+        //可以解析出来为'"name"'形式,替换掉多余的引号
+        let key = tmp[0].split("=")[1].replace(quotReg, "");
+        let contentType = arr[1].split(":")[1].trim();
+        result[key] = {
+            filename: tmp[1].split("=")[1].replace(quotReg, ""),
+            contentType
+        };
+        //该文件属性的索引
+        result.key = key;
+    } else {
+        let key = arr[0].split("=")[1].replace(quotReg, "");
+        result[key] = arr[1];
     }
+    return result
 }
 
-function saveFile(head, file) {
-    console.log(head.toString())
-    fs.writeFile(`${__dirname}/test.jpg`, file, err => {
-        if (err) {
-            throw err;
-        }
-    })
+function saveFile(filesObj) {
+    for (let key in filesObj) {
+        let file = filesObj[key];
+        let name = Date.now() + file.filename + (Math.random() * 99999 >>> 0);
+        let md5 = crypto.createHash("md5");
+        let ext = EXT[file.contentType] || path.extname(file.filename);
+        md5.update(name);
+        name = md5.digest("hex");
+        console.log(`${__dirname}/upload/${name}${ext}`)
+        fs.writeFile(`${__dirname}/upload/${name}${ext}`, file.data, err => {
+            if (err) {
+                throw err;
+            }
+        });
+    }
 }

@@ -5,25 +5,21 @@
     <title>FormData上传</title>
 </head>
 <body>
-<input type="file" id="file">
+<input type="file" id="file" multiple>
 
 <script>
     let file = document.getElementById("file");
     let xhr = new XMLHttpRequest();
     file.addEventListener("change", function () {
-        let f = this.files[0];
-        let fr = new FileReader();
+        let f = this.files;
         let fm = new FormData();
         fm.append("userName", "test");
-        fm.append("file", f);
+        for(let i = 0, len = f.length; i < len; i++) {
+            fm.append(`file${i}`, f[i]);
+        }
         fm.append("cn", "中文");
-        fr.readAsArrayBuffer(f);
         xhr.open("POST", "/post", true);
         xhr.send(fm);
-        fr.addEventListener("load", function () {
-
-            console.log(this.result)
-        });
     });
 
 </script>
