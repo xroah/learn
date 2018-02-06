@@ -144,6 +144,8 @@ const ZODIAC = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "
  */
 function getLeapMonth(year) {
     let _year = LUNAR_YEARS[year - BASE_YEAR].toString(16);
+    //toString会把第一个0去掉
+    _year.length === 4 && (_year = `0${_year}`);
     let first = _year.charAt(0);
     let last= parseInt(_year.charAt(_year.length - 1), 16);
     return {
@@ -160,6 +162,7 @@ function getLeapMonth(year) {
 function getLunarYearMonth(year) {
     let _year = LUNAR_YEARS[year - BASE_YEAR].toString(16),
         lm = getLeapMonth(year);
+    _year.length === 4 && (_year = `0${_year}`);
     _year = _year.substr(1, 3);
     _year = parseInt(_year, 16).toString(2).split("");
     if (_year.length === 11) _year.unshift("0");
@@ -185,19 +188,26 @@ function solar2Lunar(year, month, day) {
     let date = +new Date(`${year}-${month}-${day}`);
     let solarDays = Math.ceil((date - base)/(24 * 60 * 60 * 1000));
     let lunarDays = 0;
-    let _year;
-    for (let i = 1900; i <= year; i++) {
-        let month = getLunarYearMonth(i);
-        for (let j = 0, len = month.length; j < len; j++) {
-            if (lunarDays >= solarDays) {
-                _year = i;
+    let done = false;
+    for (let i = BASE_YEAR; i <= year; i++) {
+        let _month = getLunarYearMonth(i);
+        for (let j = 0, len = _month.length; j < len; j++) {
+            let tmp = lunarDays + parseInt(_month[j]) + 29;
+            if (tmp <= solarDays && !done) {
+                lunarDays = tmp;
+            } else {
+                done = true;
+                year = i;
+                month = j + 1;
                 break;
             }
-            lunarDays += parseInt(month[j]) + 29;
         }
-        console.log(i)
+        if (done) {
+            break;
+        }
     }
-    console.log(solarDays, lunarDays);
+    console.log(solarDays, lunarDays, done)
+    console.log(year, month, solarDays - lunarDays + 1);
 }
 
 function isLeapYear(year) {
