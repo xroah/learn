@@ -161,11 +161,19 @@ function getLeapMonth(year) {
  */
 function getLunarYearMonth(year) {
     let _year = LUNAR_YEARS[year - BASE_YEAR].toString(16),
-        lm = getLeapMonth(year);
+        lm = getLeapMonth(year),
+        len;
     _year.length === 4 && (_year = `0${_year}`);
     _year = _year.substr(1, 3);
     _year = parseInt(_year, 16).toString(2).split("");
-    if (_year.length === 11) _year.unshift("0");
+    len = _year.length;
+    //len小于12时，可能为11(如1901年),也可能为10(如1926年);
+    if (len < 12) {
+        len = 12 - len;
+        for (let i = 0; i < len; i++) {
+            _year.unshift("0");
+        }
+    }
     if (lm.month) _year.splice(lm.month, 0, lm.type);
     return _year;
 }
@@ -188,26 +196,16 @@ function solar2Lunar(year, month, day) {
     let date = +new Date(`${year}-${month}-${day}`);
     let solarDays = Math.ceil((date - base)/(24 * 60 * 60 * 1000));
     let lunarDays = 0;
-    let done = false;
-    for (let i = BASE_YEAR; i <= year; i++) {
-        let _month = getLunarYearMonth(i);
-        for (let j = 0, len = _month.length; j < len; j++) {
-            let tmp = lunarDays + parseInt(_month[j]) + 29;
-            if (tmp <= solarDays && !done) {
-                lunarDays = tmp;
-            } else {
-                done = true;
-                year = i;
-                month = j + 1;
-                break;
-            }
-        }
-        if (done) {
-            break;
-        }
+    for (let i = BASE_YEAR; i < year; i++) {
+        lunarDays += getLunarYearDays(i);
     }
-    console.log(solarDays, lunarDays, done)
-    console.log(year, month, solarDays - lunarDays + 1);
+    date = solarDays - lunarDays;
+    if (date >= 0) {
+        year = getGanZhiYear(year);
+    } else {
+        year = getGanZhiYear(year - 1);
+    }
+    console.log(year)
 }
 
 function isLeapYear(year) {
@@ -220,7 +218,8 @@ function getSolarMonthDays(year, month) {
     return days[month];
 }
 
-function getGanZhiYear(year, month, day) {
+//获取天干地支
+function getGanZhiYear(year) {
     //计算甲子年的公式year = 60*x + 4;
     let remainder = (year - 4) % 60,
         hs = remainder % 10,
@@ -228,7 +227,8 @@ function getGanZhiYear(year, month, day) {
     return `${HEAVENLY_STEMS[hs]}${EARTHLY_BRANCHES[eb]}`;
 }
 
-function getZodiac(year, month, day) {
+//获取生肖
+function getZodiac(year) {
     let remainder = (year - 4) % 12;
     return ZODIAC[remainder];
 }
