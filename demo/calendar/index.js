@@ -194,7 +194,6 @@ function getLunarYearDays(year) {
 
 //转换农历日期
 function convertDay(day) {
-    console.log(day)
     return day <= 10 ? `初${DAY_MAP[day]}` :
             day < 20 ? `十${DAY_MAP[day % 10]}` :
             day === 20 ? "二十" :
@@ -203,7 +202,7 @@ function convertDay(day) {
 
 //获取农历日期(以正月一号为基准)
 function getLunarDate(year, days) {
-    let months, month;
+    let months, month, type;
     if (days < 0) {
         year -= 1;
         days += getLunarYearDays(year);
@@ -211,9 +210,10 @@ function getLunarDate(year, days) {
     months = getLunarYearMonth(year);
     console.log(months, days)
     for (let i = 0, len = months.length; i < len; i++) {
-        let tmp = parseInt(months[i]) + 29;
+        let tmp = +months[i] + 29;
         if (days <= tmp) {
             month = i;
+            type = +months[i];
             break;
         }
         days -= tmp;
@@ -225,7 +225,13 @@ function getLunarDate(year, days) {
     if (months.month && months.month === month) {
         month -= 1;
     }
-    console.log(year, LUNAR_MONTH[month], convertDay(days + 1))
+    days += 1;
+    if ((type === 0 && days === 30) || (type === 1 && days === 31)) {
+        days = 1;
+        month += 1;
+    }
+    days = convertDay(days);
+    console.log(year, LUNAR_MONTH[month], days)
 }
 
 //公历日期转换为农历日期(1901年及以后)
