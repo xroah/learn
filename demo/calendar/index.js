@@ -127,7 +127,9 @@ const SOLAR_TERMS_MAP = {
     "o": 24
 };
 //农历月
-const LUNAR_MONTH = ["正", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"];
+const LUNAR_MONTH = ["正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"];
+//阿拉伯数字对应的中文
+const DAY_MAP = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
 //24节气
 const SOLAR_TERMS = ["小寒","大寒","立春","雨水","惊蛰","春分","清明","谷雨","立夏","小满","芒种","夏至","小暑","大暑","立秋","处暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至"];
 //天干
@@ -190,6 +192,42 @@ function getLunarYearDays(year) {
     }, 0);
 }
 
+//转换农历日期
+function convertDay(day) {
+    console.log(day)
+    return day <= 10 ? `初${DAY_MAP[day]}` :
+            day < 20 ? `十${DAY_MAP[day % 10]}` :
+            day === 20 ? "二十" :
+            day < 30 ? `廿${DAY_MAP[day % 20]}` : "三十";
+}
+
+//获取农历日期(以正月一号为基准)
+function getLunarDate(year, days) {
+    let months, month;
+    if (days < 0) {
+        year -= 1;
+        days += getLunarYearDays(year);
+    } 
+    months = getLunarYearMonth(year);
+    console.log(months, days)
+    for (let i = 0, len = months.length; i < len; i++) {
+        let tmp = parseInt(months[i]) + 29;
+        if (days <= tmp) {
+            month = i;
+            break;
+        }
+        days -= tmp;
+    }
+    console.log(month)
+    months = getLeapMonth(year);
+    year = getGanZhiYear(year);
+    //闰月
+    if (months.month && months.month === month) {
+        month -= 1;
+    }
+    console.log(year, LUNAR_MONTH[month], convertDay(days + 1))
+}
+
 //公历日期转换为农历日期(1901年及以后)
 function solar2Lunar(year, month, day) {
     let base = +new Date("1900-01-31");
@@ -200,12 +238,7 @@ function solar2Lunar(year, month, day) {
         lunarDays += getLunarYearDays(i);
     }
     date = solarDays - lunarDays;
-    if (date >= 0) {
-        year = getGanZhiYear(year);
-    } else {
-        year = getGanZhiYear(year - 1);
-    }
-    console.log(year)
+    getLunarDate(year, date);
 }
 
 function isLeapYear(year) {
