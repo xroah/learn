@@ -208,7 +208,6 @@ function getLunarDate(year, days) {
         days += getLunarYearDays(year);
     } 
     months = getLunarYearMonth(year);
-    console.log(months, days)
     for (let i = 0, len = months.length; i < len; i++) {
         let tmp = +months[i] + 29;
         if (days <= tmp) {
@@ -225,13 +224,14 @@ function getLunarDate(year, days) {
     if (months.month && months.month === month) {
         month -= 1;
     }
+    //0为初一,以此类推，所以+1
     days += 1;
     if ((type === 0 && days === 30) || (type === 1 && days === 31)) {
         days = 1;
         month += 1;
     }
     days = convertDay(days);
-    console.log(year, LUNAR_MONTH[month], days)
+    return `${year}${LUNAR_MONTH[month]}月${days}`;
 }
 
 //公历日期转换为农历日期(1901年及以后)
@@ -244,7 +244,29 @@ function solar2Lunar(year, month, day) {
         lunarDays += getLunarYearDays(i);
     }
     date = solarDays - lunarDays;
-    getLunarDate(year, date);
+    return getLunarDate(year, date);
+}
+
+function formatDate(date) {
+    let y = date.getFullYear(),
+        m = date.getMonth() + 1,
+        d = date.getDate();
+    return `${y}-${m}-${d}`;
+}
+
+//农历转公里(1901年及以后)，公里1900年1月31日为农历正月初一
+function lunar2Solar(year, month, day) {
+    let days = 0, months = getLunarYearMonth(year);
+    for (let i = BASE_YEAR; i < year; i++) {
+        days += getLunarYearDays(i);
+    }
+    for (let i = 0; i < month - 1; i++) {
+        days += +months[i] + 29;
+    }
+    days += day - 1;
+    months = +new Date("1900-01-31");
+    console.log(days,months + days * 24 * 60 * 60 * 1000)
+    return formatDate(new Date(months + days * 24 * 60 * 60 * 1000));
 }
 
 function isLeapYear(year) {
