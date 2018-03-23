@@ -217,11 +217,10 @@ function getLunarDate(year, days) {
         }
         days -= tmp;
     }
-    console.log(month)
     months = getLeapMonth(year);
     year = getGanZhiYear(year);
-    //闰月
-    if (months.month && months.month === month) {
+    //闰月及闰月之后的月都要-1
+    if (months.month && month >= months.month) {
         month -= 1;
     }
     //0为初一,以此类推，所以+1
@@ -231,6 +230,7 @@ function getLunarDate(year, days) {
         month += 1;
     }
     days = convertDay(days);
+    console.log(month)
     return `${year}${LUNAR_MONTH[month]}月${days}`;
 }
 
@@ -238,6 +238,7 @@ function getLunarDate(year, days) {
 function solar2Lunar(year, month, day) {
     let base = +new Date("1900-01-31");
     let date = +new Date(`${year}-${month}-${day}`);
+    if (isNaN(date)) throw new Error("日期错误");
     let solarDays = Math.ceil((date - base)/(24 * 60 * 60 * 1000));
     let lunarDays = 0;
     for (let i = BASE_YEAR; i < year; i++) {
@@ -254,18 +255,23 @@ function formatDate(date) {
     return `${y}-${m}-${d}`;
 }
 
-//农历转公里(1901年及以后)，公里1900年1月31日为农历正月初一
+//农历转公历(1901年及以后)，公历1900年1月31日为农历正月初一
 function lunar2Solar(year, month, day) {
     let days = 0, months = getLunarYearMonth(year);
+    //索引从0开始
+    month -= 1;
+    if (day > +months[month] + 29) throw new Error("日期无效");
+    //获取该年以前的所有天数
     for (let i = BASE_YEAR; i < year; i++) {
         days += getLunarYearDays(i);
     }
-    for (let i = 0; i < month - 1; i++) {
+    //获取该月以前的所有天数
+    for (let i = 0; i < month; i++) {
         days += +months[i] + 29;
     }
+    //1900为正月初一为1， 距正月初一应为0天,故-1，以此类推
     days += day - 1;
     months = +new Date("1900-01-31");
-    console.log(days,months + days * 24 * 60 * 60 * 1000)
     return formatDate(new Date(months + days * 24 * 60 * 60 * 1000));
 }
 
