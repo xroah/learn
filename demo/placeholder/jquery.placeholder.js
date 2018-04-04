@@ -25,7 +25,7 @@
             if (!isSurport() && !_this.val()) {
                 _this.val(_this.attr("placeholder")).css("color", styles.color);
             }
-        }).attr("tabIndex", 0);
+        });
     }
 
     $.fn.extend({
