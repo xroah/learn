@@ -38,7 +38,8 @@
             width = this.size.orignalWidth,
             height = this.size.orignalHeight,
             padding = this.size.padding,
-            border = this.size.border;
+            border = this.size.border,
+            style = getComputedStyle(this.el);
         if (this.boxSizing === "border-box") {
             width += padding.left + padding.right + border.left + border.right;
             height += padding.top + padding.bottom + border.top + border.bottom;
@@ -52,8 +53,8 @@
             "z-index": -1000,
             "width": width,
             "height": height,
-            "padding": getComputedStyle(this.el).getPropertyValue("padding"),
-            "border": getComputedStyle(this.el).getPropertyValue("border")
+            "padding": style.getPropertyValue("padding"),
+            "border": style.getPropertyValue("border")
         });
         $(doc.body).append(ta);
         height = ta.scrollHeight; //scrollHeight不包含边框
@@ -70,27 +71,34 @@
         return this;
     };
 
+    fn.onKeyDown = function (evt) {
+        var code = evt.keyCode,
+            _this = $(this);
+        if (code === 8 || code === 46) {
+            //ie9下按下backspace,delete键不会触发input事件
+            //如果当前删除最后一行的最后一个字符，并不会立即删除最后一行(最后一行是空白行)
+            setTimeout(function () {
+                _this.trigger("input");
+            });
+        }
+        //如果没有输入任何则不做处理(ie下bug)
+        if (code === 13 && !$.trim(this.value)) {
+            evt.preventDefault();
+        }
+    };
+
     fn.initEvent = function () {
-        $(this.el).on("input propertychange", $.proxy(this.setHeight, this)).on("keydown", function (evt) {
-            var code = evt.keyCode,
-                _this = $(this);
-            if (code === 8 || code === 46) {
-                //ie9下按下backspace,delete键不会触发input事件
-                //如果当前删除最后一行的最后一个字符，并不会立即删除最后一行(最后一行是空白行)
-                setTimeout(function () {
-                    _this.trigger("input");
-                });
-            }
-            //如果没有输入任何则不做处理(ie下bug)
-            if (code === 13 && !$.trim(this.value)) {
-                evt.preventDefault();
-            }
-        });
+        $(this.el).
+                    on("input", $.proxy(this.setHeight, this)).
+                    on("keydown", this.onKeyDown);
         return this;
     };
 
     fn.init = function () {
-        this.initEvent().initSize().setHeight();
+        this.
+            initEvent().
+            initSize().
+            setHeight();
     };
     $.fn.extend({
         autoHeightTextArea: function (fn) {
