@@ -61,23 +61,16 @@
 
     fn.selectProvince = function() {
         var val = this.provinceEl.value;
-        if (val) {
-            this.currentProvice = this.data[val];
-            this.initCity();
-        } else {
-            this.currentProvice = this.currentCity = this.currentDistrict = null;
-            this.initCity().initDistrict();
-        }
+        this.currentProvice = val ? this.data[val] : null;
+        this.currentCity = this.currentDistrict = null;
+        this.initCity().initDistrict();
         return this;
     };
 
     fn.selectCity = function() {
         var val = this.cityEl.value;
-        if (val) {
-            this.currentCity = this.currentProvice.child[val];
-        } else {
-            this.currentCity = this.currentCity = null;
-        }
+        this.currentCity = val ? this.currentProvice.child[val] : null;
+        this.currentDistrict = null;
         this.initDistrict();
         return this;
     };
