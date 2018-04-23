@@ -1,0 +1,81 @@
+.imitation-select-container {
+    width: 150px;
+    font-size: 14px;
+}
+
+.imitation-select-container .hide {
+    display: none;
+}
+
+.imitation-select {
+    position: relative;
+    height: 24px;
+    border: 1px solid #aaa;
+    padding-right: 20px;
+    cursor: pointer;
+}
+
+.imitation-select:after,
+.imitation-select-container ul,
+.imitation-select-container li,
+.imitation-select-container div{
+    box-sizing: border-box;
+}
+
+.imitation-select:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 5px;
+    top: 8px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-top-color: #aaa;
+    transition: transform .3s;
+}
+
+.imitation-select.expanded {
+    border-color: skyblue;
+}
+
+.imitation-select.expanded:after {
+    border-top-color: skyblue;
+    transform: rotate(180deg);
+}
+
+.imitation-options {
+    position: absolute;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 150px;
+    max-height: 200px;
+    border: 1px solid #aaa;
+    border-top: none;
+    overflow: auto;
+    transition: transform .3s;
+    transform-origin: top center;
+    background: #fff;
+}
+
+.imitation-select-container .out {
+    transform: scaleY(.3);
+}
+
+.imitation-options li {
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.imitation-options li.hover,
+.imitation-options li.selected {
+    background: #eee;
+    cursor: default;
+}
+
+.imitation-options li + li {
+    border-top: 1px solid #aaa;
+}
