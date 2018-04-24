@@ -46,6 +46,8 @@
             text: "555"
         },
     ];
-        $("#con").iSelect(data);
+        $("#con").iSelect("init", data).on("iselect.change", function(evt, value) {
+            console.log(value);
+        });
     </script>
 </body>

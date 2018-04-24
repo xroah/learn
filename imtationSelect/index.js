@@ -11,6 +11,11 @@
     
     fn.show = function() {
         var me = this;
+        if (this.selected) {
+            this.selected.addClass("selected").siblings(".selected").removeClass(".selected");
+        } else {
+            this.options.find(".selected").removeClass("selected");
+        }
         this.select.addClass("expanded");
         this.options.removeClass("hide");
         setTimeout(function() {
@@ -48,10 +53,23 @@
              removeClass("selected");
         if (value !== this.value) {
             this.value = value;
+            this.selected = li;
             this.select.html(li.text());
-            $(this.container).trigger("iselect.change", value);
+            this.container.trigger("iselect.change", value);
         }
         this.hide();
+    }
+
+    fn.refresh = function(data) {
+        this.data = data;
+        this.value = "";
+        this.select.html("");
+        this.initOptions();
+        return this;
+    }
+
+    fn.val = function() {
+        return this.value;
     }
 
     fn.initEvent = function () { 
@@ -64,6 +82,56 @@
             }
             evt.stopPropagation();
         });
+        this.container.on("keydown", function(evt) {
+            var key = evt.key.toLowerCase(),
+                up = {
+                    "up": true, //ie
+                    "arrowup": true
+                },
+                down = {
+                    "down": true,//ie
+                    "arrowdown": true
+                },
+                esc = {
+                    "esc": true,//ie
+                    "escape": true
+                },
+                options = me.options.children(),
+                tmp;
+            if (me.select.hasClass("expanded")) {
+                tmp = me.options.find(".selected");
+                if (key in up) {
+                    if (tmp.length) {
+                        tmp.removeClass("selected");
+                        if (tmp.index() === 0) {
+                            options.last().addClass("selected");
+                        } else {
+                            tmp.prev().addClass("selected");    
+                        }
+                    } else {
+                        options.last().addClass("selected");
+                    }
+                } else if (key in down) {
+                    tmp.removeClass("selected");
+                    if (tmp.length) {
+                        if (tmp.index() === options.length - 1) {
+                            options.first().addClass("selected");
+                        } else {
+                            tmp.next().addClass("selected");    
+                        }
+                    } else {
+                        options.first().addClass("selected");
+                    }
+                } else if (key === "enter") {
+                    if (tmp.length) {
+                        me.selectOne(tmp);
+                    }
+                } else if (key in esc) {
+                    me.hide();                    
+                }
+            }
+            console.log(evt.key)
+        });
         this.options.on("click", ".imitation-item", function() {
             me.selectOne(this);
         });
@@ -71,7 +139,7 @@
             var tgt = evt.target,
                 con = me.select.get(0);
             //如果显示了选项,并且用户点击不在选择的div，或者其子元素上则关闭
-            if (me.select.hasClass("expanded") && tgt !== con && !me.container.contains(tgt)) {
+            if (me.select.hasClass("expanded") && tgt !== con && !me.container.get(0).contains(tgt)) {
                 me.hide();
             }
         });
@@ -88,15 +156,56 @@
         this.select = select;
         this.options = options;
         con.append(select).append(options);
-        $(this.container).append(con);
+        this.container.attr("tabindex", -1).css("outline", "none").append(con);
         return this.initOptions().initEvent();
     }
+
+    function iSelect(con, method, data) {
+        var ins,
+            i = 0, 
+            len = con.length,
+            methodMap = {
+                "init": true,
+                "refresh": true,
+                "val": true
+            }, tmp;
+        if (!methodMap[method]) {
+            console.warn("方法" + method + "不存在");
+            return con;
+        }
+        if (method === "refresh" || method === "init") {
+            if (!Array.isArray(data)) throw new Error("第二个参数不是一个数组");
+        }
+        if (method === "val") {
+            ins = con.eq(0).data("isInstance");
+            return ins ? ins.val() : null;
+        }
+        for (; i < len; i++) {
+            tmp = con.eq(i);
+            ins = tmp.data("isInstance");
+            if (!ins) {
+                if (method === "init") {
+                    ins = new ImatitionSelect(tmp, data);
+                    ins.init();
+                    tmp.data("isInstance", ins);
+                } else {
+                    console.warn("请先调用init方法初始化");
+                }
+            } else {
+                if (method !== "init") {
+                    console.log(ins[method])
+                    ins[method](data);
+                } else {
+                    console.warn("不能重复初始化,请调用refresh方法");
+                }
+            }
+        }
+        return con;
+    }
+
     $.fn.extend({
-        iSelect: function (data) {
-            this.each(function() {
-                new ImatitionSelect(this, data).init();
-            }); 
-            return this;
+        iSelect: function (method, data) {
+            return iSelect(this, method, data);
          }
     });
  }();

@@ -1,5 +1,6 @@
 .imitation-select-container {
     width: 150px;
+    outline: none;
     font-size: 14px;
 }
 
