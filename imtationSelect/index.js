@@ -1,6 +1,7 @@
 !function () { 
     function ImatitionSelect(appendTo,data) {
-        this.container = appendTo;
+        //目标元素容器,插件的父元素
+        this.target = appendTo;
         this.selected = null;
         this.value = "";
         this.data = data;
@@ -55,7 +56,7 @@
             this.value = value;
             this.selected = li;
             this.select.html(li.text());
-            this.container.trigger("iselect.change", value);
+            this.target.trigger("iselect.change", value);
         }
         this.hide();
     }
@@ -72,18 +73,8 @@
         return this.value;
     }
 
-    fn.initEvent = function () { 
-        var me = this;
-        this.select.on("click", function(evt) {
-            if ($(this).hasClass("expanded")) {
-                me.hide();
-            } else {
-                me.show();
-            }
-            evt.stopPropagation();
-        });
-        this.container.on("keydown", function(evt) {
-            var key = evt.key.toLowerCase(),
+    fn.keyDown = function(evt) {
+        var key = evt.key.toLowerCase(),
                 up = {
                     "up": true, //ie
                     "arrowup": true
@@ -96,10 +87,10 @@
                     "esc": true,//ie
                     "escape": true
                 },
-                options = me.options.children(),
+                options = this.options.children(),
                 tmp;
-            if (me.select.hasClass("expanded")) {
-                tmp = me.options.find(".selected");
+            if (this.select.hasClass("expanded")) {
+                tmp = this.options.find(".selected");
                 if (key in up) {
                     if (tmp.length) {
                         tmp.removeClass("selected");
@@ -124,14 +115,25 @@
                     }
                 } else if (key === "enter") {
                     if (tmp.length) {
-                        me.selectOne(tmp);
+                        this.selectOne(tmp);
                     }
                 } else if (key in esc) {
-                    me.hide();                    
+                    this.hide();                    
                 }
             }
-            console.log(evt.key)
+    }
+
+    fn.initEvent = function () { 
+        var me = this;
+        this.select.on("click", function(evt) {
+            if ($(this).hasClass("expanded")) {
+                me.hide();
+            } else {
+                me.show();
+            }
+            evt.stopPropagation();
         });
+        this.container.on("keydown", this.keyDown.bind(this));
         this.options.on("click", ".imitation-item", function() {
             me.selectOne(this);
         });
@@ -151,12 +153,14 @@
             select = $(doc.createElement("div")),
             options = $(doc.createElement("ul"));
         con.addClass("imitation-select-container");
-        select.addClass("imitation-select");
+        //tabindex 使得div能获取焦点
+        select.addClass("imitation-select").attr("tabindex", -1);
         options.addClass("imitation-options hide out");
+        this.container = con;
         this.select = select;
         this.options = options;
         con.append(select).append(options);
-        this.container.attr("tabindex", -1).css("outline", "none").append(con);
+        this.target.append(con);
         return this.initOptions().initEvent();
     }
 
@@ -169,6 +173,10 @@
                 "refresh": true,
                 "val": true
             }, tmp;
+        if (typeof method !== "string") {
+            throw new Error("第一个参数不是字符串");
+            return con;
+        }
         if (!methodMap[method]) {
             console.warn("方法" + method + "不存在");
             return con;
