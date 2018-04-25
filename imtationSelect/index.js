@@ -152,9 +152,9 @@
         var con = $(doc.createElement("div")),
             select = $(doc.createElement("div")),
             options = $(doc.createElement("ul"));
-        con.addClass("imitation-select-container");
         //tabindex 使得div能获取焦点
-        select.addClass("imitation-select").attr("tabindex", -1);
+        con.addClass("imitation-select-container").attr("tabindex", -1);
+        select.addClass("imitation-select");
         options.addClass("imitation-options hide out");
         this.container = con;
         this.select = select;
@@ -201,7 +201,6 @@
                 }
             } else {
                 if (method !== "init") {
-                    console.log(ins[method])
                     ins[method](data);
                 } else {
                     console.warn("不能重复初始化,请调用refresh方法");
