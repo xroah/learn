@@ -20,7 +20,7 @@
         this.options.removeClass("hide");
         setTimeout(function() {
             me.options.removeClass("out");
-        });
+        }, 16);
         return this;
     }
 
