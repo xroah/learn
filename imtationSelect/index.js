@@ -12,10 +12,9 @@
     
     fn.show = function() {
         var me = this;
+		this.options.find(".selected").removeClass("selected");
         if (this.selected) {
-            this.selected.addClass("selected").siblings(".selected").removeClass(".selected");
-        } else {
-            this.options.find(".selected").removeClass("selected");
+            this.selected.addClass("selected");
         }
         this.select.addClass("expanded");
         this.options.removeClass("hide");
