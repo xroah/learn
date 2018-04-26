@@ -122,28 +122,29 @@
             }
     }
 
+    fn._docClick = function(evt) {
+        var tgt = evt.target,
+            con = this.select.get(0);
+        //如果显示了选项,并且用户点击不在选择的div，或者其子元素上则关闭
+        if (this.select.hasClass("expanded") && tgt !== con && !this.container.get(0).contains(tgt)) {
+            this.hide();
+        }
+    };
+
     fn.initEvent = function () { 
         var me = this;
-        this.select.on("click", function(evt) {
+        this.container.on("click", ".imitation-select", function(evt) {
             if ($(this).hasClass("expanded")) {
                 me.hide();
             } else {
                 me.show();
             }
             evt.stopPropagation();
-        });
-        this.container.on("keydown", this.keyDown.bind(this));
-        this.options.on("click", ".imitation-item", function() {
+        }).on("keydown", this.keyDown.bind(this))
+        .on("click", ".imitation-item", function() {
             me.selectOne(this);
         });
-        $(document).on("click", function(evt) {
-            var tgt = evt.target,
-                con = me.select.get(0);
-            //如果显示了选项,并且用户点击不在选择的div，或者其子元素上则关闭
-            if (me.select.hasClass("expanded") && tgt !== con && !me.container.get(0).contains(tgt)) {
-                me.hide();
-            }
-        });
+        $(doc).on("click", this.docClick);
         return this;
     }
     
@@ -158,9 +159,22 @@
         this.container = con;
         this.select = select;
         this.options = options;
+        this.docClick = this._docClick.bind(this);
         con.append(select).append(options);
-        this.target.append(con);
+        this.target.append(con).data("isInstance", this);
         return this.initOptions().initEvent();
+    }
+
+    fn.destroy = function() {
+        var key;
+        $(this.target).empty().data("isInstance", null);
+        $(doc).off("click", this.docClick);
+        for (key in this) {
+            if (this.hasOwnProperty(key)) {
+                delete this[key];
+            }
+        }
+        return this;
     }
 
     function iSelect(con, method, data) {
@@ -168,9 +182,10 @@
             i = 0, 
             len = con.length,
             methodMap = {
-                "init": true,
-                "refresh": true,
-                "val": true
+                init: true,
+                destroy: true, 
+                refresh: true,
+                val: true
             }, tmp;
         if (typeof method !== "string") {
             throw new Error("第一个参数不是字符串");
@@ -194,7 +209,6 @@
                 if (method === "init") {
                     ins = new ImatitionSelect(tmp, data);
                     ins.init();
-                    tmp.data("isInstance", ins);
                 } else {
                     console.warn("请先调用init方法初始化");
                 }
