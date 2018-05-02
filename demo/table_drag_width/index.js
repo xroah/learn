@@ -39,6 +39,7 @@
             let resize = $(this);
             //鼠标左键evt.button 为0
             if (evt.button) return; 
+            $(table).css("cursor", "col-resize");
             baseMark.css({
                 left: startX,
                 top: rect.top,
@@ -53,7 +54,7 @@
                 let dis = evt.clientX - startX;
                 let td = resize.parent();
                 td.css("width", td.width() + dis);
-                $(table).off("mousemove", mouseMove);
+                $(table).off("mousemove", mouseMove).css("cursor", "default");
                 baseMark.hide();
             }
             $(table).on("mousemove", mouseMove);
