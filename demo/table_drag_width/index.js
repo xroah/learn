@@ -17,8 +17,8 @@
         let baseMark = $(document.body).children(".base-mark");
         if (!baseMark.length) {
             baseMark = $(document.createElement("div"));
-        baseMark.addClass("base-mark").css("height", height);
-        $(document.body).append(baseMark);
+            baseMark.addClass("base-mark").css("height", height);
+            $(document.body).append(baseMark);
         }
         table.show();
     }
@@ -38,14 +38,14 @@
             let rect = this.getBoundingClientRect();
             let resize = $(this);
             //鼠标左键evt.button 为0
-            if (evt.button) return; 
+            if (evt.button) return;
             $(table).css("cursor", "col-resize");
             baseMark.css({
                 left: startX,
                 top: rect.top,
                 height: $(table).height()
             }).show();
-            let mouseMove = function(evt) {
+            let mouseMove = function (evt) {
                 baseMark.css({
                     left: evt.clientX
                 });
@@ -59,14 +59,14 @@
             }
             $(table).on("mousemove", mouseMove);
             $(document.body).one("mouseup", mouseUp);
-             console.log("mousedown")
-         });
-         tableDragWidth(table);
+            console.log("mousedown")
+        }).css("table-layout", "fixed");
+        tableDragWidth(table);
     }
 
     $.fn.extend({
         tableDragWidth() {
-            return this.each(function() {
+            return this.each(function () {
                 init(this);
             });
         }
