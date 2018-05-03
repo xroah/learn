@@ -2,17 +2,25 @@
     function addCursor(table) {
         table = $(table);
         let height = table.height();
-        table.hide();
         let tr = table.find("tr").eq(0);
         let tds = tr.find("th");
+        let span = $(document.createElement("span"));
+        span.addClass("resize");
         if (!tds.length) {
             tds = tr.find("td");
         }
         //最后一个td不加resize
         for (let i = 0, len = tds.length - 1; i < len; i++) {
-            let span = $(document.createElement("span"));
-            span.addClass("resize");
-            tds.eq(i).css("position", "relative").append(span);
+            let tmp = tds.eq(i);
+            //如果不设置列的宽度，拖动时前面几列宽度会跟着变化
+            //拖动列后宽度正常 
+            if (i === 0) {
+                ;
+            }
+            tmp.css({
+                width: tmp.width(),
+                position: "relative"
+            }).append(span.clone());
         }
         let baseMark = $(document.body).children(".base-mark");
         if (!baseMark.length) {
@@ -20,7 +28,6 @@
             baseMark.addClass("base-mark").css("height", height);
             $(document.body).append(baseMark);
         }
-        table.show();
     }
 
     function tableDragWidth(table) {
