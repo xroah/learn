@@ -1,6 +1,9 @@
+
+let uid = 0;
 class Subject {
     constructor() {
         this.observers = [];
+        this.id = uid++;
     }
 
     get(index) {
@@ -31,7 +34,6 @@ class Subject {
     depend() {
         if (Subject.target) {
             Subject.target.addDep(this);
-            Subject.target = null;
         }
     }
 
@@ -65,14 +67,18 @@ class Watcher {
     constructor(vm, exp, cb = noop()) {
         this.vm = vm;
         this.deps = [];
+        this.depIds = new Set();
         this.exp = exp;
         this.cb = cb;
         Subject.target = this;
     }
 
     addDep(sub) {
-        sub.add(this);
-        this.deps.push(sub);
+        if (!this.depIds.has(sub.id)) {
+            this.depIds.add(sub.id);
+            sub.add(this);
+            this.deps.push(sub);
+        }
     }
 
     update(prop, val, oldVal) {
@@ -172,7 +178,7 @@ class DataBinding {
         for (let i = 0, len = children.length; i < len; i++) {
             let node = children[i];
             if (node.hasAttribute("v-bind")) {
-                node.innerHTML = val;
+                if (node.getAttribute("v-bind") === prop) node.innerHTML = val;
             } else if(node.children.length) {
                 this.update(prop, val, oldVal, node);
             } else {
@@ -180,11 +186,10 @@ class DataBinding {
                 if (!views[prop]) views[prop] = [];
                 if (reg.test(node.nodeValue)) {
                     views[prop].push(node);
-                } else {
-                    views[prop].forEach(function(node) {
-                        node.nodeValue = val;
-                    });
-                }
+                } 
+                views[prop].forEach(function(node) {
+                    node.nodeValue = val;
+                });
             }
         }
         models[prop].forEach(function(input) {
@@ -195,10 +200,12 @@ class DataBinding {
 }
 
 let data = {
-    model: 1
+    model: 1,
+    model1: 2
 };
 
 new DataBinding({
     el: "#app",
     data
 });
+
