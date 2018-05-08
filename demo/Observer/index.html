@@ -7,8 +7,21 @@
     <title>Document</title>
 </head>
 <body>
-    <input type="text" id="input"/>
-    <div id="value"></div>
+    <div id="app">
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div v-bind="model"></div>
+        <div>{{model}}</div>
+        <div>{{model}}</div>
+        <div>{{model}}</div>
+        <input type="text" v-model="model"/>
+        <input type="text" v-model="model"/>
+        <input type="text" v-model="model"/>
+    </div>
     <script src="index.js"></script>
 </body>
 </html>
