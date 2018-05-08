@@ -179,7 +179,7 @@
 
         update(prop, val, oldVal, root) {
             root = root || this.$el;
-            let reg = new RegExp("{{(" + prop + ")}}");
+            let reg = new RegExp("{{" + prop + "}}");
             let children = root.children;
             for (let i = 0, len = children.length; i < len; i++) {
                 let node = children[i];
