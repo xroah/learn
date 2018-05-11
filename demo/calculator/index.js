@@ -31,6 +31,11 @@ Stack.prototype = {
     }
 };
 
+/**
+ * 如33+10 split后为["3", "3", "+", "1", "0"]
+ * 处理表达式split后的数组,将分割后的整数/小数还原为原来数
+ * @param {Array} 表达式split后的的字符串数组 
+ */
 function handleExpArray(expArr) {
     let result = [];
     let charMap = {
@@ -44,7 +49,10 @@ function handleExpArray(expArr) {
     for (let i = 0, len = expArr.length; i < len; i++) {
         let char = expArr[i];
         let tmp = result.pop() || "";
+        //当前字符为数字
         if (!charMap[char]) {
+            //结果数组中最后一个运算符或者括号则直接将pop出来的字符和当前字符push回去
+            //否则拼接上当前字符再push回去
             if (charMap[tmp]) {
                 result.push(tmp, char);
             } else {
@@ -57,8 +65,20 @@ function handleExpArray(expArr) {
     return result;
 }
 
+
+/**
+ * 中缀表达式转换为后缀表达式法则：
+ * 1、如果遇到数字，我们就直接将其输出。
+ * 2、如果遇到非数字时，若栈为空或者该符号为左括号或者栈顶元素为括号，直接入栈。
+ * 3、如果遇到一个右括号，持续出栈并输出符号，直到栈顶元素为左括号，
+ * 然后将左括号出栈（注意，左括号只出栈，不输出），右括号不入栈
+ * 4、如果遇到运算符号且栈非空，查看栈顶元素，如果栈顶元素的运算优先级大于或者等于该运算符号，
+ * 则持续出栈，直到栈顶元素优先级小于该运算符。最后将该元素入栈
+ * 5、如果我们读到了输入的末尾，则将栈中所有元素依次弹出。
+ * @param {string} exp 要转换的表达式 
+ */
 function convertExpression(exp) {
-    let _exp = exp.replace(/\s+/g, "").split("");
+    let _exp = exp.replace(/\s+/g, "").split(""); //去掉表达式多余的空格
     _exp = handleExpArray(_exp);
     let result = [];
     let stack = new Stack();
@@ -117,6 +137,13 @@ function divide(a, b) {
     return a / b;
 }
 
+/**
+ * 后缀表达式求值
+ * 从左到右扫描后缀表达式
+ * 遇到运算符就把表达式中该运算符前面两个操作数取出并运算，然后把结果带回后缀表达式
+ * ；继续扫描直到后缀表达式最后一个表达式。
+ * @param {string} 待求值的表达式 
+ */
 function calc(exp) {
     let ret = convertExpression(exp);
     let stack = new Stack();
@@ -149,7 +176,7 @@ function calc(exp) {
     return stack.pop();
 }
 
-let exp = "39 +(3-1)*3+6/2";
+let exp = "39 +((3-1) + 2*3)*3+6/2";
 
 let result = calc(exp);
 
