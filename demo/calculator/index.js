@@ -6,8 +6,8 @@ function Stack() {
 Stack.prototype = {
     constructor: Stack,
     push(item) {
-        this.data.push(item);
         this.top++;
+        return this.data.push(item);
     },
     pop() {
         this.top--;
@@ -31,8 +31,35 @@ Stack.prototype = {
     }
 };
 
+function handleExpArray(expArr) {
+    let result = [];
+    let charMap = {
+        "+": true,
+        "-": true,
+        "*": true,
+        "/": true,
+        "(": true,
+        ")": true
+    };
+    for (let i = 0, len = expArr.length; i < len; i++) {
+        let char = expArr[i];
+        let tmp = result.pop() || "";
+        if (!charMap[char]) {
+            if (charMap[tmp]) {
+                result.push(tmp, char);
+            } else {
+                result.push(tmp + char);
+            }
+        } else {
+            result.push(tmp, char);
+        }
+    }
+    return result;
+}
+
 function convertExpression(exp) {
-    let _exp = exp.split("");
+    let _exp = exp.replace(/\s+/g, "").split("");
+    _exp = handleExpArray(_exp);
     let result = [];
     let stack = new Stack();
     let priority = {
@@ -41,9 +68,10 @@ function convertExpression(exp) {
         "*": 1,
         "/": 1
     };
+    let reg = /\d/;
     for (let i = 0, len = _exp.length; i < len; i++) {
         let char = _exp[i];
-        if (/\d/.test(char)) {
+        if (reg.test(char)) {
             result.push(char);
         } else {
             let peek = stack.peek();
@@ -92,14 +120,14 @@ function divide(a, b) {
 function calc(exp) {
     let ret = convertExpression(exp);
     let stack = new Stack();
+    let reg = /\d/;
     for (let i = 0, len = ret.length; i < len; i++) {
         let char = ret[i];
-        if (/\d/.test(char)) {
+        if (reg.test(char)) {
             stack.push(char);
         } else {
             let num1 = +stack.pop();
             let num2 = +stack.pop();
-            console.log(num1, num2)
             let result;
             switch (char) {
                 case "+":
@@ -118,9 +146,11 @@ function calc(exp) {
             stack.push(result);
         }
     }
-    console.log(stack.pop())
+    return stack.pop();
 }
 
-let exp = "9+(3-1)*3+6/2";
+let exp = "39 +(3-1)*3+6/2";
 
-calc(exp);
+let result = calc(exp);
+
+console.log("表达式结果=>", result);
