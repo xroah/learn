@@ -1,6 +1,4 @@
-function isObject(obj) {
-    return Object.prototype.toString.call(obj) === "[object Object]"
-}
+const utils = require("./utils");
 
 function bfs(obj) {
     let keys = Object.keys(obj);
@@ -8,7 +6,7 @@ function bfs(obj) {
     while(keys.length) {
         let key = keys.shift();
         let value = values.shift();
-        if (isObject(value)) {
+        if (utils.isObject(value)) {
             keys = keys.concat(Object.keys(value));
             values = values.concat(Object.values(value));
         } else {
@@ -26,7 +24,14 @@ let obj = {
      e: 5
     },
     f: {
-        g: 7
+        g: 7,
+        l: {
+            o: 23,
+            p: {
+                u: 42,
+                w: 28
+            }
+        }
     },
     h: {
         m: 10,
