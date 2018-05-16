@@ -1,14 +1,14 @@
 const utils = require("./utils");
 
 function bfs(obj) {
-    let keys = Object.keys(obj);
-    let values = Object.values(obj);
+    let {keys, values} = utils.getObjectKeysAndValues(obj);
     while(keys.length) {
         let key = keys.shift();
         let value = values.shift();
         if (utils.isObject(value)) {
-            keys = keys.concat(Object.keys(value));
-            values = values.concat(Object.values(value));
+            let tmp = utils.getObjectKeysAndValues(value);
+            keys = keys.concat(tmp.keys);
+            values = values.concat(tmp.values);
         } else {
             console.log(`${key}=>${value}`);
         }
@@ -45,5 +45,6 @@ let obj = {
         }
     }
 };
-
+console.time("遍历");
 bfs(obj);
+console.timeEnd("遍历")
