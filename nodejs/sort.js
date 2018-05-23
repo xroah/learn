@@ -1,16 +1,29 @@
 let arr = [];
 
-for (let i = 0; i < 1000000; i++) {
-    arr.push(Math.random() * 1000000 >>> 0);
+for (let i = 0; i < 100000; i++) {
+    arr.push(Math.random() * 100000 >>> 0);
 }
 
 function bubbleSort(arr) {
     let copy = arr.slice();
     let len = copy.length;
     for (let i = 0; i < len; i++) {
-        for (let j = len - 1; j > 0; j--) {
-            if (copy[j] < copy[j - 1]) {
-                copy[j - 1] = [copy[j], copy[j] = copy[j - 1]][0];
+        for (let j = 0; j < len - i - 1; j++) {
+            if (copy[j] > copy[j + 1]) {
+                copy[j + 1] = [copy[j], copy[j] = copy[j + 1]][0];
+            }
+        }
+    }
+    return copy;
+}
+
+function selectionSort(arr) {
+    let copy = arr.slice();
+    let len = copy.length;
+    for (let i = 0; i < len - 1; i++) {
+        for (let j = i + 1; j < len; j++) {
+            if (copy[i] > copy[j]) {
+                [copy[i], copy[j]] = [copy[j], copy[i]];
             }
         }
     }
@@ -73,6 +86,10 @@ console.time("冒泡");
 bubbleSort(arr);
 console.timeEnd("冒泡");
 
+console.time("选择");
+selectionSort(arr);
+console.timeEnd("选择");
+
 console.time("插入");
 insertionSort(arr);
 console.timeEnd("插入");
@@ -84,6 +101,5 @@ console.timeEnd("快速1");
 console.time("快速2");
 let copy = arr.slice();
 quickSort2(copy, 0, copy.length - 1);
-console.log(copy)
 console.timeEnd("快速2");
 
