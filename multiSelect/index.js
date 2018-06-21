@@ -5,7 +5,9 @@ function MultiSel(options) {
     if (!$.isPlainObject(options)) {
         options = {};
     }
+    this.wrapper = $('<div class="r-multi-wrapper"></div>');
     this.options = options;
+    this.opened = this.disabled = false;
 }
 
 function arrayIndexOf(arr, val, start) {
@@ -29,20 +31,19 @@ MultiSel.prototype = {
     init: function (selector) {
         var el = $(selector);
         if (!el.prop("multiple")) {
+            el.data("ms-instance", null);
             return;
         }
         var caret = $('<span class="r-multi-caret"></span>');
-        this.hiddenInput.attr("name", el.attr("name")).insertAfter(el);
-        this.input.css({
-            cursor: "default",
-            color: "#666"
-        }).insertAfter(el);
-        el.attr("name", "").hide();
-        caret.insertAfter(this.input);
+        this.hiddenInput.attr("name", el.attr("name"));
+        el.data("display", el.css("display")).attr("name", "").hide();
+        this.wrapper.append([this.input, this.hiddenInput, caret]).insertAfter(el);
+        this.documentClick = $.proxy(this._documentClick, this);
+        this.el = el;
         this.initOptions(el);
         this.initEvent();
     },
-    initOptions: function(select) {
+    initOptions: function (select) {
         var options = select.children(),
             html = [],
             val = [],
@@ -74,18 +75,14 @@ MultiSel.prototype = {
     initEvent: function () {
         var ul = this.list,
             _this = this;
-        this.input.on("click", function () {
+        this.input.on("click", function (evt) {
+            if (this.disabled) return;
             var rect = this.getBoundingClientRect();
-            var display = ul.css("display");
             ul.css({
                 left: rect.left,
                 top: rect.bottom - 1
             });
-            if (display === "none") {
-                ul.fadeIn(150)
-            } else {
-                ul.fadeOut(150);
-            }
+            _this.opened ? _this.close() : _this.open();
         });
         this.list.on("change", ".check", function () {
             var $this = $(this);
@@ -98,43 +95,95 @@ MultiSel.prototype = {
             }
             _this.setText(val);
             _this.hiddenInput.val(val.join(","));
+            _this.el.trigger("ms.change", [val]);
         });
-        $(document).on("click", function (evt) {
-            var tgt = evt.target;
-            if (tgt !== ul[0] && tgt !== _this.input[0] && !ul[0].contains(tgt)) {
-                ul.fadeOut(150);
-            }
-        });
+        $(document).on("click", this.documentClick);
+    },
+    _documentClick: function (evt) {
+        var tgt = evt.target,
+            ul = this.list;
+        if (tgt !== ul[0] && tgt !== this.input[0] && !ul[0].contains(tgt)) {
+            this.close();
+        }
+    },
+    open: function() {
+        if (this.disabled) return;
+        if (!this.opened) {
+            this.opened = true;
+            this.list.fadeIn(150);
+            this.wrapper.addClass("opened");
+        }
+    },
+    close: function () { 
+        if (this.opened) {
+            this.opened = false;
+            this.list.fadeOut(150);
+            this.wrapper.removeClass("opened");
+        }
+    },
+    disable: function() {
+        if (!this.disabled) {
+            this.disabled = true;
+            this.input.prop("disabled", true);
+            this.wrapper.addClass("disabled");
+        }
+    },
+    enable: function() {
+        if (this.disabled) {
+            this.disabled = false;
+            this.input.prop("disabled", false);
+            this.wrapper.removeClass("disabled");
+        }
     },
     setText: function (val) {
         val.length ?
             this.input.val("已选中" + val.length + "项") :
             this.input.val(this.options.defaultValue);
     },
-    getSelected: function() {
-        return this.hiddenInput.val().split(",");
+    destroy: function () {
+        this.input.off();
+        this.wrapper.remove();
+        this.list.remove();
+        $(document).off("click", this.documentClick);
+        this.el.data("ms-instance", null).css("display", this.el.data("display"));
+        for (var key in this) {
+            if (this.hasOwnProperty(key)) {
+                delete this[key];
+            }
+        }
+    },
+    getSelected: function () {
+        var val = this.hiddenInput.val();
+        return !val ? [] : val.split(",");
     }
 };
 $.fn.extend({
     multiSel: function (options) {
         var i = 0,
             len = this.length,
-            instance;
+            instance,
+            hasReturnValueFunc = {
+                getSelected: true
+            };
         if (typeof options === "string") {
-            switch(options) {
-                case "getSelected": 
-                    instance = this.first().data("ms-instance");
-                    if (instance) {
-                        return instance.getSelected();
+            for (; i < len; i++) {
+                instance = this.eq(i).data("ms-instance");
+                if (instance) {
+                    if (!(options in hasReturnValueFunc)) {
+                        instance[options]();
+                    } else {
+                        return instance[options]();
                     }
-                    break;
+                }
             }
+
         } else {
             for (; i < len; i++) {
                 instance = new MultiSel(options);
-                instance.init(this[i]);
                 this.eq(i).data("ms-instance", instance);
+                instance.init(this[i]);
             }
         }
+        return this;
     }
 });

@@ -31,6 +31,8 @@
     <script>
         $(".multi").multiSel({
             defaultValue: "请选择"
+        }).on("ms.change", function(evt, val) {
+console.log(val);
         });
     </script>
 </body>
