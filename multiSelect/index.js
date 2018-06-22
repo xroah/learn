@@ -1,3 +1,6 @@
+import $ from "jquery";
+import "./index.css";
+
 function MultiSel(options) {
     this.input = $('<input type="text" readonly class="r-multi-input">');
     this.hiddenInput = $('<input type="hidden">'); //存放选中的值(表单提交)
