@@ -26,11 +26,30 @@
         <option value="">请选择</option>
         <option value="1">浙江</option>
     </select>
+    <div class="multi"></div>
     <script src="../jquery-1.11.2.min.js"></script>
     <script src="./index.js"></script>
     <script>
         $(".multi").multiSel({
-            defaultValue: "请选择"
+            defaultValue: "请选择",
+            data: [{
+                value: "heihei",
+                text: "嘿嘿",
+                selected: true,
+            },{
+                value: "haha",
+                text: "哈哈"
+            },{
+                value: "hehe",
+                text: "呵呵"
+            },{
+                value: "xixi",
+                text: "嘻嘻",
+                selected: true,
+            },{
+                value: "hengheng",
+                text: "哼哼"
+            }]
         }).on("ms.change", function(evt, val) {
 console.log(val);
         });

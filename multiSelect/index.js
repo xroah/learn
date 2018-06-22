@@ -30,20 +30,31 @@ MultiSel.prototype = {
     constructor: MultiSel,
     init: function (selector) {
         var el = $(selector);
-        if (!el.prop("multiple")) {
-            el.data("ms-instance", null);
-            return;
-        }
         var caret = $('<span class="r-multi-caret"></span>');
-        this.hiddenInput.attr("name", el.attr("name"));
-        el.data("display", el.css("display")).attr("name", "").hide();
-        this.wrapper.append([this.input, this.hiddenInput, caret]).insertAfter(el);
+        this.hiddenInput.attr("name", el.attr("name") || this.options.name);
+        if (el.get(0).nodeName.toLowerCase() === "select") {
+            this.initOptions(el);
+            el.data("display", el.css("display")).attr("name", "").hide();
+            this.wrapper.append([this.input, this.hiddenInput, caret]).insertAfter(el);
+        } else {
+            if (!this.options.data) {
+                throw new Error("没有data，请选择select元素或者提供data选项");
+            }
+            this.initOptions(this.options.data, true);
+            this.wrapper.append([this.input, this.hiddenInput, caret]).appendTo(el);
+        }
         this.documentClick = $.proxy(this._documentClick, this);
         this.el = el;
-        this.initOptions(el);
         this.initEvent();
     },
-    initOptions: function (select) {
+    initOptions: function (select, isData) {
+        var ret = isData ? this.initOptionsByData(select) : this.initOptionsBySelect(select);
+        this.hiddenInput.val(ret.val.join(","));
+        this.setText(ret.val);
+        this.list.append(ret.html.join(""));
+        $(document.body).append(this.list);
+    },
+    initOptionsBySelect: function(select) {
         var options = select.children(),
             html = [],
             val = [],
@@ -67,15 +78,37 @@ MultiSel.prototype = {
             });
             html.push(li);
         }
-        this.hiddenInput.val(val.join(","));
-        this.setText(val);
-        this.list.append(html.join(""));
-        $(document.body).append(this.list);
+        return {val: val, html: html}
+    },
+    initOptionsByData: function(select) {
+        var html = [],
+            val = [],
+            i = 0,
+            len = select.length,
+            tmp;
+        for (; i < len; i++) {
+            tmp = select[i];
+            if (tmp.selected) {
+                val.push(tmp.value);
+                li = '<li><label title="{text}"><input type="checkbox" class="check" checked value="{val}"/>{text}</label></li>';
+            } else {
+                li = '<li><label title="{text}"><input type="checkbox" class="check" value="{val}"/>{text}</label></li>';
+            }
+            li = li.replace(/(\{text\})|(\{val\})/g, function (match, $1, $2) {
+                if ($1) {
+                    return $1 = tmp.text;
+                } else if ($2) {
+                    return $2 = tmp.value;
+                }
+            });
+            html.push(li);
+        }
+        return {val: val, html: html}
     },
     initEvent: function () {
         var ul = this.list,
             _this = this;
-        this.input.on("click", function (evt) {
+        this.wrapper.on("click", function (evt) {
             if (this.disabled) return;
             var rect = this.getBoundingClientRect();
             ul.css({
@@ -102,7 +135,12 @@ MultiSel.prototype = {
     _documentClick: function (evt) {
         var tgt = evt.target,
             ul = this.list;
-        if (tgt !== ul[0] && tgt !== this.input[0] && !ul[0].contains(tgt)) {
+        if (
+            tgt !== ul[0] && 
+            !ul[0].contains(tgt) && 
+            tgt !== this.wrapper[0] &&
+            !this.wrapper[0].contains(tgt)
+        ) {
             this.close();
         }
     },
@@ -141,7 +179,6 @@ MultiSel.prototype = {
             this.input.val(this.options.defaultValue);
     },
     destroy: function () {
-        this.input.off();
         this.wrapper.remove();
         this.list.remove();
         $(document).off("click", this.documentClick);
@@ -157,6 +194,7 @@ MultiSel.prototype = {
         return !val ? [] : val.split(",");
     }
 };
+
 $.fn.extend({
     multiSel: function (options) {
         var i = 0,
@@ -165,6 +203,7 @@ $.fn.extend({
             hasReturnValueFunc = {
                 getSelected: true
             };
+        if (!len) throw new Error("没有选中元素");
         if (typeof options === "string") {
             for (; i < len; i++) {
                 instance = this.eq(i).data("ms-instance");
@@ -176,9 +215,11 @@ $.fn.extend({
                     }
                 }
             }
-
         } else {
             for (; i < len; i++) {
+                //防止重复初始化
+                instance = this.eq(i).data("ms-instance");
+                if (instance) continue;
                 instance = new MultiSel(options);
                 this.eq(i).data("ms-instance", instance);
                 instance.init(this[i]);
