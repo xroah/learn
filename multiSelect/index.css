@@ -79,5 +79,15 @@
 }
 
 .r-multi-list li:hover {
+    color: #fff;
+    background-color: #1E90FF;
+}
+.r-multi-list li.selected {
+    color: #333;
     background-color: #dadada;
+}
+
+.r-multi-list li.disabled {
+    color: #aaa;
+    cursor: not-allowed;
 }

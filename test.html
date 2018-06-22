@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .r-multi-checkbox-wrapper {
+            font-size: 14px;
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox {
+            display: none;
+        }
+
+        .r-multi-checkbox-wrapper span {
+            vertical-align: middle;
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox-outer {
+            display: inline-block;
+            position: relative;
+            width: 13px;
+            height: 13px;
+            border: 1px solid #a6a6a6;
+            overflow: hidden;
+            vertical-align: middle;
+            box-sizing: border-box;
+            transition: all .3s;
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox-outer::after,
+        .r-multi-checkbox-wrapper .r-multi-checkbox-outer::before {
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            content: "";
+            width: 100%;
+            height: 100%;
+            box-sizing: inherit;
+            transition: inherit;
+            transition: inherit;
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox-outer::before {
+            left: 1px;
+            top: 2px;
+            border: 2px solid transparent;
+            border-right: none;
+            border-top: none;
+            z-index: 10;
+            height: 45%;
+            width: 80%;
+            -ms-transform: rotate(-45deg) scale(0);/*for IE9*/
+            transform: rotate(-45deg) scale(0);
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox:checked+.r-multi-checkbox-outer::before {
+            border-color: #fff;
+            -ms-transform: rotate(-45deg) scale(1); 
+            transform: rotate(-45deg) scale(1);
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox:checked+.r-multi-checkbox-outer {
+            border-color: #1E90FF;
+        }
+
+        .r-multi-checkbox-wrapper .r-multi-checkbox:checked+.r-multi-checkbox-outer::after {
+            background: #1E90FF;
+        }
+    </style>
+</head>
+
+<body>
+    <label class="r-multi-checkbox-wrapper">
+        <input type="checkbox" class="r-multi-checkbox">
+        <span class="r-multi-checkbox-outer"></span>
+        <span>多选框</span>
+    </label>
+</body>
+
+</html>
