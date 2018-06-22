@@ -1,2 +1,2 @@
 # plugins
-插件集
+jquery插件
