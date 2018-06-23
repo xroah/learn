@@ -1,10 +1,24 @@
 const MINI_CSS_EXTRACT_PLUGIN = require("mini-css-extract-plugin");
+const YARGS = require("yargs");
+
+let mod = YARGS.argv.module;
+
+let entry;
+//如果输入了webpack --module mod，则打包该模块
+//否则全部打包
+if (mod) {
+    entry = {
+        [mod]: `./${mod}`
+    }
+} else {
+    entry = {
+        MultiSel: "./multiSelect"
+    }
+}
 
 module.exports = {
     mode: "production",
-    entry: {
-        MultiSel: "./multiSelect"
-    },
+    entry,
     devtool: "source-map",
     output: {
         path: `${__dirname}/dist`,
