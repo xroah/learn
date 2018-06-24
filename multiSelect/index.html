@@ -1,13 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="../dist//multiSelect/multiSelect.min.css">
     <title>Document</title>
 </head>
+
 <body>
+    <!-- <div class="r-select-wrapper r-select-opened">
+        <input type="text" readonly class="r-select-input" />
+        <input type="hidden" />
+        <span class="r-select-caret"></span>
+    </div>
+    <ul class="r-select-options">
+        <li>
+            <label class="r-checkbox-wrapper">
+                <span class="r-checkbox-outer"></span>
+                <span>多选框</span>
+            </label>选项1</li>
+        <li class="r-select-selected">
+            <label class="r-checkbox-wrapper">
+                <span class="r-checkbox-outer"></span>
+                <span>多选框</span>
+            </label>选项2</li>
+        <li class="r-select-disabled">
+            <label class="r-checkbox-wrapper">
+                <span class="r-checkbox-outer"></span>
+                <span>多选框</span>
+            </label>选项3</li>
+        <li>
+            <label class="r-checkbox-wrapper">
+                <span class="r-checkbox-outer"></span>
+                <span>多选框</span>
+            </label>选项4</li>
+        <li>
+            <label class="r-checkbox-wrapper">
+                <span class="r-checkbox-outer"></span>
+                <span>多选框</span>
+            </label>选项5</li>
+    </ul> -->
     <select multiple class="multi">
         <option value="1">选项1</option>
         <option value="2">选项2</option>
@@ -17,42 +51,31 @@
     </select>
     <select multiple class="multi">
         <option value="1">类型1</option>
-        <option value="2">类型2</option>
-        <option value="3">类型2</option>
-        <option value="4">类型4</option>
+        <option value="2" disabled>类型2</option>
+        <option value="3" selected>类型3</option>
+        <option value="4" selected>类型4</option>
         <option value="5">类型5</option>
     </select>
-    <select class="multi">
+    <select class="single">
         <option value="">请选择</option>
         <option value="1">浙江</option>
     </select>
+    <select class="single">
+        <option value="">请选择</option>
+        <option value="s1" disabled selected>单选1</option>
+        <option value="s2">单选2</option>
+        <option value="s3">单选3</option>
+        <option value="s4" disabled>单选5</option>
+        <option value="s5">单选6</option>
+    </select>
     <div class="multi"></div>
-    <script src="../jquery-1.11.2.min.js"></script>
-    <script src="./index.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../dist/multiSelect/jquery.multiSelect.min.js"></script>
     <script>
-        $(".multi").multiSel({
-            defaultValue: "请选择",
-            data: [{
-                value: "heihei",
-                text: "嘿嘿",
-                selected: true,
-            },{
-                value: "haha",
-                text: "哈哈"
-            },{
-                value: "hehe",
-                text: "呵呵"
-            },{
-                value: "xixi",
-                text: "嘻嘻",
-                selected: true,
-            },{
-                value: "hengheng",
-                text: "哼哼"
-            }]
-        }).on("ms.change", function(evt, val) {
-console.log(val);
+        $(".single, .multi").select({
+            placeholder: "请选择"
         });
     </script>
 </body>
+
 </html>
