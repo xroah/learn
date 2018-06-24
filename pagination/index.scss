@@ -1,0 +1,132 @@
+.rpages-list {
+    display: inline-block;
+    padding: 10px 1px;
+    margin: 0;
+    list-style: none;
+    font-size: 14px;
+}
+
+.rpages-nowrap {
+    white-space: nowrap;
+    overflow: auto;
+}
+
+.rpages-text-left {
+    text-align: left;
+}
+
+.rpages-text-center {
+    text-align: center;
+}
+
+.rpages-text-right {
+    text-align: right;
+}
+
+.rpages-list > li {
+    display: inline-block;
+    position: relative;
+    margin-left: -1px;
+}
+
+.rpages-list > li > a{
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    color: #337ab7;
+    background-color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.rpages-list > li > a:hover,
+.rpages-list .rpages-jump:hover{
+    color: #23527c;
+    background-color: #ddd;
+}
+
+.rpages-list > .active > a,
+.rpages-list > .active > a:hover,
+.rpages-list .rpages-jump:active{
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+    cursor: default;
+}
+
+.rpages-list > .disabled > a,
+.rpages-list > .disabled > a:hover{
+    color: #aaa;
+    background-color: #fff;
+    cursor: not-allowed;
+}
+
+.rpages-list .rpages-info {
+    margin-left: 5px;
+    color: #666;
+}
+
+.rpages-list .jump-input {
+    width: 50px;
+    padding: 5px 0;
+    margin-left: 15px;
+    border: 1px solid #ddd;
+    font-size: inherit;
+    text-align: center;
+    color: #666;
+}
+
+.rpages-list .rpages-jump {
+    padding: 3px 5px;
+    margin-left: 5px;
+    border: 1px solid #ddd;
+    color: #337ab7;
+    background: #fff;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.rpages-list > li > a,
+.rpages-list .rpages-jump,
+.rpages-list .jump-input,
+.rpages-list > li > span {
+    vertical-align: middle;
+}
+
+.rpages-list .rpages-increase,
+.rpages-list .rpages-decrease {
+    display: none;
+    position: absolute;
+    right: 2px;
+    border: 6px solid transparent;
+}
+
+.rpages-list .rpages-input:hover .rpages-decrease,
+.rpages-list .rpages-input:hover .rpages-increase {
+    display: inline-block;
+}
+
+.rpages-list .rpages-increase:hover {
+    border-bottom-color: #666;
+}
+
+.rpages-list .rpages-decrease:hover {
+    border-top-color: #666;
+}
+
+.rpages-list .rpages-increase:active {
+    border-bottom-color: #333;
+}
+
+.rpages-list .rpages-decrease:active {
+    border-top-color: #333;
+}
+
+.rpages-list .rpages-increase {
+    border-bottom-color: #777;
+    top: 0;
+}
+
+.rpages-list .rpages-decrease {
+    border-top-color: #777;
+    bottom: 0;
+}
