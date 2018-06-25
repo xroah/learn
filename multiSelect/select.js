@@ -1,19 +1,10 @@
-const DEFAULT_OPTIONS = {
-    data: [],
-    multiple: false,
-    placeholder: ""
-};
-
 export default class Select {
     constructor(options) {
         this.input = $('<span class="r-select-span"></span>');
         this.list = $('<ul class="r-select-options"></ul>');
-        if (!$.isPlainObject(options)) {
-            options = DEFAULT_OPTIONS;
-        }
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
-        this.options = {...DEFAULT_OPTIONS, ...options};
+        this.options = {...options};
         this.opened = this.disabled = false;
     }
 
@@ -22,6 +13,8 @@ export default class Select {
         let caret = $('<span class="r-select-caret"></span>');
         if (el.get(0).nodeName.toLowerCase() === "select") {
             let data = this.getSelectData(el);
+            //如果select元素没有option则使用配置的data
+            data = data.length ? data : this.options.data;
             this.initOptions(data);
             this.options.data = data;
             el.data("display", el.css("display")).hide();
