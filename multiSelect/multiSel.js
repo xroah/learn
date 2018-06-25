@@ -56,4 +56,22 @@ export default class MultiSel extends Select {
             this.input.addClass("r-select-placeholder").text(this.options.placeholder);
         }
     }
+    
+    val(val) {
+        let lis = this.list.children();
+        if (Array.isArray(val)) {
+            this.value = [];
+            for (let i = 0, len = lis.length; i < len; i++) {
+                let tmp = lis.eq(i);
+                if (val.indexOf(tmp.data("value")) > -1) {
+                    this.value.push(tmp.data("value"));
+                    tmp.addClass("r-select-selected");
+                } else {
+                    tmp.removeClass("r-select-selected");
+                }
+            }
+        }
+        this.setText(this.value);
+        return this.value;
+    }
 }

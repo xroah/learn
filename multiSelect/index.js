@@ -19,7 +19,7 @@ function callMethod(jqEl, method, data) {
             if (!(method in hasReturnValueFunc)) {
                 instance[method](data);
             } else {
-                return instance[method]();
+                return instance[method](data);
             }
         }
     }

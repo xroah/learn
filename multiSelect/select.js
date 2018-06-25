@@ -4,8 +4,7 @@ export default class Select {
         this.list = $('<ul class="r-select-options"></ul>');
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
-        this.options = { ...options
-        };
+        this.options = { ...options };
         this.opened = this.disabled = false;
     }
 
@@ -18,6 +17,7 @@ export default class Select {
             //如果select元素没有option则使用配置的data
             data = data.length ? data : this.options.data;
             this.options.data = data;
+            //保存当前元素的display属性,destroy时还原
             el.data("display", el.css("display")).hide();
             el.prop("disabled") && this.disable();
             this.initOptions(data);
@@ -26,6 +26,7 @@ export default class Select {
             this.initOptions(this.options.data);
             this.wrapper.append([this.input, caret]).appendTo(el);
         }
+        $(document.body).append(this.list);
         this.options.disabled && this.disable();
         this.documentClick = this._documentClick.bind(this);
         this.el = el;
@@ -40,7 +41,6 @@ export default class Select {
         this.value = val;
         this.setText(val);
         this.list.empty().append(html);
-        $(document.body).append(this.list);
     }
 
     refresh(data) {
@@ -52,6 +52,7 @@ export default class Select {
         this.initOptions(_data);
     }
 
+    //获取select元素下的option,根据option的value和text设置data
     getSelectData(el) {
         let data = [];
         let options = el.children();
@@ -70,6 +71,7 @@ export default class Select {
     initOptionsByData(data) {
         let html = [],
             val,
+            //单选,如果有选中项,改变selectedIndex(选中最后一个)
             selectedIndex = -1;
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
@@ -200,7 +202,20 @@ export default class Select {
         }
     }
 
-    val() {
+    val(val) {
+        let lis = this.list.children();
+        if (val !== undefined) {
+            this.value = "";
+            for (let i = 0, len = lis.length; i < len; i++) {
+                let tmp = lis.eq(i);
+                if (val === tmp.data("value")) {
+                    this.setText(this.value = val);
+                    tmp.addClass("r-select-selected");
+                } else {
+                    tmp.removeClass("r-select-selected");
+                }
+            }
+        }
         return this.value;
     }
 }
