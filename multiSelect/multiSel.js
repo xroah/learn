@@ -33,19 +33,19 @@ export default class MultiSel extends Select {
                                 <span class="r-checkbox-outer"></span>
                                 <span>{text}</span>
                             </span>
-                    </li>`
+                    </li>`;
             li = $(li.replace("{text}", tmp.text));
             li.data("value", tmp.value).attr("title", tmp.text);
             if (tmp.selected) {
                 val.push(tmp.value);
-                li.addClass("r-select-selected")
+                li.addClass("r-select-selected");
             }
             if (tmp.disabled) {
                 li.addClass("r-select-disabled");
             }
             html.push(li);
         }
-        return { val: val, html: html }
+        return { val: val, html: html };
     }
 
     setText(val) {

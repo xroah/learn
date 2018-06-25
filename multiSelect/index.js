@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
     placeholder: ""
 };
 
-function callMethod(jqEl, method) {
+function callMethod(jqEl, method, data) {
     let hasReturnValueFunc = {
         val: true
     };
@@ -17,7 +17,7 @@ function callMethod(jqEl, method) {
         let instance = jqEl.eq(i).data("ms-instance");
         if (instance) {
             if (!(method in hasReturnValueFunc)) {
-                instance[method]();
+                instance[method](data);
             } else {
                 return instance[method]();
             }
@@ -44,11 +44,11 @@ function init(jqEl, options) {
 }
 
 $.fn.extend({
-    select: function (options) {
+    select: function (options, data) {
         let len = this.length;
         if (!len) return this;
         if (typeof options === "string") {
-          return callMethod(this, options);
+          return callMethod(this, options, data);
         } 
         if (!$.isPlainObject(options)) {
             options = DEFAULT_OPTIONS;

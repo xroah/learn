@@ -13,15 +13,14 @@ export default class Select {
         let el = $(selector);
         let caret = $('<span class="r-select-caret"></span>');
         if (el.get(0).nodeName.toLowerCase() === "select") {
+            //优先使用select的options作为选项
             let data = this.getSelectData(el);
             //如果select元素没有option则使用配置的data
             data = data.length ? data : this.options.data;
-            this.initOptions(data);
             this.options.data = data;
             el.data("display", el.css("display")).hide();
-            if (el.prop("disabled")) {
-                this.disable();
-            }
+            el.prop("disabled") && this.disable();
+            this.initOptions(data);
             this.wrapper.append([this.input, caret]).insertAfter(el);
         } else {
             this.initOptions(this.options.data);
@@ -44,6 +43,15 @@ export default class Select {
         $(document.body).append(this.list);
     }
 
+    refresh(data) {
+        let _data;
+        if (this.el.get(0).nodeName.toLowerCase() === "select") {
+            !data && console.warn("refresh方法未传入data,将使用option元素作为选项");
+            _data = data || this.getSelectData(this.el);
+        }
+        this.initOptions(_data);
+    }
+
     getSelectData(el) {
         let data = [];
         let options = el.children();
@@ -61,19 +69,23 @@ export default class Select {
 
     initOptionsByData(data) {
         let html = [],
-            val;
+            val,
+            selectedIndex = -1;
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
             let li = $('<li></li>');
             li.data("value", tmp.value).text(tmp.text).attr("title", tmp.text);
             if (tmp.selected) {
                 val = tmp.value;
-                li.addClass("r-select-selected")
+                selectedIndex = i;
             }
             if (tmp.disabled) {
                 li.addClass("r-select-disabled");
             }
             html.push(li);
+        }
+        if (selectedIndex > -1) {
+            html[selectedIndex].addClass("r-select-selected");
         }
         if (!html.length) {
             html.push('<li class="r-select-disabled">无数据</li>');
