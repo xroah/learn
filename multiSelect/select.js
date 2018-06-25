@@ -4,7 +4,8 @@ export default class Select {
         this.list = $('<ul class="r-select-options"></ul>');
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
-        this.options = {...options};
+        this.options = { ...options
+        };
         this.opened = this.disabled = false;
     }
 
@@ -33,7 +34,10 @@ export default class Select {
     }
 
     initOptions(data) {
-        let { html, val } = this.initOptionsByData(data);
+        let {
+            html,
+            val
+        } = this.initOptionsByData(data);
         this.value = val;
         this.setText(val);
         this.list.empty().append(html);
@@ -74,7 +78,10 @@ export default class Select {
         if (!html.length) {
             html.push('<li class="r-select-disabled">无数据</li>');
         }
-        return { val: val, html: html }
+        return {
+            val: val,
+            html: html
+        }
     }
 
     initEvent() {
@@ -84,7 +91,7 @@ export default class Select {
             if (this.disabled) return;
             this.showList();
             this.opened ? this.close() : this.open();
-        }).on("keydown", function(evt) {
+        }).on("keydown", function (evt) {
             let key = evt.key.toLowerCase();
             if (key === "enter") {
                 $(this).trigger("click");
@@ -95,14 +102,18 @@ export default class Select {
         }).on("mouseleave", "li", function () {
             $(this).removeClass("r-select-hover");
         }).on("click", "li", function () {
-            let cls = "r-select-selected";
             if ($(this).hasClass("r-select-disabled")) return;
-            $(this).addClass(cls).siblings(`.${cls}`).removeClass(cls);
-            _this.setText(_this.value = $(this).data("value"));
-            _this.close();
-            _this.wrapper.focus();
+            _this.selectOne($(this));
         });
         $(document).on("click", this.documentClick);
+    }
+
+    selectOne(el) {
+        let cls = "r-select-selected";
+        $(el).addClass(cls).siblings(`.${cls}`).removeClass(cls);
+        this.setText(this.value = $(el).data("value"));
+        this.close();
+        this.wrapper.focus();
     }
 
     _documentClick(evt) {
@@ -182,4 +193,3 @@ export default class Select {
         return this.value;
     }
 }
-

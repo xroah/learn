@@ -6,15 +6,9 @@ export default class MultiSel extends Select {
         this.value = [];
     }
 
-    initEvent() {
-        let _this = this;
-        super.initEvent();
-        this.list.off("click").on("click", "li", function () {
-            if ($(this).hasClass("r-select-disabled")) return;
-            let $this = $(this);
-            $this.toggleClass("r-select-selected");
-            _this.changeValue($this);
-        });
+    selectOne(el) {
+        el.toggleClass("r-select-selected");
+        this.changeValue(el);
     }
 
     changeValue(li) {
