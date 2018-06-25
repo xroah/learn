@@ -65,8 +65,9 @@ $color: #40a9ff;
 
 .r-select-options {
     display: none;
-    overflow: hidden;
+    overflow: auto;
     position: absolute;
+    max-height: 240px;
     padding: 0;
     margin: 0;
     border: 1px solid #aaa;
