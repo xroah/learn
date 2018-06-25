@@ -101,7 +101,6 @@ export default class Select {
             _this = this;
         this.wrapper.on("click", () => {
             if (this.disabled) return;
-            this.showList();
             this.opened ? this.close() : this.open();
         }).on("keydown", function (evt) {
             let key = evt.key.toLowerCase();
@@ -147,14 +146,14 @@ export default class Select {
             width: rect.width,
             left: rect.left,
             top: rect.bottom + 2
-        });
+        }).fadeIn(150);
     }
 
     open() {
         if (this.disabled) return;
         if (!this.opened) {
             this.opened = true;
-            this.list.fadeIn(150);
+            this.showList();
             this.wrapper.addClass("r-select-opened");
         }
     }
