@@ -16,13 +16,14 @@ function callMethod(jqEl, method) {
     for (let i = 0, len = jqEl.length; i < len; i++) {
         let instance = jqEl.eq(i).data("ms-instance");
         if (instance) {
-            if (!(options in hasReturnValueFunc)) {
-                instance[options]();
+            if (!(method in hasReturnValueFunc)) {
+                instance[method]();
             } else {
-                return instance[options]();
+                return instance[method]();
             }
         }
     }
+    return jqEl;
 }
 
 function init(jqEl, options) {
@@ -39,12 +40,16 @@ function init(jqEl, options) {
         jqEl.eq(i).data("ms-instance", instance);
         instance.init(jqEl[i]);
     }
+    return jqEl;
 }
 
 $.fn.extend({
     select: function (options) {
         let len = this.length;
-        if (!len) throw new Error("没有选中元素");
+        if (!len) return this;
+        if (typeof options === "string") {
+          return callMethod(this, options);
+        } 
         if (!$.isPlainObject(options)) {
             options = DEFAULT_OPTIONS;
         }
@@ -52,11 +57,6 @@ $.fn.extend({
         if (!Array.isArray(options.data)) {
             throw new Error("data不是数组");
         }
-        if (typeof options === "string") {
-            callMethod(this, options);
-        } else {
-            init(this, options);
-        }
-        return this;
+        return init(this, options);
     }
 });
