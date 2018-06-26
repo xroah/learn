@@ -9,7 +9,6 @@ export default class MultiSel extends Select {
     selectOne(el) {
         el.toggleClass("r-select-selected");
         this.changeValue(el);
-        this.wrapper.focus();
     }
 
     changeValue(li) {

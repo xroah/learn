@@ -1,7 +1,7 @@
 export default class Select {
     constructor(options) {
         this.input = $('<span class="r-select-span"></span>');
-        this.list = $('<ul class="r-select-options"></ul>');
+        this.list = $('<ul class="r-select-options" tabindex="0"></ul>');
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
         this.options = { ...options
@@ -182,19 +182,29 @@ export default class Select {
     }
 
     initEvent() {
-        let ul = this.list;
         let _this = this;
+        let clickTgt;
         this.wrapper.on("click", () => {
             if (this.disabled) return;
             this.opened ? this.close() : this.open();
-        }).on("keydown", this.keyDown.bind(this));
+        }).on("keydown", this.keyDown.bind(this)).on("blur", () => {
+            //延迟获取当前活动元素,否则获取到的活动元素是body
+            setTimeout(() => {
+                let activeEl = document.activeElement;
+                if (activeEl !== this.list.get(0)) {
+                    this.close();
+                }
+            });
+        });
 
         this.list.on("mouseenter", "li", function () {
             $(this).addClass("r-select-hover");
         }).on("mouseleave", "li", function () {
             $(this).removeClass("r-select-hover");
         }).on("click", "li", function () {
-            let $this = clickTgt = $(this);
+            let $this = $(this);
+            _this.wrapper.focus();
+            clickTgt = $this;
             if ($this.hasClass("r-select-disabled")) return;
             _this.selectOne($this);
         });
@@ -207,7 +217,6 @@ export default class Select {
         el.addClass(cls).siblings(`.${cls}`).removeClass(cls);
         this.setText(this.value = el.data("value"));
         this.close();
-        this.wrapper.focus();
     }
 
     _documentClick(evt) {
