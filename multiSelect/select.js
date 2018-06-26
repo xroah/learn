@@ -161,6 +161,9 @@ export default class Select {
             case "enter":
                 if (this.opened) {
                     let el = this.list.find(".r-select-active");
+                    if (!el.length) {
+                        el = this.list.find(".r-select-hover");
+                    }
                     el.length && this.selectOne(el);
                 } else {
                     this.open();
@@ -179,22 +182,21 @@ export default class Select {
     }
 
     initEvent() {
-        let ul = this.list,
-            _this = this;
+        let ul = this.list;
+        let _this = this;
         this.wrapper.on("click", () => {
             if (this.disabled) return;
             this.opened ? this.close() : this.open();
-        }).on("keydown", this.keyDown.bind(this)).on("blur", () => {
-            this.close();
-        });
+        }).on("keydown", this.keyDown.bind(this));
 
         this.list.on("mouseenter", "li", function () {
             $(this).addClass("r-select-hover");
         }).on("mouseleave", "li", function () {
             $(this).removeClass("r-select-hover");
         }).on("click", "li", function () {
-            if ($(this).hasClass("r-select-disabled")) return;
-            _this.selectOne($(this));
+            let $this = clickTgt = $(this);
+            if ($this.hasClass("r-select-disabled")) return;
+            _this.selectOne($this);
         });
         $(document).on("click", this.documentClick);
     }
