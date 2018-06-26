@@ -4,7 +4,8 @@ export default class Select {
         this.list = $('<ul class="r-select-options"></ul>');
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
-        this.options = { ...options };
+        this.options = { ...options
+        };
         this.opened = this.disabled = false;
     }
 
@@ -98,18 +99,95 @@ export default class Select {
         }
     }
 
+    //键盘选择
+    keySelect(dir = "up") {
+        let aCls = "r-select-active";
+        //当前鼠标hover的选项
+        let curActive = this.list.find(`.${aCls}`);
+        let lis = this.list.children();
+        let len = lis.length;
+        let index;
+        if (curActive.length) {
+            index = curActive.index();
+        } else {
+            if ((curActive = this.list.find(".r-select-hover")).length) {
+                index = curActive.index();
+            }
+        }
+        curActive.removeClass(aCls);
+        let max = 0;
+        if (dir === "up") {
+            if (index === undefined) index = 0;
+            //往上找没有disabled的选项
+            while(true) {
+                index -= 1;
+                if (index === -1) index = len - 1;
+                curActive = lis.eq(index);
+                if (!curActive.hasClass("r-select-disabled")) {
+                    curActive.addClass(aCls);
+                    break;
+                }
+                if (max >= len) {
+                    break;
+                }
+                max++;
+            }
+        } else if (dir === "down") {
+            if (index === undefined) index = -1;
+            //往下找没有disabled的选项
+            while(true) {
+                index += 1;
+                if (index === len) index = 0;
+                curActive = lis.eq(index);
+                if (!curActive.hasClass("r-select-disabled")) {
+                    curActive.addClass(aCls);
+                    break;
+                }
+                if (max >= len) {
+                    break;
+                }
+                max++;
+            }
+        }
+    }
+
+    keyDown(evt) {
+        let key = evt.key.toLowerCase();
+        switch (key) {
+            case "escape":
+            case "esc": //ie
+                this.close();
+                break;
+            case "enter":
+                if (this.opened) {
+                    let el = this.list.find(".r-select-active");
+                    el.length && this.selectOne(el);
+                } else {
+                    this.open();
+                }
+                break;
+            case "arrowup":
+            case "up": //ie
+                this.keySelect("up");
+                break;
+            case "arrowdown":
+            case "down": //ie
+                this.keySelect("down");
+                break;
+
+        }
+    }
+
     initEvent() {
         let ul = this.list,
             _this = this;
         this.wrapper.on("click", () => {
             if (this.disabled) return;
             this.opened ? this.close() : this.open();
-        }).on("keydown", function (evt) {
-            let key = evt.key.toLowerCase();
-            if (key === "enter") {
-                $(this).trigger("click");
-            }
+        }).on("keydown", this.keyDown.bind(this)).on("blur", () => {
+            this.close();
         });
+
         this.list.on("mouseenter", "li", function () {
             $(this).addClass("r-select-hover");
         }).on("mouseleave", "li", function () {
@@ -123,8 +201,9 @@ export default class Select {
 
     selectOne(el) {
         let cls = "r-select-selected";
-        $(el).addClass(cls).siblings(`.${cls}`).removeClass(cls);
-        this.setText(this.value = $(el).data("value"));
+        el = $(el);
+        el.addClass(cls).siblings(`.${cls}`).removeClass(cls);
+        this.setText(this.value = el.data("value"));
         this.close();
         this.wrapper.focus();
     }
@@ -163,7 +242,14 @@ export default class Select {
     close() {
         if (this.opened) {
             this.opened = false;
-            this.list.fadeOut(150);
+            this.list
+                .children(".r-select-active")
+                .removeClass("r-select-active")
+                .end()
+                .children(".r-select-hover")
+                .removeClass("r-select-hover")
+                .end()
+                .fadeOut(150);
             this.wrapper.removeClass("r-select-opened");
         }
     }
