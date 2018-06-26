@@ -28,7 +28,7 @@ export default class MultiSel extends Select {
             val = [];
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
-            let li = `<li>
+            let li = `<li class="r-select-item">
                             <span class="r-checkbox-wrapper">
                                 <span class="r-checkbox-outer"></span>
                                 <span>{text}</span>
@@ -44,6 +44,9 @@ export default class MultiSel extends Select {
                 li.addClass("r-select-disabled");
             }
             html.push(li);
+        }
+        if (!html.length) {
+            html.push('<li class="r-select-item r-select-disabled">无数据</li>');
         }
         return { val: val, html: html };
     }

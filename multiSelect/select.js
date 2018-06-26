@@ -76,7 +76,7 @@ export default class Select {
             selectedIndex = -1;
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
-            let li = $('<li></li>');
+            let li = $('<li class="r-select-item"></li>');
             li.data("value", tmp.value).text(tmp.text).attr("title", tmp.text);
             if (tmp.selected) {
                 val = tmp.value;
@@ -91,7 +91,7 @@ export default class Select {
             html[selectedIndex].addClass("r-select-selected");
         }
         if (!html.length) {
-            html.push('<li class="r-select-disabled">无数据</li>');
+            html.push('<li class="r-select-item r-select-disabled">无数据</li>');
         }
         return {
             val: val,
@@ -104,7 +104,7 @@ export default class Select {
         let aCls = "r-select-active";
         //当前鼠标hover的选项
         let curActive = this.list.find(`.${aCls}`);
-        let lis = this.list.children();
+        let lis = this.list.find(".r-select-item");
         let len = lis.length;
         let index;
         if (curActive.length) {
@@ -183,7 +183,6 @@ export default class Select {
 
     initEvent() {
         let _this = this;
-        let clickTgt;
         this.wrapper.on("click", () => {
             if (this.disabled) return;
             this.opened ? this.close() : this.open();
@@ -193,6 +192,10 @@ export default class Select {
                 let activeEl = document.activeElement;
                 if (activeEl !== this.list.get(0)) {
                     this.close();
+                } else {
+                    //在选项列表右键弹出菜单不会关闭
+                    //使其获取焦点，当点击右键菜单任一项时关闭列表
+                    this.wrapper.focus();
                 }
             });
         });
@@ -204,7 +207,6 @@ export default class Select {
         }).on("click", "li", function () {
             let $this = $(this);
             _this.wrapper.focus();
-            clickTgt = $this;
             if ($this.hasClass("r-select-disabled")) return;
             _this.selectOne($this);
         });
