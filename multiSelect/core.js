@@ -69,59 +69,6 @@ export default class Select {
         return data;
     }
 
-    //键盘选择
-    keySelect(dir = "up") {
-        let aCls = "r-select-active";
-        let ul = this.list.ul;
-        //当前鼠标hover的选项
-        let curActive = ul.find(`.${aCls}`);
-        let lis = ul.find(".r-select-item");
-        let len = lis.length;
-        let index;
-        if (curActive.length) {
-            index = curActive.index();
-        } else {
-            if ((curActive = ul.find(".r-select-hover")).length) {
-                index = curActive.index();
-            }
-        }
-        curActive.removeClass(aCls);
-        let max = 0;
-        if (dir === "up") {
-            if (index === undefined) index = 0;
-            //往上找没有disabled的选项
-            while (true) {
-                index -= 1;
-                if (index === -1) index = len - 1;
-                curActive = lis.eq(index);
-                if (!curActive.hasClass("r-select-disabled")) {
-                    curActive.addClass(aCls);
-                    break;
-                }
-                if (max >= len) {
-                    break;
-                }
-                max++;
-            }
-        } else if (dir === "down") {
-            if (index === undefined) index = -1;
-            //往下找没有disabled的选项
-            while (true) {
-                index += 1;
-                if (index === len) index = 0;
-                curActive = lis.eq(index);
-                if (!curActive.hasClass("r-select-disabled")) {
-                    curActive.addClass(aCls);
-                    break;
-                }
-                if (max >= len) {
-                    break;
-                }
-                max++;
-            }
-        }
-    }
-
     keyDown(evt) {
         let key = evt.key.toLowerCase();
         let ul = this.list.ul;
@@ -143,11 +90,11 @@ export default class Select {
                 break;
             case "arrowup":
             case "up": //ie
-                this.keySelect("up");
+                this.list.keySelect("up");
                 break;
             case "arrowdown":
             case "down": //ie
-                this.keySelect("down");
+                this.list.keySelect("down");
                 break;
 
         }
