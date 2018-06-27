@@ -56,6 +56,9 @@ export default class Options {
             this.selected = val;
             selectedIndex >= 0 && items[selectedIndex].addClass("r-select-selected");
         }
+        if (!items.length) {
+            items.push($('<li class="r-select-item r-select-disabled">无数据</li>'));
+        }
         return items;
     }
 
@@ -166,6 +169,7 @@ export default class Options {
             if (curActive.length) {
                 index = curActive.index();
                 this.select(index, curActive.hasClass("r-select-selected"));
+                return curActive;
             }
         }
     }

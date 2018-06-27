@@ -1,9 +1,9 @@
 import Options from "./options";
+import * as eName from "./event_name";
 
 export default class Select {
     constructor(config, selector) {
         this.input = $('<span class="r-select-span"></span>');
-        this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
         this.el = $(selector);
         this.config = {
@@ -38,7 +38,7 @@ export default class Select {
         });
         this.documentClick = this._documentClick.bind(this);
         this.config.disabled && this.disable();
-        this.updateVal();
+        this.updateVal(false);
         this.initEvent();
     }
 
@@ -50,7 +50,7 @@ export default class Select {
         }
         this.config.data = _data;
         this.list.refresh(data);
-        this.updateVal();
+        this.updateVal(false);
     }
 
     //获取select元素下的option,根据option的value和text设置data
@@ -78,8 +78,8 @@ export default class Select {
                 break;
             case "enter":
                 if (this.opened) {
-                    this.list.keySelect("enter");
-                    this.selectOne();
+                    let el = this.list.keySelect("enter");
+                    this.selectOne(el);
                 } else {
                     this.open();
                 }
@@ -95,43 +95,79 @@ export default class Select {
         }
     }
 
+    blur() {
+        //延迟获取当前活动元素,否则获取到的活动元素是body
+        setTimeout(() => {
+            let activeEl = document.activeElement;
+            if (activeEl !== this.list.ul.get(0)) {
+                this.close();
+            } else {
+                //在选项列表右键弹出菜单不会关闭
+                //使其获取焦点，当点击右键菜单任一项时关闭列表
+                this.wrapper.focus();
+            }
+        });
+    }
+
+    clickItem(evt) {
+        let el = $(evt.currentTarget);
+        let cls = "r-select-selected";
+        let before;
+        //点击的时候wrapper会失去焦点
+        //使其重新获取焦点以便响应键盘事件
+        this.wrapper.focus();
+        if (el.hasClass("r-select-disabled")) return;
+        //单选，选中当前li要取消之前选中的li
+        //如果当前选中跟之前选中不是同一个则同时出发delselect和select时间
+        if (!this.config.multiple) {
+            if (el.hasClass(cls)){
+                this.close();
+                return;
+            }
+            before = el.siblings(`.${cls}`);
+        }
+        this.list.select(el.index(), el.hasClass(cls));
+        this.selectOne(el, before);
+    }
+
     initEvent() {
         let _this = this;
         this.wrapper.on("click", () => {
-            if (this.disabled) return;
-            this.opened ? this.close() : this.open();
-        }).on("keydown", this.keyDown.bind(this)).on("blur", () => {
-            //延迟获取当前活动元素,否则获取到的活动元素是body
-            setTimeout(() => {
-                let activeEl = document.activeElement;
-                if (activeEl !== this.list.ul.get(0)) {
-                    this.close();
-                } else {
-                    //在选项列表右键弹出菜单不会关闭
-                    //使其获取焦点，当点击右键菜单任一项时关闭列表
-                    this.wrapper.focus();
-                }
-            });
-        });
+                if (this.disabled) return;
+                this.opened ? this.close() : this.open();
+            }).on("keydown", this.keyDown.bind(this))
+            .on("blur", this.blur.bind(this));
 
-        this.list.ul.on("mouseenter", "li", function () {
+        this.list.ul.on("mouseenter", ".r-select-item", function () {
             $(this).addClass("r-select-hover");
-        }).on("mouseleave", "li", function () {
+        }).on("mouseleave", ".r-select-item", function () {
             $(this).removeClass("r-select-hover");
-        }).on("click", "li", function () {
-            let $this = $(this);
-            let deselect = $this.hasClass("r-select-selected");
-            //点击的时候wrapper会失去焦点
-            //使其重新获取焦点以便响应键盘事件
-            _this.wrapper.focus();
-            if ($this.hasClass("r-select-disabled")) return;
-            _this.selectOne($this, deselect);
-        });
+        }).on("click", ".r-select-item", this.clickItem.bind(this));
         $(document).on("click", this.documentClick);
     }
 
-    selectOne(el, deselect) {
+    selectOne(el, deselectEl) {
         !this.config.multiple && this.close();
+        if ($(el).hasClass("r-select-selected")) {
+            //只有单选并且选中改变了才会触发
+            if (
+                deselectEl &&
+                deselectEl.length &&
+                !deselectEl.is(el)
+            ) {
+                this.el.trigger($.Event(eName.DESELECT, {
+                    node: deselectEl.get(0)
+                }));
+            }
+            this.el.trigger($.Event(eName.SELECT, {
+                node: el.get(0)
+            }));
+        } else {
+            //只有多选是才会出发
+            this.el.trigger($.Event(eName.DESELECT, {
+                node: el.get(0)
+            }));
+        }
         this.updateVal();
     }
 
@@ -163,6 +199,7 @@ export default class Select {
             this.opened = true;
             this.showList();
             this.wrapper.addClass("r-select-opened");
+            this.el.trigger($.Event(eName.OPEN));
         }
     }
 
@@ -171,6 +208,7 @@ export default class Select {
             this.opened = false;
             this.list.hide();
             this.wrapper.removeClass("r-select-opened");
+            this.el.trigger($.Event(eName.CLOSE));
         }
     }
 
@@ -188,14 +226,27 @@ export default class Select {
         }
     }
 
-    updateVal() {
-        this.value = this.list.getSelected();
+    updateVal(triggerEvent = true) {
+        let val = this.list.getSelected();
+        if (this.multiple) {
+            if (val.join("") === this.value.join("")) return;
+        } else {
+            if (val === this.value) return;
+        }
+        let evt = $.Event(eName.CHANGE, {
+            value: val
+        });
+        this.value = val;
         this.setText();
+        triggerEvent && this.el.trigger(evt);
     }
 
     setText() {
         let val = this.value;
-        let { multiple, placeholder } = this.config;
+        let {
+            multiple,
+            placeholder
+        } = this.config;
         if (val && val.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {
@@ -246,7 +297,7 @@ export default class Select {
             this.config.multiple ?
                 this.setMultiVal(val) :
                 this.setSingleVal(val);
-            this.updateVal();
+            this.updateVal(false);
         }
         return this.value;
     }

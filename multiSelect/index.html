@@ -56,7 +56,7 @@
         <option value="4" selected>类型4</option>
         <option value="5">类型5</option>
     </select>
-    <select class="single">
+    <select class="single" id="single2">
         <option value="">请选择</option>
         <option value="1">浙江</option>
     </select>
@@ -74,7 +74,17 @@
     <script>
         $(".single, .multi").select({
             placeholder: "请选择"
-        });
+        }).on("ms.select", function(evt) {
+console.log("select", evt.node);
+        }).on("ms.deselect", function (evt) { 
+            console.log("deselect", evt.node);
+         }).on("ms.change", function(evt) {
+             console.log(evt.value);
+         }).on("ms.open", function() {
+             console.log("open")
+         }).on("ms.close", function() {
+             console.log("close");
+         })
     </script>
 </body>
 

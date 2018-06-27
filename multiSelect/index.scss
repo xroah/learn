@@ -129,8 +129,8 @@ $color: #40a9ff;
             }
         }
         &.r-select-active {
-            color: #fff;
-            background-color: $color;
+            color: #fff !important;
+            background-color: $color !important;
         }
         .r-checkbox-wrapper {
             display: inline-block;
