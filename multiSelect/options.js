@@ -80,6 +80,7 @@ export default class Options {
     /**
      * 
      * @param {number | Array} index 选择的索引
+     * @param {boolean} deselect 选择/取消选择，仅对multiple有效
      */
     select(index, deselect) {
         let cls = "r-select-selected";
@@ -104,14 +105,47 @@ export default class Options {
         }
     }
 
+    /**
+     * 
+     * @param {HTMLElement} curActive 当前active元素
+     * @param {number} index active元素的索引
+     * @param {number} step 1或者-1 向上或者向下查找的个数
+     */
+    findEl(curActive, index, step) {
+        let aCls = "r-select-active";
+        let max = 0;
+        let lis = this.ul.find(".r-select-item");
+        let len = lis.length;
+        curActive.removeClass(aCls);
+        if (index === undefined) {
+            index = step < 0 ? 0 : -1;
+        }
+        //往上/往下找没有disabled的选项
+        while (true) {
+            index += step;
+            if (index === -1) {
+                index = len - 1;
+            } else if (index === len) {
+                index = 0;
+            }
+            curActive = lis.eq(index);
+            if (!curActive.hasClass("r-select-disabled")) {
+                curActive.addClass(aCls);
+                break;
+            }
+            if (max >= len) {
+                break;
+            }
+            max++;
+        }
+    }
+
     //键盘选择
     keySelect(dir) {
         let aCls = "r-select-active";
         let ul = this.ul;
         //当前鼠标hover的选项
         let curActive = ul.find(`.${aCls}`);
-        let lis = ul.find(".r-select-item");
-        let len = lis.length;
         let index;
         if (curActive.length) {
             index = curActive.index();
@@ -120,50 +154,18 @@ export default class Options {
                 index = curActive.index();
             }
         }
-        let max = 0;
         if (dir === "up") {
-            curActive.removeClass(aCls);
-            if (index === undefined) index = 0;
-            //往上找没有disabled的选项
-            while (true) {
-                index -= 1;
-                if (index === -1) index = len - 1;
-                curActive = lis.eq(index);
-                if (!curActive.hasClass("r-select-disabled")) {
-                    curActive.addClass(aCls);
-                    break;
-                }
-                if (max >= len) {
-                    break;
-                }
-                max++;
-            }
+            this.findEl(curActive, index, -1);
         } else if (dir === "down") {
-            curActive.removeClass(aCls);
-            if (index === undefined) index = -1;
-            //往下找没有disabled的选项
-            while (true) {
-                index += 1;
-                if (index === len) index = 0;
-                curActive = lis.eq(index);
-                if (!curActive.hasClass("r-select-disabled")) {
-                    curActive.addClass(aCls);
-                    break;
-                }
-                if (max >= len) {
-                    break;
-                }
-                max++;
-            }
+            this.findEl(curActive, index, 1);
         } else if (dir === "enter") {
-            debugger;
-            len = ul.find(".r-select-active");
-            if (!len.length) {
-                len = ul.find(".r-select-hover");
+            curActive = ul.find(`.${aCls}`);
+            if (!curActive.length) {
+                curActive = ul.find(".r-select-hover");
             }
-            if (len.length) {
-                index = len.index();
-                this.select(index, len.hasClass("r-select-selected"));
+            if (curActive.length) {
+                index = curActive.index();
+                this.select(index, curActive.hasClass("r-select-selected"));
             }
         }
     }
