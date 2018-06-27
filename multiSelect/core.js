@@ -1,47 +1,45 @@
+import Options from "./options";
+
 export default class Select {
-    constructor(options) {
+    constructor(config, selector) {
         this.input = $('<span class="r-select-span"></span>');
-        this.list = $('<ul class="r-select-options" tabindex="0"></ul>');
         this.value = "";
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
-        this.options = { ...options
+        this.el = $(selector);
+        this.config = {
+            ...config
         };
+        //优先使用配置的multiple,否则检查el有没有设置multiple属性
+        if (!this.config.multiple) {
+            this.config.multiple = !!this.el.prop("multiple");
+        }
         this.opened = this.disabled = false;
+        this.init();
     }
 
-    init(selector) {
-        let el = $(selector);
+    init() {
+        let el = this.el;
         let caret = $('<span class="r-select-caret"></span>');
         if (el.get(0).nodeName.toLowerCase() === "select") {
-            //优先使用select的options作为选项
-            let data = this.getSelectData(el);
-            //如果select元素没有option则使用配置的data
-            data = data.length ? data : this.options.data;
-            this.options.data = data;
+            //如果配置没有传入data属性,则使用select的option的属性作为data
+            if (!this.config.data || !this.config.data.length) {
+                this.config.data = this.getSelectData(el);
+            }
             //保存当前元素的display属性,destroy时还原
             el.data("display", el.css("display")).hide();
             el.prop("disabled") && this.disable();
-            this.initOptions(data);
             this.wrapper.append([this.input, caret]).insertAfter(el);
         } else {
-            this.initOptions(this.options.data);
             this.wrapper.append([this.input, caret]).appendTo(el);
         }
-        $(document.body).append(this.list);
-        this.options.disabled && this.disable();
+        this.list = new Options({
+            data: this.config.data,
+            multiple: this.config.multiple
+        });
         this.documentClick = this._documentClick.bind(this);
-        this.el = el;
+        this.val(this.list.getSelected());
+        this.config.disabled && this.disable();
         this.initEvent();
-    }
-
-    initOptions(data) {
-        let {
-            html,
-            val
-        } = this.initOptionsByData(data);
-        this.value = val;
-        this.setText(val);
-        this.list.empty().append(html);
     }
 
     refresh(data) {
@@ -50,15 +48,17 @@ export default class Select {
             !data && console.warn("refresh方法未传入data,将使用option元素作为选项");
             _data = data || this.getSelectData(this.el);
         }
-        this.initOptions(_data);
+        this.options.data = _data;
+        this.list.refresh(data);
+        this.val(this.list.getSelected());
     }
 
     //获取select元素下的option,根据option的value和text设置data
     getSelectData(el) {
         let data = [];
-        let options = el.children();
-        for (let i = 0, len = options.length; i < len; i++) {
-            let tmp = options.eq(i);
+        let config = el.children();
+        for (let i = 0, len = config.length; i < len; i++) {
+            let tmp = config.eq(i);
             data.push({
                 value: tmp.val(),
                 text: tmp.text(),
@@ -69,48 +69,19 @@ export default class Select {
         return data;
     }
 
-    initOptionsByData(data) {
-        let html = [],
-            val,
-            //单选,如果有选中项,改变selectedIndex(选中最后一个)
-            selectedIndex = -1;
-        for (let i = 0, len = data.length; i < len; i++) {
-            let tmp = data[i];
-            let li = $('<li class="r-select-item"></li>');
-            li.data("value", tmp.value).text(tmp.text).attr("title", tmp.text);
-            if (tmp.selected) {
-                val = tmp.value;
-                selectedIndex = i;
-            }
-            if (tmp.disabled) {
-                li.addClass("r-select-disabled");
-            }
-            html.push(li);
-        }
-        if (selectedIndex > -1) {
-            html[selectedIndex].addClass("r-select-selected");
-        }
-        if (!html.length) {
-            html.push('<li class="r-select-item r-select-disabled">无数据</li>');
-        }
-        return {
-            val: val,
-            html: html
-        }
-    }
-
     //键盘选择
     keySelect(dir = "up") {
         let aCls = "r-select-active";
+        let ul = this.list.ul;
         //当前鼠标hover的选项
-        let curActive = this.list.find(`.${aCls}`);
-        let lis = this.list.find(".r-select-item");
+        let curActive = ul.find(`.${aCls}`);
+        let lis = ul.find(".r-select-item");
         let len = lis.length;
         let index;
         if (curActive.length) {
             index = curActive.index();
         } else {
-            if ((curActive = this.list.find(".r-select-hover")).length) {
+            if ((curActive = ul.find(".r-select-hover")).length) {
                 index = curActive.index();
             }
         }
@@ -119,7 +90,7 @@ export default class Select {
         if (dir === "up") {
             if (index === undefined) index = 0;
             //往上找没有disabled的选项
-            while(true) {
+            while (true) {
                 index -= 1;
                 if (index === -1) index = len - 1;
                 curActive = lis.eq(index);
@@ -135,7 +106,7 @@ export default class Select {
         } else if (dir === "down") {
             if (index === undefined) index = -1;
             //往下找没有disabled的选项
-            while(true) {
+            while (true) {
                 index += 1;
                 if (index === len) index = 0;
                 curActive = lis.eq(index);
@@ -153,6 +124,7 @@ export default class Select {
 
     keyDown(evt) {
         let key = evt.key.toLowerCase();
+        let ul = this.list.ul;
         switch (key) {
             case "escape":
             case "esc": //ie
@@ -160,11 +132,11 @@ export default class Select {
                 break;
             case "enter":
                 if (this.opened) {
-                    let el = this.list.find(".r-select-active");
+                    let el = ul.find(".r-select-active");
                     if (!el.length) {
-                        el = this.list.find(".r-select-hover");
+                        el = ul.find(".r-select-hover");
                     }
-                    el.length && this.selectOne(el);
+                    el.length && this.selectOne(el, el.hasClass("r-select-selected"));
                 } else {
                     this.open();
                 }
@@ -190,7 +162,7 @@ export default class Select {
             //延迟获取当前活动元素,否则获取到的活动元素是body
             setTimeout(() => {
                 let activeEl = document.activeElement;
-                if (activeEl !== this.list.get(0)) {
+                if (activeEl !== this.list.ul.get(0)) {
                     this.close();
                 } else {
                     //在选项列表右键弹出菜单不会关闭
@@ -200,30 +172,31 @@ export default class Select {
             });
         });
 
-        this.list.on("mouseenter", "li", function () {
+        this.list.ul.on("mouseenter", "li", function () {
             $(this).addClass("r-select-hover");
         }).on("mouseleave", "li", function () {
             $(this).removeClass("r-select-hover");
         }).on("click", "li", function () {
             let $this = $(this);
+            let deselect = $this.hasClass("r-select-selected");
+            //点击的时候wrapper会失去焦点
+            //使其重新获取焦点以便响应键盘事件
             _this.wrapper.focus();
             if ($this.hasClass("r-select-disabled")) return;
-            _this.selectOne($this);
+            _this.selectOne($this, deselect);
         });
         $(document).on("click", this.documentClick);
     }
 
-    selectOne(el) {
-        let cls = "r-select-selected";
-        el = $(el);
-        el.addClass(cls).siblings(`.${cls}`).removeClass(cls);
-        this.setText(this.value = el.data("value"));
-        this.close();
+    selectOne(el, deselect) {
+        this.list.select($(el).index(), deselect);
+        this.val(this.list.getSelected());
+        !this.config.multiple && this.close();
     }
 
     _documentClick(evt) {
         let tgt = evt.target,
-            ul = this.list;
+            ul = this.list.ul;
         if (
             tgt !== ul[0] &&
             !ul[0].contains(tgt) &&
@@ -236,11 +209,11 @@ export default class Select {
 
     showList() {
         let rect = this.input.get(0).getBoundingClientRect();
-        this.list.css({
+        this.list.show({
             width: rect.width,
             left: rect.left,
             top: rect.bottom + 2
-        }).fadeIn(150);
+        });
     }
 
     open() {
@@ -255,14 +228,7 @@ export default class Select {
     close() {
         if (this.opened) {
             this.opened = false;
-            this.list
-                .children(".r-select-active")
-                .removeClass("r-select-active")
-                .end()
-                .children(".r-select-hover")
-                .removeClass("r-select-hover")
-                .end()
-                .fadeOut(150);
+            this.list.hide();
             this.wrapper.removeClass("r-select-opened");
         }
     }
@@ -281,17 +247,24 @@ export default class Select {
         }
     }
 
-    setText(val) {
-        if (val) {
-            this.input.removeClass("r-select-placeholder").text(val);
+    setText() {
+        let val = this.value;
+        let { multiple, placeholder } = this.config;
+        if (val && val.length) {
+            this.input.removeClass("r-select-placeholder");
+            if (multiple) {
+                this.input.text(`已选中${val.length}项`);
+            } else {
+                this.input.text(val);
+            }
         } else {
-            this.input.addClass("r-select-placeholder").text(this.options.placeholder);
+            this.input.addClass("r-select-placeholder").text(placeholder);
         }
     }
 
     destroy() {
         this.wrapper.remove();
-        this.list.remove();
+        this.list.destroy();
         $(document).off("click", this.documentClick);
         this.el.data("ms-instance", null).css("display", this.el.data("display"));
         for (var key in this) {
@@ -301,19 +274,44 @@ export default class Select {
         }
     }
 
-    val(val) {
-        let lis = this.list.children();
-        if (val !== undefined) {
-            this.value = "";
-            for (let i = 0, len = lis.length; i < len; i++) {
-                let tmp = lis.eq(i);
-                if (val === tmp.data("value")) {
-                    this.setText(this.value = val);
-                    tmp.addClass("r-select-selected");
-                } else {
-                    tmp.removeClass("r-select-selected");
-                }
+    setMultiVal(val) {
+        let {
+            data
+        } = this.config;
+        let value = [];
+        if (!Array.isArray(val)) {
+            val = [String(val)];
+        }
+        for (let i = 0, len = data.length; i < len; i++) {
+            if (val.indexOf(data[i].value) > -1) {
+                value.push(data[i].value);
+                this.list.select(i);
             }
+        }
+        this.value = value;
+    }
+
+    setSingleVal(val) {
+        let {
+            data
+        } = this.config;
+        val = String(val);
+        for (let i = 0, len = data.length; i < len; i++) {
+            if (val === data[i].value) {
+                this.value = val;
+                this.list.select(i);
+                break;
+            }
+        }
+    }
+
+    val(val) {
+        if (val !== undefined) {
+            this.list.clearSlected();
+            this.config.multiple ?
+                this.setMultiVal(val) :
+                this.setSingleVal(val);
+            this.setText();
         }
         return this.value;
     }

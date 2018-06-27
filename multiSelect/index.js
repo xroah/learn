@@ -1,9 +1,8 @@
 import "jquery";
-import Select from "./select";
-import MultiSel from "./multiSel";
+import Select from "./core";
 import "./index.scss";
 
-const DEFAULT_OPTIONS = {
+const DEFAULT_CONFIG = {
     data: [],
     multiple: false,
     placeholder: ""
@@ -26,37 +25,32 @@ function callMethod(jqEl, method, data) {
     return jqEl;
 }
 
-function init(jqEl, options) {
+function init(jqEl, config) {
     for (let i = 0, len = jqEl.length; i < len; i++) {
         //防止重复初始化
         let instance = jqEl.eq(i).data("ms-instance");
         if (instance) continue;
-        //多选
-        if (jqEl[i].multiple || options.multiple) {
-            instance = new MultiSel(options);
-        } else {
-            instance = new Select(options);
-        }
+        instance = new Select(config, jqEl[i]);
         jqEl.eq(i).data("ms-instance", instance);
-        instance.init(jqEl[i]);
     }
     return jqEl;
 }
 
 $.fn.extend({
-    select: function (options, data) {
+    select: function (config, data) {
         let len = this.length;
         if (!len) return this;
-        if (typeof options === "string") {
-          return callMethod(this, options, data);
+        if (typeof config === "string") {
+          return callMethod(this, config, data);
         } 
-        if (!$.isPlainObject(options)) {
-            options = DEFAULT_OPTIONS;
+        if (!$.isPlainObject(config)) {
+            config = DEFAULT_CONFIG;
         }
-        options = {...DEFAULT_OPTIONS, ...options};
-        if (!Array.isArray(options.data)) {
-            throw new Error("data不是数组");
+        config = {...DEFAULT_CONFIG, ...config};
+        if (!Array.isArray(config.data)) {
+            console.error("data不是数组");
+            config.data = [];
         }
-        return init(this, options);
+        return init(this, config);
     }
 });
