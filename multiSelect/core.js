@@ -92,7 +92,6 @@ export default class Select {
             case "down": //ie
                 this.list.keySelect("down");
                 break;
-
         }
     }
 
@@ -247,6 +246,7 @@ export default class Select {
             this.config.multiple ?
                 this.setMultiVal(val) :
                 this.setSingleVal(val);
+            this.updateVal();
         }
         return this.value;
     }

@@ -172,7 +172,7 @@ export default class Options {
 
     clearSlected() {
         let cls = "r-select-selected";
-        this.ul.find(cls).removeClass(cls);
+        this.ul.find(`.${cls}`).removeClass(cls);
         this.selected = this.multiple ? [] : "";
     }
 
