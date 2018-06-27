@@ -37,8 +37,8 @@ export default class Select {
             multiple: this.config.multiple
         });
         this.documentClick = this._documentClick.bind(this);
-        this.val(this.list.getSelected());
         this.config.disabled && this.disable();
+        this.updateVal();
         this.initEvent();
     }
 
@@ -48,9 +48,9 @@ export default class Select {
             !data && console.warn("refresh方法未传入data,将使用option元素作为选项");
             _data = data || this.getSelectData(this.el);
         }
-        this.options.data = _data;
+        this.config.data = _data;
         this.list.refresh(data);
-        this.val(this.list.getSelected());
+        this.updateVal();
     }
 
     //获取select元素下的option,根据option的value和text设置data
@@ -71,7 +71,6 @@ export default class Select {
 
     keyDown(evt) {
         let key = evt.key.toLowerCase();
-        let ul = this.list.ul;
         switch (key) {
             case "escape":
             case "esc": //ie
@@ -79,11 +78,8 @@ export default class Select {
                 break;
             case "enter":
                 if (this.opened) {
-                    let el = ul.find(".r-select-active");
-                    if (!el.length) {
-                        el = ul.find(".r-select-hover");
-                    }
-                    el.length && this.selectOne(el, el.hasClass("r-select-selected"));
+                    this.list.keySelect("enter");
+                    this.selectOne();
                 } else {
                     this.open();
                 }
@@ -136,9 +132,8 @@ export default class Select {
     }
 
     selectOne(el, deselect) {
-        this.list.select($(el).index(), deselect);
-        this.val(this.list.getSelected());
         !this.config.multiple && this.close();
+        this.updateVal();
     }
 
     _documentClick(evt) {
@@ -194,6 +189,11 @@ export default class Select {
         }
     }
 
+    updateVal() {
+        this.value = this.list.getSelected();
+        this.setText();
+    }
+
     setText() {
         let val = this.value;
         let { multiple, placeholder } = this.config;
@@ -206,18 +206,6 @@ export default class Select {
             }
         } else {
             this.input.addClass("r-select-placeholder").text(placeholder);
-        }
-    }
-
-    destroy() {
-        this.wrapper.remove();
-        this.list.destroy();
-        $(document).off("click", this.documentClick);
-        this.el.data("ms-instance", null).css("display", this.el.data("display"));
-        for (var key in this) {
-            if (this.hasOwnProperty(key)) {
-                delete this[key];
-            }
         }
     }
 
@@ -252,14 +240,26 @@ export default class Select {
         }
     }
 
+    //暴露出去的设置value的方法
     val(val) {
         if (val !== undefined) {
             this.list.clearSlected();
             this.config.multiple ?
                 this.setMultiVal(val) :
                 this.setSingleVal(val);
-            this.setText();
         }
         return this.value;
+    }
+
+    destroy() {
+        this.wrapper.remove();
+        this.list.destroy();
+        $(document).off("click", this.documentClick);
+        this.el.data("ms-instance", null).css("display", this.el.data("display"));
+        for (var key in this) {
+            if (this.hasOwnProperty(key)) {
+                delete this[key];
+            }
+        }
     }
 }

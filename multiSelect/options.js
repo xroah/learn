@@ -61,6 +61,7 @@ export default class Options {
 
     refresh(data) {
         this.data = data;
+        this.selected = this.multiple ? [] : "";
         this.render();
     }
 
@@ -91,8 +92,6 @@ export default class Options {
             if (this.multiple) {
                 let i = this.selected.indexOf(val);
                 this.selected.splice(i, 1);
-            } else {
-                this.selected = "";
             }
         } else {
             li.addClass(cls);
@@ -100,12 +99,13 @@ export default class Options {
                 this.selected.push(val);
             } else {
                 this.selected = val;
+                li.siblings(`.${cls}`).removeClass(cls);
             }
         }
     }
 
     //键盘选择
-    keySelect(dir = "up") {
+    keySelect(dir) {
         let aCls = "r-select-active";
         let ul = this.ul;
         //当前鼠标hover的选项
@@ -120,9 +120,9 @@ export default class Options {
                 index = curActive.index();
             }
         }
-        curActive.removeClass(aCls);
         let max = 0;
         if (dir === "up") {
+            curActive.removeClass(aCls);
             if (index === undefined) index = 0;
             //往上找没有disabled的选项
             while (true) {
@@ -139,6 +139,7 @@ export default class Options {
                 max++;
             }
         } else if (dir === "down") {
+            curActive.removeClass(aCls);
             if (index === undefined) index = -1;
             //往下找没有disabled的选项
             while (true) {
@@ -153,6 +154,16 @@ export default class Options {
                     break;
                 }
                 max++;
+            }
+        } else if (dir === "enter") {
+            debugger;
+            len = ul.find(".r-select-active");
+            if (!len.length) {
+                len = ul.find(".r-select-hover");
+            }
+            if (len.length) {
+                index = len.index();
+                this.select(index, len.hasClass("r-select-selected"));
             }
         }
     }
