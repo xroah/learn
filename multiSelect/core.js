@@ -95,6 +95,10 @@ export default class Select {
         }
     }
 
+    clickWrapper() {
+        this.opened ? this.close() : this.open();
+    }
+
     blur() {
         //延迟获取当前活动元素,否则获取到的活动元素是body
         setTimeout(() => {
@@ -118,9 +122,9 @@ export default class Select {
         this.wrapper.focus();
         if (el.hasClass("r-select-disabled")) return;
         //单选，选中当前li要取消之前选中的li
-        //如果当前选中跟之前选中不是同一个则同时出发delselect和select时间
+        //如果当前选中跟之前选中不是同一个则同时触发delselect和select事件
         if (!this.config.multiple) {
-            if (el.hasClass(cls)){
+            if (el.hasClass(cls)) {
                 this.close();
                 return;
             }
@@ -131,18 +135,12 @@ export default class Select {
     }
 
     initEvent() {
-        let _this = this;
-        this.wrapper.on("click", () => {
-                if (this.disabled) return;
-                this.opened ? this.close() : this.open();
-            }).on("keydown", this.keyDown.bind(this))
+        this.wrapper
+            .on("click", this.clickWrapper.bind(this))
+            .on("keydown", this.keyDown.bind(this))
             .on("blur", this.blur.bind(this));
 
-        this.list.ul.on("mouseenter", ".r-select-item", function () {
-            $(this).addClass("r-select-hover");
-        }).on("mouseleave", ".r-select-item", function () {
-            $(this).removeClass("r-select-hover");
-        }).on("click", ".r-select-item", this.clickItem.bind(this));
+        this.list.ul.on("click", ".r-select-item", this.clickItem.bind(this));
         $(document).on("click", this.documentClick);
     }
 
@@ -152,11 +150,7 @@ export default class Select {
         if (!el || !el.length) return;
         if ($(el).hasClass("r-select-selected")) {
             //只有单选并且选中改变了才会触发
-            if (
-                deselectEl &&
-                deselectEl.length &&
-                !deselectEl.is(el)
-            ) {
+            if (deselectEl && deselectEl.length) {
                 this.el.trigger($.Event(eName.DESELECT, {
                     node: deselectEl.get(0)
                 }));

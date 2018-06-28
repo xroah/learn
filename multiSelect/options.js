@@ -8,6 +8,7 @@ export default class Options {
         this.multiple = !!config.multiple;
         this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
         this.selected = this.multiple ? [] : "";
+        this.initEvent();
         this.render();
     }
 
@@ -60,6 +61,14 @@ export default class Options {
             items.push($('<li class="r-select-item r-select-disabled">无数据</li>'));
         }
         return items;
+    }
+
+    initEvent() {
+        this.ul.on("mouseenter", ".r-select-item", function () {
+            $(this).addClass("r-select-hover");
+        }).on("mouseleave", ".r-select-item", function () {
+            $(this).removeClass("r-select-hover");
+        });
     }
 
     refresh(data) {
