@@ -8,11 +8,12 @@ let entry;
 //否则全部打包
 if (mod) {
     entry = {
-        [mod]: `./${mod}`
+        [mod]: `./${mod}/index.js`
     }
 } else {
     entry = {
-        MultiSel: "./multiSelect"
+        MultiSelect: "./multiSelect/index.js",
+        cookie: "./cookie/index.js"
     }
 }
 
