@@ -148,6 +148,8 @@ export default class Select {
 
     selectOne(el, deselectEl) {
         !this.config.multiple && this.close();
+        //没有选中元素直接返回
+        if (!el || !el.length) return;
         if ($(el).hasClass("r-select-selected")) {
             //只有单选并且选中改变了才会触发
             if (
@@ -163,7 +165,7 @@ export default class Select {
                 node: el.get(0)
             }));
         } else {
-            //只有多选是才会出发
+            //只有多选是才会触发
             this.el.trigger($.Event(eName.DESELECT, {
                 node: el.get(0)
             }));
