@@ -1,3 +1,5 @@
+import * as cName from "./classNames";
+
 export default class Options {
     constructor(config) {
         this.data = config.data;
@@ -19,23 +21,24 @@ export default class Options {
             disabled,
             selected
         } = obj;
-        if (typeof singleSlectedCallback !== "function") singleSlectedCallback = () => {};
         let li = this.multiple ?
-            `<li class="r-select-item">
+            `<li class="${cName.ITEM_CLS}">
                     <span class="r-checkbox-wrapper">
                         <span class="r-checkbox-outer"></span>
                         <span>{text}</span>
                     </span>
                 </li>` : '<li class="r-select-item">{text}</li>';
+        value = String(value);
         li = li.replace("{text}", text);
         li = $(li).attr("title", text).data("value", value);
         if (disabled) {
-            li.addClass("r-select-disabled");
+            li.addClass(cName.DISABLED_CLS);
         }
+        if (typeof singleSlectedCallback !== "function") singleSlectedCallback = () => {};
         if (selected) {
             if (this.multiple) {
                 this.selected.push(value);
-                li.addClass("r-select-selected");
+                li.addClass(cName.SELECTED_CLS);
             } else {
                 singleSlectedCallback(value);
             }
@@ -55,19 +58,20 @@ export default class Options {
         }
         if (!this.multiple) {
             this.selected = val;
-            selectedIndex >= 0 && items[selectedIndex].addClass("r-select-selected");
+            selectedIndex >= 0 && items[selectedIndex].addClass(cName.SELECTED_CLS);
         }
         if (!items.length) {
-            items.push($('<li class="r-select-item r-select-disabled">无数据</li>'));
+            items.push($(`<li class="${cName.ITEM_CLS} ${cName.DISABLED_CLS}">无数据</li>`));
         }
         return items;
     }
 
     initEvent() {
-        this.ul.on("mouseenter", ".r-select-item", function () {
-            $(this).addClass("r-select-hover");
-        }).on("mouseleave", ".r-select-item", function () {
-            $(this).removeClass("r-select-hover");
+        let selector = `.${cName.ITEM_CLS}`;
+        this.ul.on("mouseenter", selector, function () {
+            $(this).addClass(cName.HOVER_CLS);
+        }).on("mouseleave", selector, function () {
+            $(this).removeClass(cName.HOVER_CLS);
         });
     }
 
@@ -89,30 +93,73 @@ export default class Options {
         return selected;
     }
 
+    isSelected(el) {
+        return $(el).hasClass(cName.SELECTED_CLS);
+    }
+
+    isDisabled(el) {
+        return $(el).hasClass(cName.DISABLED_CLS);
+    }
+
     /**
-     * 
+     * 根据索引选择
      * @param {number | Array} index 选择的索引
      * @param {boolean} deselect 选择/取消选择，仅对multiple有效
      */
-    select(index, deselect) {
-        let cls = "r-select-selected";
-        let lis = this.ul.find(".r-select-item");
+    selectByIndex(index) {
+        let lis = this.ul.find(`.${cName.ITEM_CLS}`);
         let li = lis.eq(index);
+        //index可能越界
         if (!li.length) return;
-        let val = li.data("value");
-        if (deselect) {
-            li.removeClass(cls);
-            if (this.multiple) {
-                let i = this.selected.indexOf(val);
-                this.selected.splice(i, 1);
+        if (Array.isArray(index)) {
+            for (let i = index.length; i--;) {
+                this.selectByIndex(i);
             }
+            return;
+        }
+        this.select(li);
+    }
+
+    select(el) {
+        let cls = cName.SELECTED_CLS;
+        let val = el.data("value");
+        //多选时,如果当前是选中的则取消选中
+        if (this.multiple && this.isSelected(el)) {
+            let i = this.selected.indexOf(val);
+            el.removeClass(cls);
+            this.selected.splice(i, 1);
+            return;
+        }
+        el.addClass(cls);
+        if (this.multiple) {
+            this.selected.push(val);
         } else {
-            li.addClass(cls);
-            if (this.multiple) {
-                this.selected.push(val);
-            } else {
-                this.selected = val;
-                li.siblings(`.${cls}`).removeClass(cls);
+            this.selected = val;
+            el.siblings(`.${cls}`).removeClass(cls);
+        }
+    }
+
+    //根据值选择
+    selectByVal(val) {
+        let {
+            data
+        } = this;
+        if (!this.multiple) {
+            val = String(val);
+            for (let i = 0, len = data.length; i < len; i++) {
+                if (val === data[i].value) {
+                    this.selectByIndex(i);
+                    break;
+                }
+            }
+            return;
+        }
+        if (!Array.isArray(val)) {
+            val = [String(val)];
+        }
+        for (let i = 0, len = data.length; i < len; i++) {
+            if (val.indexOf(data[i].value) > -1) {
+                this.selectByIndex(i);
             }
         }
     }
@@ -124,9 +171,9 @@ export default class Options {
      * @param {number} step 1或者-1 向上或者向下查找的个数
      */
     findEl(curActive, index, step) {
-        let aCls = "r-select-active";
+        let aCls = cName.ACTIVE_CLS;
         let max = 0;
-        let lis = this.ul.find(".r-select-item");
+        let lis = this.ul.find(`.${cName.ITEM_CLS}`);
         let len = lis.length;
         curActive.removeClass(aCls);
         if (index === undefined) {
@@ -141,7 +188,7 @@ export default class Options {
                 index = 0;
             }
             curActive = lis.eq(index);
-            if (!curActive.hasClass("r-select-disabled")) {
+            if (!curActive.hasClass(cName.DISABLED_CLS)) {
                 curActive.addClass(aCls);
                 break;
             }
@@ -154,7 +201,7 @@ export default class Options {
 
     //键盘选择
     keySelect(dir) {
-        let aCls = "r-select-active";
+        let aCls = cName.ACTIVE_CLS;
         let ul = this.ul;
         //当前鼠标hover的选项
         let curActive = ul.find(`.${aCls}`);
@@ -162,7 +209,7 @@ export default class Options {
         if (curActive.length) {
             index = curActive.index();
         } else {
-            if ((curActive = ul.find(".r-select-hover")).length) {
+            if ((curActive = ul.find(cName.HOVER_CLS)).length) {
                 index = curActive.index();
             }
         }
@@ -173,18 +220,18 @@ export default class Options {
         } else if (dir === "enter") {
             curActive = ul.find(`.${aCls}`);
             if (!curActive.length) {
-                curActive = ul.find(".r-select-hover");
+                curActive = ul.find(`.${cName.HOVER_CLS}`);
             }
             if (curActive.length) {
                 index = curActive.index();
-                this.select(index, curActive.hasClass("r-select-selected"));
+                this.select(index, curActive.hasClass(cName.SELECTED_CLS));
                 return curActive;
             }
         }
     }
 
     clearSlected() {
-        let cls = "r-select-selected";
+        let cls = cName.SELECTED_CLS;
         this.ul.find(`.${cls}`).removeClass(cls);
         this.selected = this.multiple ? [] : "";
     }
@@ -195,11 +242,11 @@ export default class Options {
 
     hide() {
         this.ul
-            .children(".r-select-active")
-            .removeClass("r-select-active")
+            .children(`.${cName.ACTIVE_CLS}`)
+            .removeClass(cName.ACTIVE_CLS)
             .end()
-            .children(".r-select-hover")
-            .removeClass("r-select-hover")
+            .children(`.${cName.HOVER_CLS}`)
+            .removeClass(cName.HOVER_CLS)
             .end()
             .fadeOut(150);
     }
