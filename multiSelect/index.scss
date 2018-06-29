@@ -70,18 +70,21 @@ $disabled_color: #aaa;
     }
 }
 
-.r-select-options {
+.r-select-options-wrapper {
     display: none;
     overflow: auto;
     position: absolute;
     max-height: 240px;
+    border: 1px solid #aaa;
+    box-shadow: 1px 1px 1px 2px #eee;
+    background-color: #fff;
+}
+
+.r-select-options {
     padding: 0;
     margin: 0;
-    border: 1px solid #aaa;
     outline: none;
     box-sizing: border-box;
-    background-color: #fff;
-    box-shadow: 1px 1px 1px 2px #eee;
     list-style: none;
     font-size: 14px;
     z-index: 99999;

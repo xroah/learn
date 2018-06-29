@@ -9,6 +9,7 @@ export default class Options {
         };
         this.options = null; //所有的选项
         this.multiple = !!config.multiple;
+        this.wrapper = $('<div class="r-select-options-wrapper"></div>')
         this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
         this.selected = {};
         this.initEvent();
@@ -285,25 +286,26 @@ export default class Options {
     }
 
     show(cssObj) {
-        this.ul.css(cssObj).fadeIn(150);
+        this.wrapper.css(cssObj).fadeIn(150);
     }
 
     hide() {
         this.options
             .removeClass(cName.ACTIVE_CLS)
             .removeClass(cName.HOVER_CLS);
-        this.ul.fadeOut(150);
+        this.wrapper.fadeOut(150);
     }
 
     destroy() {
         this.ul.remove();
+        this.wrapper.remove();
     }
 
     render() {
         let items = this.getItems(this.data);
         this.ul.empty().append(items);
-        if (!this.ul.parent().length) {
-            this.ul.appendTo(document.body);
+        if (!this.wrapper.parent().length) {
+            this.wrapper.append(this.ul).appendTo(document.body);
         }
         this.options = this.ul.find(`.${cName.ITEM_CLS}`);
         let selected = this.getCurrentSlectedEl();
