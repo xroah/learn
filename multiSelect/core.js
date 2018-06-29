@@ -1,5 +1,5 @@
 import Options from "./options";
-import { ITEM_CLS, ACTIVE_CLS } from "./classNames";
+import { ITEM_CLS } from "./classNames";
 import * as eName from "./event_name";
 
 export default class Select {
@@ -26,9 +26,9 @@ export default class Select {
             if (!this.config.data || !this.config.data.length) {
                 this.config.data = this.getSelectData(el);
             }
-            console.log(this.config.data)
             //保存当前元素的display属性,destroy时还原
             el.data("display", el.css("display")).hide();
+            //如果select元素是禁用状态,则禁用
             el.prop("disabled") && this.disable();
             this.wrapper.append([this.input, caret]).insertAfter(el);
         } else {
@@ -38,7 +38,6 @@ export default class Select {
             data: this.config.data,
             multiple: this.config.multiple
         });
-        this.documentClick = this._documentClick.bind(this);
         this.config.disabled && this.disable();
         this.updateVal(false);
         this.initEvent();
@@ -160,7 +159,6 @@ export default class Select {
             .on("blur", this.blur.bind(this));
 
         this.list.ul.on("click", `.${ITEM_CLS}`, this.clickItem.bind(this));
-        $(document).on("click", this.documentClick);
     }
 
     selectOne(el, deselectEl) {
@@ -192,23 +190,6 @@ export default class Select {
             }));
         }
         this.updateVal();
-    }
-
-    _documentClick(evt) {
-        let tgt = evt.target,
-            ul = this.list.ul;
-        //当鼠标点击的目标不是ul、wrapper元素,或者不是ul、wrapper元素的子元素的时候关闭
-        //当点击wrapper时候会显示或者关闭,同时事件会冒泡到document,此时则会关闭选项
-        //如果给wrapper点击事件加上stopPropagation
-        //如果此时页面上有多个select,点击当前wrapper,则其他的不会关闭
-        if (
-            tgt !== ul[0] &&
-            !ul[0].contains(tgt) &&
-            tgt !== this.wrapper[0] &&
-            !this.wrapper[0].contains(tgt)
-        ) {
-            this.close();
-        }
     }
 
     showList() {
@@ -302,7 +283,6 @@ export default class Select {
     destroy() {
         this.wrapper.remove();
         this.list.destroy();
-        $(document).off("click", this.documentClick);
         this.el.data("ms-instance", null).css("display", this.el.data("display"));
         for (var key in this) {
             if (this.hasOwnProperty(key)) {
