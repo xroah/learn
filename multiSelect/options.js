@@ -67,9 +67,6 @@ export default class Options {
             this.lastSingleSelected.addClass(cName.SELECTED_CLS);
             delete this.lastSingleSelected;
         }
-        if (!items.length) {
-            items.push($(`<li class="${cName.ITEM_CLS} ${cName.DISABLED_CLS}">无数据</li>`));
-        }
         return items;
     }
 
@@ -284,17 +281,7 @@ export default class Options {
     }
 
     getCurrentSlectedEl() {
-        let ret = this.ul.find(`.${cName.SELECTED_CLS}`);
-        let opts = this.options;
-        if (this.multiple) {
-            for (let i = 0, len = opts.length; i < len; i++) {
-                let tmp = opts.eq(o);
-                if (tmp.hasClass(cName.SELECTED_CLS)) {
-                    ret.push(tmp);
-                }
-            }
-        }
-        return ret;
+        return this.ul.find(`.${cName.SELECTED_CLS}`);
     }
 
     show(cssObj) {
@@ -319,5 +306,10 @@ export default class Options {
             this.ul.appendTo(document.body);
         }
         this.options = this.ul.find(`.${cName.ITEM_CLS}`);
+        let selected = this.getCurrentSlectedEl();
+        //默认选中第一项
+        if (!selected.length) {
+            this.select(this.options.first());
+        }
     }
 }
