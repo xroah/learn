@@ -14,7 +14,7 @@ export default class Options {
         this.render();
     }
 
-    getOneItem(obj, singleSlectedCallback) {
+    getOneItem(obj) {
         let {
             value,
             text,
@@ -34,13 +34,13 @@ export default class Options {
         if (disabled) {
             li.addClass(cName.DISABLED_CLS);
         }
-        if (typeof singleSlectedCallback !== "function") singleSlectedCallback = () => {};
         if (selected) {
             if (this.multiple) {
                 this.selected.push(value);
                 li.addClass(cName.SELECTED_CLS);
             } else {
-                singleSlectedCallback(value);
+                this.value = value;
+                this.lastSingleSelectedIndex++;
             }
         }
         return li;
@@ -48,22 +48,38 @@ export default class Options {
 
     getItems(data) {
         let items = [];
-        let selectedIndex = -1;
-        let val = "";
+        this.lastSingleSelectedIndex = -1;
         for (let i = 0, len = data.length; i < len; i++) {
-            items.push(this.getOneItem(data[i], v => {
-                selectedIndex = i;
-                val = v;
-            }));
+            let tmp = data[i];
+            if (!tmp.children) {
+                //如果没有分组
+                items.push(this.getOneItem(tmp));
+            } else {
+                items.push(this.getGroupItem(tmp));
+            }
         }
-        if (!this.multiple) {
-            this.selected = val;
-            selectedIndex >= 0 && items[selectedIndex].addClass(cName.SELECTED_CLS);
+        if (this.lastSingleSelectedIndex >= 0) {
+            items[this.lastSingleSelectedIndex].addClass(cName.ITEM_CLS);
         }
         if (!items.length) {
             items.push($(`<li class="${cName.ITEM_CLS} ${cName.DISABLED_CLS}">无数据</li>`));
         }
         return items;
+    }
+
+    getGroupItem(data) {
+        let group = $(`<li class="r-select-group"><span>${data.text}</span></li>`);
+        let opts = $('<ul class="r-select-group-options"></ul>');
+        let items = [];
+        let c = data.children;
+        for (let i = 0, len = c.length; i < len; i++) {
+            let li = this.getOneItem(c[i]);
+            if (data.disabled) {
+                li.addClass(cName.DISABLED_CLS);
+            }
+            items.push(li);
+        }
+        return group.append(opts.append(items));
     }
 
     initEvent() {
@@ -130,13 +146,13 @@ export default class Options {
             this.selected.splice(i, 1);
             return;
         }
-        el.addClass(cls);
         if (this.multiple) {
             this.selected.push(val);
         } else {
             this.selected = val;
-            el.siblings(`.${cls}`).removeClass(cls);
+            this.ul.find(`.${cls}`).removeClass(cls);
         }
+        el.addClass(cls);
     }
 
     //根据值选择
@@ -170,13 +186,14 @@ export default class Options {
      * @param {number} index active元素的索引
      * @param {number} step 1或者-1 向上或者向下查找的个数
      */
-    findEl(curActive, index, step) {
+    findEl(curActive, step) {
         let aCls = cName.ACTIVE_CLS;
         let max = 0;
         let lis = this.ul.find(`.${cName.ITEM_CLS}`);
         let len = lis.length;
+        let index = lis.index(curActive);
         curActive.removeClass(aCls);
-        if (index === undefined) {
+        if (index === -1) {
             index = step < 0 ? 0 : -1;
         }
         //往上/往下找没有disabled的选项
@@ -205,26 +222,20 @@ export default class Options {
         let ul = this.ul;
         //当前鼠标hover的选项
         let curActive = ul.find(`.${aCls}`);
-        let index;
-        if (curActive.length) {
-            index = curActive.index();
-        } else {
-            if ((curActive = ul.find(cName.HOVER_CLS)).length) {
-                index = curActive.index();
-            }
-        }
+        if (!curActive.length) {
+            curActive = ul.find(cName.HOVER_CLS)
+        } 
         if (dir === "up") {
-            this.findEl(curActive, index, -1);
+            this.findEl(curActive, -1);
         } else if (dir === "down") {
-            this.findEl(curActive, index, 1);
+            this.findEl(curActive, 1);
         } else if (dir === "enter") {
             curActive = ul.find(`.${aCls}`);
             if (!curActive.length) {
                 curActive = ul.find(`.${cName.HOVER_CLS}`);
             }
             if (curActive.length) {
-                index = curActive.index();
-                this.select(index, curActive.hasClass(cName.SELECTED_CLS));
+                this.select(curActive);
                 return curActive;
             }
         }
@@ -242,10 +253,10 @@ export default class Options {
 
     hide() {
         this.ul
-            .children(`.${cName.ACTIVE_CLS}`)
+            .find(`.${cName.ACTIVE_CLS}`)
             .removeClass(cName.ACTIVE_CLS)
             .end()
-            .children(`.${cName.HOVER_CLS}`)
+            .find(`.${cName.HOVER_CLS}`)
             .removeClass(cName.HOVER_CLS)
             .end()
             .fadeOut(150);

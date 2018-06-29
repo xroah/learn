@@ -1,4 +1,10 @@
 $color: #40a9ff;
+@mixin ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .r-select-wrapper {
     display: inline-block;
     position: relative;
@@ -77,12 +83,10 @@ $color: #40a9ff;
     list-style: none;
     font-size: 14px;
     z-index: 99999;
-    li {
+    .r-select-item {
         padding: 5px 8px;
         line-height: 1.5;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        @include ellipse();
         transition: all .3s;
         cursor: default;
         &.r-select-disabled {
@@ -174,11 +178,28 @@ $color: #40a9ff;
             }
         }
     }
-    li:hover {
+    .r-select-item:hover {
         color: #fff;
         background-color: $color;
         .r-checkbox-outer {
             border-color: #fff;
+        }
+    }
+    .r-select-group {
+        @include ellipse();
+        >span {
+            display: inline-block;
+            max-width: 100%;
+            padding: 8px;
+            font-weight: bold;
+        }
+    }
+    .r-select-group-options {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        .r-select-item {
+            padding-left: 20px;
         }
     }
 }

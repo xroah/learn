@@ -26,6 +26,7 @@ export default class Select {
             if (!this.config.data || !this.config.data.length) {
                 this.config.data = this.getSelectData(el);
             }
+            console.log(this.config.data)
             //保存当前元素的display属性,destroy时还原
             el.data("display", el.css("display")).hide();
             el.prop("disabled") && this.disable();
@@ -55,17 +56,29 @@ export default class Select {
     }
 
     //获取select元素下的option,根据option的value和text设置data
-    getSelectData(el) {
-        let data = [];
+    getSelectData(el, data) {
+        data = data || [];
         let config = el.children();
         for (let i = 0, len = config.length; i < len; i++) {
             let tmp = config.eq(i);
-            data.push({
-                value: tmp.val(),
-                text: tmp.text(),
-                selected: tmp.prop("selected"),
-                disabled: tmp.prop("disabled")
-            });
+            //optgroup分组
+            if (tmp.get(0).nodeName.toLowerCase() === "optgroup") {
+                let obj = {
+                    value: "",
+                    text: tmp.attr("label") || "分组",
+                    disabled: tmp.prop("disabled"),
+                    children: []
+                };
+                data.push(obj);
+                this.getSelectData(tmp, obj.children);
+            } else {
+                data.push({
+                    value: tmp.val(),
+                    text: tmp.text(),
+                    selected: tmp.prop("selected"),
+                    disabled: tmp.prop("disabled")
+                });
+            }
         }
         return data;
     }

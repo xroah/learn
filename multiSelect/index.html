@@ -52,8 +52,10 @@
     <select multiple id="multi1" class="multi">
         <option value="1">类型1</option>
         <option value="2" disabled>类型2</option>
-        <option value="3" selected>类型3</option>
-        <option value="4" selected>类型4</option>
+        <optgroup disabled>
+            <option value="3" selected>类型3</option>
+            <option value="4" selected>类型4</option>
+        </optgroup>
         <option value="5">类型5</option>
     </select>
     <select class="single" id="single2">
@@ -74,17 +76,17 @@
     <script>
         $(".single, .multi").select({
             placeholder: "请选择"
-        }).on("ms.select", function(evt) {
-console.log("select", evt.node);
-        }).on("ms.deselect", function (evt) { 
+        }).on("ms.select", function (evt) {
+            console.log("select", evt.node);
+        }).on("ms.deselect", function (evt) {
             console.log("deselect", evt.node);
-         }).on("ms.change", function(evt) {
-             console.log(evt.value);
-         }).on("ms.open", function() {
-             console.log("open")
-         }).on("ms.close", function() {
-             console.log("close");
-         })
+        }).on("ms.change", function (evt) {
+            console.log(evt.value);
+        }).on("ms.open", function () {
+            console.log("open")
+        }).on("ms.close", function () {
+            console.log("close");
+        })
     </script>
 </body>
 
