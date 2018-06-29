@@ -83,6 +83,9 @@ $color: #40a9ff;
     list-style: none;
     font-size: 14px;
     z-index: 99999;
+    .r-select-hide {
+        display: none;
+    }
     .r-select-item {
         padding: 5px 8px;
         line-height: 1.5;
