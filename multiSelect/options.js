@@ -10,7 +10,7 @@ export default class Options {
         this.options = null; //所有的选项
         this.multiple = !!config.multiple;
         this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
-        this.initSelected();
+        this.selected = {};
         this.initEvent();
         this.render();
     }
@@ -114,21 +114,26 @@ export default class Options {
 
     refresh(data) {
         this.data = data;
-        this.initSelected();
+        this.selected = {};
         this.render();
     }
 
-    getSelected(text) {
+    getSelected(getText) {
         let {
             selected,
-            selectedText,
             multiple
         } = this;
-        if (multiple) {
-            //复制一份,引用类型以防被外部改变
-            return text ? [...selectedText] : [...selected];
+        let text = [];
+        let val = Object.keys(selected);
+        //由于babel不会转换es6新增API,只会转换语法,
+        //如使用Object.values,则要引入babel-polyfill
+        for (let i = 0, len = val.length; i < len; i++) {
+            text.push(selected[val[i]]);
         }
-        return text ? selectedText : selected;
+        if (multiple) {
+            return getText ? text : val;
+        }
+        return getText ? text[0] : val[0];
     }
 
     isSelected(el) {
@@ -158,24 +163,18 @@ export default class Options {
         this.select(li);
     }
 
-    initSelected() {
-        this.selectedText = this.multiple ? [] : "";
-        this.selected = this.multiple ? [] : "";
-    }
-
     setMultipleSlected(val, text) {
-        this.selected.push(val);
-        this.selectedText.push(text)
+        this.selected[val] = text;
     }
 
     setSingleSelected(val, text) {
-        this.selected = val;
-        this.selectedText = text;
+        this.selected = {
+            [val]: text
+        };
     }
 
-    removeOneSelected(index) {
-        this.selected.splice(index, 1);
-        this.selectedText.splice(index, 1);
+    removeOneSelected(val) {
+        delete this.selected[val];
     }
 
     select(el) {
@@ -184,9 +183,8 @@ export default class Options {
         let text = el.text();
         //多选时,如果当前是选中的则取消选中
         if (this.multiple && this.isSelected(el)) {
-            let i = this.selected.indexOf(val);
             el.removeClass(cls);
-            this.removeOneSelected(i);
+            this.removeOneSelected(val);
             return;
         }
         if (this.multiple) {
@@ -282,7 +280,7 @@ export default class Options {
     clearSlected() {
         let cls = cName.SELECTED_CLS;
         this.ul.find(`.${cls}`).removeClass(cls);
-        this.initSelected();
+        this.selected = {};
     }
 
     getCurrentSlectedEl() {
