@@ -130,6 +130,12 @@ export default class Select {
             let activeEl = document.activeElement;
             let wrapper = this.wrapper.get(0);
             let ul = this.list.ul.get(0);
+            //当点击到文档之外（当前页面之外）
+            //document.activeElement依然是wrapper
+            //导致选项不能关闭，ie下会不断出发blur事件（不断调用focus函数）
+            if (activeEl === wrapper) {
+                activeEl = document.body;
+            }
             //在选项列表右键弹出菜单不让选项关闭
             if (
                 activeEl !== this.list.ul.get(0) &&
