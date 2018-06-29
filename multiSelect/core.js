@@ -119,6 +119,8 @@ export default class Select {
 
     //点击wrapper时,关闭或者打开
     clickWrapper() {
+        //IE下点击的时候不会自动获得焦点
+        this.wrapper.focus();
         this.opened ? this.close() : this.open();
     }
 
