@@ -10,7 +10,7 @@ export default class Options {
         this.options = null; //所有的选项
         this.multiple = !!config.multiple;
         this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
-        this.selected = this.multiple ? [] : "";
+        this.initSelected();
         this.initEvent();
         this.render();
     }
@@ -37,10 +37,10 @@ export default class Options {
         }
         if (selected) {
             if (this.multiple) {
-                this.selected.push(value);
+                this.setMultipleSlected(value, text);
                 li.addClass(cName.SELECTED_CLS);
             } else {
-                this.selected = value;
+                this.setSingleSelected(value, text);
                 this.lastSingleSelected = li;
             }
         }
@@ -105,20 +105,21 @@ export default class Options {
 
     refresh(data) {
         this.data = data;
-        this.selected = this.multiple ? [] : "";
+        this.initSelected();
         this.render();
     }
 
-    getSelected() {
+    getSelected(text) {
         let {
             selected,
+            selectedText,
             multiple
         } = this;
         if (multiple) {
             //复制一份,引用类型以防被外部改变
-            return [...selected];
+            return text ? [...selectedText] : [...selected];
         }
-        return selected;
+        return text ? selectedText : selected;
     }
 
     isSelected(el) {
@@ -148,20 +149,41 @@ export default class Options {
         this.select(li);
     }
 
+    initSelected() {
+        this.selectedText = this.multiple ? [] : "";
+        this.selected = this.multiple ? [] : "";
+    }
+
+    setMultipleSlected(val, text) {
+        this.selected.push(val);
+        this.selectedText.push(text)
+    }
+
+    setSingleSelected(val, text) {
+        this.selected = val;
+        this.selectedText = text;
+    }
+
+    removeOneSelected(index) {
+        this.selected.splice(index, 1);
+        this.selectedText.splice(index, 1);
+    }
+
     select(el) {
         let cls = cName.SELECTED_CLS;
         let val = el.data("value");
+        let text = el.text();
         //多选时,如果当前是选中的则取消选中
         if (this.multiple && this.isSelected(el)) {
             let i = this.selected.indexOf(val);
             el.removeClass(cls);
-            this.selected.splice(i, 1);
+            this.removeOneSelected(i);
             return;
         }
         if (this.multiple) {
-            this.selected.push(val);
+            this.setMultipleSlected(val, text);
         } else {
-            this.selected = val;
+            this.setSingleSelected(val, text);
             this.ul.find(`.${cls}`).removeClass(cls);
         }
         el.addClass(cls);
@@ -251,7 +273,7 @@ export default class Options {
     clearSlected() {
         let cls = cName.SELECTED_CLS;
         this.ul.find(`.${cls}`).removeClass(cls);
-        this.selected = this.multiple ? [] : "";
+        this.initSelected();
     }
 
     getCurrentSlectedEl() {

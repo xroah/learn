@@ -270,6 +270,7 @@ export default class Select {
 
     setText() {
         let val = this.value;
+        let text = this.list.getSelected(true);
         let {
             multiple,
             placeholder
@@ -277,9 +278,9 @@ export default class Select {
         if (val && val.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {
-                this.input.text(`已选中${val.length}项`);
+                this.input.text(text.join(","));
             } else {
-                this.input.text(val);
+                this.input.text(text);
             }
         } else {
             this.input.addClass("r-select-placeholder").text(placeholder);
