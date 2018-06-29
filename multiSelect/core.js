@@ -199,7 +199,7 @@ export default class Select {
     }
 
     showList() {
-        let rect = this.input.get(0).getBoundingClientRect();
+        let rect = this.wrapper.get(0).getBoundingClientRect();
         this.list.show({
             width: rect.width,
             left: rect.left,
@@ -256,13 +256,12 @@ export default class Select {
     }
 
     setText() {
-        let val = this.value;
         let text = this.list.getSelected(true);
         let {
             multiple,
             placeholder
         } = this.config;
-        if (val && val.length) {
+        if (text.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {
                 this.input.text(text.join(","));

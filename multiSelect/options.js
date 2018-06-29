@@ -133,7 +133,7 @@ export default class Options {
         if (multiple) {
             return getText ? text : val;
         }
-        return getText ? text[0] : val[0];
+        return getText ? text.toString() : val.toString();
     }
 
     isSelected(el) {
