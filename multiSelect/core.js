@@ -126,8 +126,14 @@ export default class Select {
         //延迟获取当前活动元素,否则获取到的活动元素是body
         setTimeout(() => {
             let activeEl = document.activeElement;
+            let wrapper = this.wrapper.get(0);
+            let ul = this.list.ul.get(0);
             //在选项列表右键弹出菜单不让选项关闭
-            if (activeEl !== this.list.ul.get(0)) {
+            if (
+                activeEl !== this.list.ul.get(0) &&
+                !wrapper.contains(activeEl) &&  //IE下的span会获取焦点成为activeElement
+                !ul.contains(activeEl)
+        ) {
                 this.close();
             } else {
                 //使其获取焦点，使其能触发blur事件
