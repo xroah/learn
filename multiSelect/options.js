@@ -310,7 +310,6 @@ export default class Options {
         this.input && this.input.remove();
     }
 
-
     onSearch() {
         const DELAY = 200;
         if (this.searchTimer) {
@@ -338,9 +337,27 @@ export default class Options {
         }, DELAY);
     }
 
+    isIE9() {
+        let reg = /msie\s*9.0/i;
+        return reg.test(navigator.userAgent);
+    }
+
+    ie9KeyDown(evt) {
+        let key = evt.key.toLowerCase();
+        if (key === "backspace" || key === "del") {
+            this.onSearch();
+        }
+    }
+
     initSearch() {
         let search = this.onSearch.bind(this);
         this.input.on("input", search);
+        //IE9 按下backspace delete键以及剪切不会触发input事件
+        if (this.isIE9) {
+            this.input
+                .on("keydown", this.ie9KeyDown.bind(this))
+                .on("cut", search)
+        }
     }
 
     render() {
