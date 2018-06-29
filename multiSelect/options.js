@@ -7,6 +7,7 @@ export default class Options {
             onClick: config.onClick,
             onSelect: config.onSelect
         };
+        this.options = null; //所有的选项
         this.multiple = !!config.multiple;
         this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
         this.selected = this.multiple ? [] : "";
@@ -39,8 +40,8 @@ export default class Options {
                 this.selected.push(value);
                 li.addClass(cName.SELECTED_CLS);
             } else {
-                this.value = value;
-                this.lastSingleSelectedIndex++;
+                this.selected = value;
+                this.lastSingleSelected = li;
             }
         }
         return li;
@@ -48,18 +49,23 @@ export default class Options {
 
     getItems(data) {
         let items = [];
-        this.lastSingleSelectedIndex = -1;
+        this.lastSingleSelected = null;
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
             if (!tmp.children) {
                 //如果没有分组
-                items.push(this.getOneItem(tmp));
+                tmp = this.getOneItem(tmp);
+                items.push(tmp);
             } else {
-                items.push(this.getGroupItem(tmp));
+                tmp = this.getGroupItem(tmp)
+                if (tmp) {
+                    items.push(tmp);
+                }
             }
         }
-        if (this.lastSingleSelectedIndex >= 0) {
-            items[this.lastSingleSelectedIndex].addClass(cName.ITEM_CLS);
+        if (this.lastSingleSelected) {
+            this.lastSingleSelected.addClass(cName.SELECTED_CLS);
+            delete this.lastSingleSelected;
         }
         if (!items.length) {
             items.push($(`<li class="${cName.ITEM_CLS} ${cName.DISABLED_CLS}">无数据</li>`));
@@ -79,7 +85,13 @@ export default class Options {
             }
             items.push(li);
         }
-        return group.append(opts.append(items));
+        //如果分组有选项则添加,没有则不添加
+        if (items.length) {
+            group.append(opts.append(items));
+        } else {
+            group = null;
+        }
+        return group;
     }
 
     initEvent() {
@@ -123,7 +135,7 @@ export default class Options {
      * @param {boolean} deselect 选择/取消选择，仅对multiple有效
      */
     selectByIndex(index) {
-        let lis = this.ul.find(`.${cName.ITEM_CLS}`);
+        let lis = this.options;
         let li = lis.eq(index);
         //index可能越界
         if (!li.length) return;
@@ -183,13 +195,12 @@ export default class Options {
     /**
      * 
      * @param {HTMLElement} curActive 当前active元素
-     * @param {number} index active元素的索引
      * @param {number} step 1或者-1 向上或者向下查找的个数
      */
     findEl(curActive, step) {
         let aCls = cName.ACTIVE_CLS;
         let max = 0;
-        let lis = this.ul.find(`.${cName.ITEM_CLS}`);
+        let lis = this.options;
         let len = lis.length;
         let index = lis.index(curActive);
         curActive.removeClass(aCls);
@@ -224,16 +235,12 @@ export default class Options {
         let curActive = ul.find(`.${aCls}`);
         if (!curActive.length) {
             curActive = ul.find(cName.HOVER_CLS)
-        } 
+        }
         if (dir === "up") {
             this.findEl(curActive, -1);
         } else if (dir === "down") {
             this.findEl(curActive, 1);
         } else if (dir === "enter") {
-            curActive = ul.find(`.${aCls}`);
-            if (!curActive.length) {
-                curActive = ul.find(`.${cName.HOVER_CLS}`);
-            }
             if (curActive.length) {
                 this.select(curActive);
                 return curActive;
@@ -252,14 +259,10 @@ export default class Options {
     }
 
     hide() {
-        this.ul
-            .find(`.${cName.ACTIVE_CLS}`)
+        this.options
             .removeClass(cName.ACTIVE_CLS)
-            .end()
-            .find(`.${cName.HOVER_CLS}`)
-            .removeClass(cName.HOVER_CLS)
-            .end()
-            .fadeOut(150);
+            .removeClass(cName.HOVER_CLS);
+        this.ul.fadeOut(150);
     }
 
     destroy() {
@@ -272,5 +275,6 @@ export default class Options {
         if (!this.ul.parent().length) {
             this.ul.appendTo(document.body);
         }
+        this.options = this.ul.find(`.${cName.ITEM_CLS}`);
     }
 }
