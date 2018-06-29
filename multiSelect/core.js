@@ -1,5 +1,5 @@
 import Options from "./options";
-import { ITEM_CLS, SELECTED_CLS } from "./classNames";
+import { ITEM_CLS, ACTIVE_CLS } from "./classNames";
 import * as eName from "./event_name";
 
 export default class Select {

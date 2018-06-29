@@ -1,4 +1,5 @@
 $color: #40a9ff;
+$disabled_color: #aaa;
 @mixin ellipse {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -53,7 +54,7 @@ $color: #40a9ff;
         @include ellipse();
         cursor: pointer;
         &.r-select-placeholder {
-            color: #aaa;
+            color: $disabled_color;
         }
     }
     .r-select-caret {
@@ -97,20 +98,21 @@ $color: #40a9ff;
             &,
             &:hover,
             &.r-select-hover {
-                color: #aaa;
+                color: $disabled_color;
                 background-color: transparent;
                 .r-checkbox-outer {
-                    border-color: #ddd;
+                    border-color: $disabled_color;
                 }
             }
             &.r-select-selected {
                 &,
-                &:hover {
-                    color: #aaa;
+                &:hover,
+                &.r-select-hover {
+                    color: $disabled_color;
                     background-color: #eee;
                     .r-checkbox-outer {
-                        border-color: #aaa;
-                        background-color: #aaa;
+                        border-color: $disabled_color;
+                        background-color: $disabled_color;
                     }
                 }
             }
@@ -120,19 +122,16 @@ $color: #40a9ff;
             }
         }
         &.r-select-selected {
-            &,
-            &:hover {
-                color: #333;
-                background-color: #dadada;
-                .r-checkbox-outer::before {
-                    border-color: #fff;
-                    -ms-transform: rotate(-45deg) scale(1);
-                    transform: rotate(-45deg) scale(1);
-                }
-                .r-checkbox-outer {
-                    border-color: $color;
-                    background-color: $color;
-                }
+            color: #333;
+            background-color: #dadada;
+            .r-checkbox-outer::before {
+                border-color: #fff;
+                -ms-transform: rotate(-45deg) scale(1);
+                transform: rotate(-45deg) scale(1);
+            }
+            .r-checkbox-outer {
+                border-color: $color;
+                background-color: $color;
             }
         }
         &.r-select-active {
@@ -182,11 +181,15 @@ $color: #40a9ff;
             }
         }
     }
-    .r-select-item:hover {
-        color: #fff;
-        background-color: $color;
-        .r-checkbox-outer {
-            border-color: #fff;
+    .r-select-item {
+        &:hover,
+        &.r-select-hover,
+        &.r-select-active {
+            color: #fff;
+            background-color: $color;
+            .r-checkbox-outer {
+                border-color: #fff;
+            }
         }
     }
     .r-select-group {

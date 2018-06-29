@@ -94,13 +94,22 @@ export default class Options {
         return group;
     }
 
+    mouseHandler(evt) {
+        let tgt = $(evt.currentTarget);
+        let type = evt.type.toLowerCase();
+        this.ul
+            .find(`.${cName.ACTIVE_CLS}`)
+            .removeClass(cName.ACTIVE_CLS);
+        type === "mouseenter" ?
+            tgt.addClass(cName.HOVER_CLS) :
+            tgt.removeClass(cName.HOVER_CLS);
+    }
+
     initEvent() {
         let selector = `.${cName.ITEM_CLS}`;
-        this.ul.on("mouseenter", selector, function () {
-            $(this).addClass(cName.HOVER_CLS);
-        }).on("mouseleave", selector, function () {
-            $(this).removeClass(cName.HOVER_CLS);
-        });
+        let handler = this.mouseHandler.bind(this);
+        this.ul.on("mouseenter", selector, handler)
+            .on("mouseleave", selector, handler);
     }
 
     refresh(data) {
@@ -256,7 +265,7 @@ export default class Options {
         //当前鼠标hover的选项
         let curActive = ul.find(`.${aCls}`);
         if (!curActive.length) {
-            curActive = ul.find(cName.HOVER_CLS)
+            curActive = ul.find(`.${cName.HOVER_CLS}`);
         }
         if (dir === "up") {
             this.findEl(curActive, -1);
