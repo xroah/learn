@@ -162,12 +162,12 @@ export default class Options {
     }
 
     setMultipleSlected(val, text) {
-        this.selected[val] = text;
+        this.selected[val] = text.trim();
     }
 
     setSingleSelected(val, text) {
         this.selected = {
-            [val]: text
+            [val]: text.trim()
         };
     }
 
