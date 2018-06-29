@@ -254,6 +254,20 @@ export default class Options {
         this.selected = this.multiple ? [] : "";
     }
 
+    getCurrentSlectedEl() {
+        let ret = this.ul.find(`.${cName.SELECTED_CLS}`);
+        let opts = this.options;
+        if (this.multiple) {
+            for (let i = 0, len = opts.length; i < len; i++) {
+                let tmp = opts.eq(o);
+                if (tmp.hasClass(cName.SELECTED_CLS)) {
+                    ret.push(tmp);
+                }
+            }
+        }
+        return ret;
+    }
+
     show(cssObj) {
         this.ul.css(cssObj).fadeIn(150);
     }

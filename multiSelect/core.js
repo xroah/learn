@@ -83,6 +83,14 @@ export default class Select {
         return data;
     }
 
+    getCurrentSingleSelectedEl() {
+        if (!this.config.multiple) {
+            //单选时,先获取之前选中,同点击选中
+            return this.list.getCurrentSlectedEl();
+        }
+        return null;
+    }
+
     keyDown(evt) {
         let key = evt.key.toLowerCase();
         switch (key) {
@@ -92,8 +100,9 @@ export default class Select {
                 break;
             case "enter":
                 if (this.opened) {
+                    let before = this.getCurrentSingleSelectedEl();
                     let el = this.list.keySelect("enter");
-                    this.selectOne(el);
+                    this.selectOne(el, before);
                 } else {
                     this.open();
                 }
@@ -136,14 +145,9 @@ export default class Select {
         //使其重新获取焦点以便响应键盘事件
         this.wrapper.focus();
         if (this.list.isDisabled(el)) return;
-        //单选,如果当前已经是被选中的则直接关闭
-        //否则先获取先前的选中项,再选中当前
+        //否则先获取先前的选中项,再选中当前,以便触发deslect和select事件
         if (!this.config.multiple) {
-            if (this.list.isSelected(el)) {
-                this.close();
-                return;
-            }
-            before = el.siblings(`.${SELECTED_CLS}`);
+            before = this.getCurrentSingleSelectedEl();
         }
         this.list.select(el);
         this.selectOne(el, before);
@@ -169,7 +173,11 @@ export default class Select {
             //只有单选并且选中改变了才会触发
             //单选，选中当前li要取消之前选中的li
             //如果当前选中跟之前选中不是同一个则同时触发delselect和select事件
-            if (deselectEl && deselectEl.length) {
+            if (
+                deselectEl &&
+                deselectEl.length &&
+                !el.is(deselectEl)
+            ) {
                 this.el.trigger($.Event(eName.DESELECT, {
                     node: deselectEl.get(0)
                 }));
