@@ -353,7 +353,7 @@ export default class Options {
         let search = this.onSearch.bind(this);
         this.input.on("input", search);
         //IE9 按下backspace delete键以及剪切不会触发input事件
-        if (this.isIE9) {
+        if (this.isIE9()) {
             this.input
                 .on("keydown", this.ie9KeyDown.bind(this))
                 .on("cut", search)
