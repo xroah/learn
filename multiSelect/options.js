@@ -344,7 +344,11 @@ export default class Options {
 
     ie9KeyDown(evt) {
         let key = evt.key.toLowerCase();
-        if (key === "backspace" || key === "del") {
+        if (
+            key === "backspace" ||
+            key === "del" ||
+            evt.ctrlKey //ctrl+z, ctrl+y也不会触发input事件
+        ) {
             this.onSearch();
         }
     }
