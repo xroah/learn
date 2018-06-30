@@ -324,7 +324,6 @@ export default class Options {
             for (let i = 0, len = opts.length; i < len; i++) {
                 let tmp = opts.eq(i);
                 let text = tmp.text().trim();
-                console.log(text, reg, reg.test(text))
                 if (!value.trim()) {
                     tmp.show();
                 } else {
