@@ -36,7 +36,8 @@ export default class Select {
         }
         this.list = new Options({
             data: this.config.data,
-            multiple: this.config.multiple
+            multiple: this.config.multiple,
+            showSearch: this.config.showSearch
         });
         this.config.disabled && this.disable();
         this.updateVal(false);
@@ -124,29 +125,36 @@ export default class Select {
         this.opened ? this.close() : this.open();
     }
 
+    //document没有焦点时候关闭
+    closeWhenDocumentnoFocus() {
+        if (!document.hasFocus()) {
+            this.close();
+            return true;
+        }
+        return false;
+    }
+
     blur() {
         //延迟获取当前活动元素,否则获取到的活动元素是body
         setTimeout(() => {
             let activeEl = document.activeElement;
             let wrapper = this.wrapper.get(0);
-            let ul = this.list.ul.get(0);
-            //当点击到文档之外（当前页面之外）
-            //document.activeElement依然是wrapper
-            //导致选项不能关闭，ie下会不断出发blur事件（不断调用focus函数）
-            if (activeEl === wrapper) {
-                activeEl = document.body;
-            }
+            let _wrapper = this.list.wrapper.get(0);
+            console.log(activeEl)
+            if (this.closeWhenDocumentnoFocus()) return;
             //在选项列表右键弹出菜单不让选项关闭
             if (
-                activeEl !== this.list.ul.get(0) &&
+                activeEl !== _wrapper &&
                 !wrapper.contains(activeEl) &&  //IE下的span会获取焦点成为activeElement
-                !ul.contains(activeEl)
+                !_wrapper.contains(activeEl)
         ) {
                 this.close();
             } else {
                 //使其获取焦点，使其能触发blur事件
                 //或者响应键盘事件
-                this.wrapper.focus();
+                //如果当前获取焦点元素是搜索框，wrapper则不获取焦点
+                //否则搜索框一直不能获取焦点
+                !$(activeEl).is(this.list.input) && this.wrapper.focus();
             }
         });
     }
@@ -167,12 +175,17 @@ export default class Select {
     }
 
     initEvent() {
+        let blur = this.blur.bind(this);
+        let keyDown = this.keyDown.bind(this);
         this.wrapper
             .on("click", this.clickWrapper.bind(this))
-            .on("keydown", this.keyDown.bind(this))
-            .on("blur", this.blur.bind(this));
+            .on("keydown", keyDown)
+            .on("blur", blur);
 
         this.list.ul.on("click", `.${ITEM_CLS}`, this.clickItem.bind(this));
+        if (this.config.showSearch) {
+            this.list.input.on("blur", blur).on("keydown", keyDown);
+        }
     }
 
     selectOne(el, deselectEl) {

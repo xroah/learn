@@ -9,9 +9,11 @@ export default class Options {
         };
         this.options = null; //所有的选项
         this.multiple = !!config.multiple;
-        this.wrapper = $('<div class="r-select-options-wrapper"></div>')
-        this.ul = $('<ul class="r-select-options" tabindex="0"></ul>');
+        this.wrapper = $('<div class="r-select-options-wrapper" tabindex="0"></div>');
+        this.ul = $('<ul class="r-select-options"></ul>');
+        this.showSearch = !!config.showSearch;
         this.selected = {};
+        this.searchTimer = null;
         this.initEvent();
         this.render();
     }
@@ -293,19 +295,69 @@ export default class Options {
         this.options
             .removeClass(cName.ACTIVE_CLS)
             .removeClass(cName.HOVER_CLS);
-        this.wrapper.fadeOut(150);
+        this.wrapper.fadeOut(150, () => {
+            if (this.input) {
+                this.input.val("");
+                this.options.show();
+            }
+        });
+
     }
 
     destroy() {
         this.ul.remove();
         this.wrapper.remove();
+        this.input && this.input.remove();
+    }
+
+
+    onSearch() {
+        const DELAY = 200;
+        if (this.searchTimer) {
+            clearTimeout(this.searchTimer);
+            this.searchTimer = null;
+        }
+        this.searchTimer = setTimeout(() => {
+            let value = this.input.val();
+            let reg = new RegExp(value, "i");
+            let opts = this.options;
+            for (let i = 0, len = opts.length; i < len; i++) {
+                let tmp = opts.eq(i);
+                let text = tmp.text().trim();
+                console.log(text, reg, reg.test(text))
+                if (!value.trim()) {
+                    tmp.show();
+                } else {
+                    if (reg.test(text)) {
+                        tmp.show();
+                    } else {
+                        tmp.hide();
+                    }
+                }
+            }
+        }, DELAY);
+    }
+
+    initSearch() {
+        let search = this.onSearch.bind(this);
+        this.input.on("input", search);
     }
 
     render() {
         let items = this.getItems(this.data);
         this.ul.empty().append(items);
         if (!this.wrapper.parent().length) {
-            this.wrapper.append(this.ul).appendTo(document.body);
+            let inputWrapper;
+            if (this.showSearch) {
+                this.input = $('<input type="text" class="r-select-search"/>');
+                inputWrapper = $('<div class="r-select-search-wrapper"></div>');
+                inputWrapper.append(this.input);
+                this.wrapper.append(inputWrapper);
+                this.initSearch();
+            }
+            this.wrapper
+                .append(this.ul)
+                .appendTo(document.body);
         }
         this.options = this.ul.find(`.${cName.ITEM_CLS}`);
         let selected = this.getCurrentSlectedEl();

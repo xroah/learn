@@ -5,6 +5,7 @@ import "./index.scss";
 const DEFAULT_CONFIG = {
     data: [],
     multiple: false,
+    showSearch: false,
     placeholder: ""
 };
 

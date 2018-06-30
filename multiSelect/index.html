@@ -77,7 +77,8 @@
     <script src="../dist/multiSelect/jquery.multiSelect.min.js"></script>
     <script>
         $(".single, .multi").select({
-            placeholder: "请选择"
+            placeholder: "请选择",
+            showSearch: true
         }).on("ms.select", function (evt) {
             console.log("select", evt.node);
         }).on("ms.deselect", function (evt) {

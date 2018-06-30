@@ -6,6 +6,11 @@ $disabled_color: #aaa;
     white-space: nowrap;
 }
 
+@mixin focused {
+    border: 1px solid $color;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+}
+
 .r-select-wrapper {
     display: inline-block;
     position: relative;
@@ -23,8 +28,7 @@ $disabled_color: #aaa;
     }
     &.r-select-opened,
     &:focus:not(.r-select-disabled) {
-        border: 1px solid $color;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+        @include focused();
     }
     &.r-select-opened .r-select-caret {
         -ms-transform: rotate(180deg);
@@ -76,8 +80,25 @@ $disabled_color: #aaa;
     position: absolute;
     max-height: 240px;
     border: 1px solid #aaa;
+    outline: none;
+    box-sizing: border-box;
     box-shadow: 1px 1px 1px 2px #eee;
     background-color: #fff;
+    .r-select-search-wrapper {
+        padding: 8px;
+    }
+    .r-select-search {
+        width: 100%;
+        height: 32px;
+        padding: 0 8px;
+        outline: none;
+        border: 1px solid #aaa;
+        box-sizing: border-box;
+        transition: all .3s;
+        &:focus {
+            @include focused();
+        }
+    }
 }
 
 .r-select-options {
