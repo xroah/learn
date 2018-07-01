@@ -185,7 +185,6 @@ export default class Select {
         //如果鼠标没有在选项上并且没有键盘选择,
         //此时按下enter键并没有元素被选中
         if (!el || !el.length) return;
-        !this.config.multiple && this.close();
         if (this.list.isSelected(el)) {
             //只有单选并且选中改变了才会触发
             //单选，选中当前li要取消之前选中的li
@@ -210,6 +209,7 @@ export default class Select {
             }));
         }
         this.updateVal();
+        !this.config.multiple && this.close();
     }
 
     showList() {
