@@ -331,7 +331,10 @@ export default class Options {
      */
     calcScrollTop(el, dir) {
         let wrapper = this.wrapper.get(0);
-        let height = wrapper.getBoundingClientRect().height;
+        let style = getComputedStyle(wrapper);
+        let borderTop = parseFloat(style.getPropertyValue("border-top-width"));
+        let borderBottom = parseFloat(style.getPropertyValue("border-bottom-width"));
+        let height = wrapper.getBoundingClientRect().height - borderTop - borderBottom;
         let offsetTop = el.offsetTop;
         let elHeight = el.getBoundingClientRect().height;
         let scrollHeight = wrapper.scrollHeight;
@@ -342,6 +345,7 @@ export default class Options {
         } else if (dir === "up") {
             scrollTop = offsetTop;
         }
+        console.log(borderTop, borderBottom)
         return scrollTop;
     }
 
