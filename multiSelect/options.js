@@ -311,24 +311,41 @@ export default class Options {
      * 如果选项过多则下面的选项要滚动后才能显示出来
      * 当键盘选择时候计算滚动的距离使得选项能够显示
      * @param {HTMLElement} el 要滚动显示的来的元素(HTML元素非jQuery对象)
+     * @param {string} dir 滚动的方向(上、下),取值up或者down
      */
-    calcScrollTop(el) {
+    calcScrollTop(el, dir) {
         let wrapper = this.wrapper.get(0);
         let height = wrapper.getBoundingClientRect().height;
         let offsetTop = el.offsetTop;
         let elHeight = el.getBoundingClientRect().height;
-        let scrollTop = -1;
-        offsetTop += elHeight;
-        if (offsetTop >= height) {
-            scrollTop = offsetTop - height;
+        let scrollHeight = wrapper.scrollHeight;
+        let scrollTop = 0;
+        let currentScrollTop = wrapper.scrollTop;
+        if (dir === "down") {
+            offsetTop += elHeight;
+            if (offsetTop >= height + currentScrollTop) {
+                scrollTop = offsetTop - height;
+            }
+        } else if (dir === "up") {
+            scrollTop = offsetTop;
         }
-        return scrollTop < 0 ? 0 : scrollTop;
+        return scrollTop;
+    }
+
+    /**
+     * 计算元素是否在显示区域内
+     * @param {HTMLElement} el HTML元素，同上
+     */
+    isInView(el) {
+        let wrapper = this.wrapper.get(0);
+        let rect = wrapper.getBoundingClientRect();
+        let elRect = el.getBoundingClientRect();
+        return rect.bottom > elRect.bottom && rect.top < elRect.top;
     }
 
     //键盘选择
     keySelect(dir) {
         let activeEl;
-        let scrollTop;
         if (dir === "up") {
             activeEl = this.findEl(-1);
         } else if (dir === "down") {
@@ -341,7 +358,11 @@ export default class Options {
             activeEl &&
             (dir === "up" || dir === "down")
         ) {
-            this.wrapper.scrollTop(this.calcScrollTop(activeEl.get(0)));
+            let tmp = activeEl.get(0);
+            if (!this.isInView(tmp)) {
+                let scrollTop = this.calcScrollTop(tmp, dir);
+                this.wrapper.scrollTop(scrollTop);
+            }
         }
         return activeEl;
     }
@@ -445,7 +466,7 @@ export default class Options {
         //此时再按键盘选择选项则可能选中的是隐藏的选项
         this.removeActive();
         this.searchTimer = setTimeout(search, DELAY);
-        this.input.trigger($.Event("ms.search", {match: this.input.val()}));
+        this.input.trigger($.Event("ms.search", { match: this.input.val() }));
     }
 
     isIE9() {
