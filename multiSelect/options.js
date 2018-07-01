@@ -117,10 +117,13 @@ export default class Options {
             return;
         }
         this.removeActive();
-        type === "mouseenter" ?
-            tgt.addClass(cName.HOVER_CLS) :
+        if (type === "mouseenter") {
+            tgt.addClass(cName.HOVER_CLS)
+            this.hoverEl = tgt;
+        } else {
             tgt.removeClass(cName.HOVER_CLS);
-        this.hoverEl = tgt;
+            this.hoverEl = null;
+        }
     }
 
     initEvent() {
@@ -398,13 +401,7 @@ export default class Options {
     }
 
     hide() {
-        if (this.activeEl) {
-            this.activeEl.removeClass(cName.ACTIVE_CLS);
-            this.activeEl = null;
-        }
-        if (this.hoverEl) {
-            this.hoverEl.removeClass(cName.HOVER_CLS);
-        }
+        this.removeActive();
         this.wrapper.fadeOut(150, () => {
             this.showAllOptions();
         });
