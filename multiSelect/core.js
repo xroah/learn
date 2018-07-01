@@ -132,7 +132,6 @@ export default class Select {
             let activeEl = document.activeElement;
             let wrapper = this.wrapper.get(0);
             let _wrapper = this.list.wrapper.get(0);
-            console.log(activeEl)
             if (this.closeWhenDocumentnoFocus()) return;
             //在选项列表右键弹出菜单不让选项关闭
             if (
@@ -275,7 +274,6 @@ export default class Select {
             multiple,
             placeholder
         } = this.config;
-        console.log(text)
         if (text.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {

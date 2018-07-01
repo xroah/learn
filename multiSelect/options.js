@@ -371,7 +371,10 @@ export default class Options {
 
     search() {
         let value = this.input.val();
-        let reg = new RegExp(value, "i");
+        let reg = /([^\w\u4e00-\u9fa5])/g;
+        //替换掉特殊字符如"\",否则new RegExp会报错
+        value = value.replace(reg, "\\$1");
+        reg = new RegExp(value, "i");
         let {options, groups} = this;
         for (let i = 0, len = options.length; i < len; i++) {
             let tmp = options[i];
