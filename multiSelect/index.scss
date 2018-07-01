@@ -8,7 +8,7 @@ $disabled_color: #aaa;
 
 @mixin focused {
     border: 1px solid $color;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, .15);
 }
 
 .r-select-wrapper {

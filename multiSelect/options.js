@@ -177,6 +177,7 @@ export default class Options {
     }
 
     isHidden(el) {
+        333
         return $(el).hasClass(cName.HIDDEN_CLS);
     }
 
@@ -260,14 +261,13 @@ export default class Options {
                 break;
             }
         }
-        console.log(index)
         return index;
     }
 
     /**
      * 按下键盘上下键时候切换
      * @param {HTMLElement} curActive 当前active元素
-     * @param {number} step 1或者-1 向上或者向下查找的个数
+     * @param {number} step 1或者-1 向下或者向上查找的个数
      */
     findEl(step) {
         let aCls = cName.ACTIVE_CLS;
@@ -283,7 +283,7 @@ export default class Options {
         if (index === -1) {
             index = step < 0 ? 0 : -1;
         }
-        //往上/往下找没有disabled的选项
+        //往上/往下找没有disabled/hidden的选项
         while (true) {
             index += step;
             if (index === -1) {
@@ -291,9 +291,10 @@ export default class Options {
             } else if (index === len) {
                 index = 0;
             }
-            curActive = lis[index];
-            if (!this.isDisabled(curActive) && !this.isHidden(curActive)) {
-                this.activeEl = curActive.addClass(aCls);
+            let tmp = lis[index];
+            if (!this.isDisabled(tmp) && !this.isHidden(tmp)) {
+                this.activeEl = curActive = tmp;
+                tmp.addClass(aCls);
                 break;
             }
             if (max >= len) {
@@ -304,17 +305,44 @@ export default class Options {
         return curActive;
     }
 
+    /**
+     * 计算选项应该滚动的距离
+     * 如果选项过多则下面的选项要滚动后才能显示出来
+     * 当键盘选择时候计算滚动的距离使得选项能够显示
+     * @param {HTMLElement} el 要滚动显示的来的元素(HTML元素非jQuery对象)
+     */
+    calcScrollTop(el) {
+        let wrapper = this.wrapper.get(0);
+        let height = wrapper.getBoundingClientRect().height;
+        let offsetTop = el.offsetTop;
+        let elHeight = el.getBoundingClientRect().height;
+        let scrollTop = -1;
+        offsetTop += elHeight;
+        if (offsetTop >= height) {
+            scrollTop = offsetTop - height;
+        }
+        return scrollTop < 0 ? 0 : scrollTop;
+    }
+
     //键盘选择
     keySelect(dir) {
+        let activeEl;
+        let scrollTop;
         if (dir === "up") {
-            return this.findEl(-1);
+            activeEl = this.findEl(-1);
         } else if (dir === "down") {
-            return this.findEl(1);
+            activeEl = this.findEl(1);
         } else if (dir === "enter") {
-            let activeEl = this.activeEl || this.hoverEl;
+            activeEl = this.activeEl || this.hoverEl;
             activeEl && this.select(activeEl);
-            return activeEl;
         }
+        if (
+            activeEl &&
+            (dir === "up" || dir === "down")
+        ) {
+            this.wrapper.scrollTop(this.calcScrollTop(activeEl.get(0)));
+        }
+        return activeEl;
     }
 
     clearSlected() {
@@ -375,7 +403,7 @@ export default class Options {
         //替换掉特殊字符如"\",否则new RegExp会报错
         value = value.replace(reg, "\\$1");
         reg = new RegExp(value, "i");
-        let {options, groups} = this;
+        let { options, groups } = this;
         for (let i = 0, len = options.length; i < len; i++) {
             let tmp = options[i];
             let text = tmp.data("text");
@@ -393,7 +421,7 @@ export default class Options {
         for (let i = 0, len = groups.length; i < len; i++) {
             let tmp = groups[i];
             //过滤掉所有隐藏的元素
-            let visibleEl = tmp.children.filter(el => !this.isHidden(el));  
+            let visibleEl = tmp.children.filter(el => !this.isHidden(el));
             //如果所有元素都隐藏，则将该组隐藏
             if (!visibleEl.length) {
                 tmp.el.addClass(cName.HIDDEN_CLS);
