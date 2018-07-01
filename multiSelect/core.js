@@ -181,16 +181,17 @@ export default class Select {
     }
 
     selectOne(el, deselectEl) {
-        !this.config.multiple && this.close();
         //没有选中元素直接返回
         //如果鼠标没有在选项上并且没有键盘选择,
         //此时按下enter键并没有元素被选中
         if (!el || !el.length) return;
+        !this.config.multiple && this.close();
         if (this.list.isSelected(el)) {
             //只有单选并且选中改变了才会触发
             //单选，选中当前li要取消之前选中的li
             //如果当前选中跟之前选中不是同一个则同时触发delselect和select事件
             if (
+                !this.config.multiple &&
                 deselectEl &&
                 deselectEl.length &&
                 !el.is(deselectEl)

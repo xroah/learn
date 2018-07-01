@@ -87,11 +87,25 @@ export default class Options {
         //没有则不添加
         if (items.length) {
             group.append(opts.append(items));
-            this.groups.push(group);
+            this.groups.push({
+                el: group,
+                children: items
+            });
         } else {
             group = null;
         }
         return group;
+    }
+
+    removeActive() {
+        if (this.activeEl) {
+            this.activeEl.removeClass(cName.ACTIVE_CLS);
+            this.activeEl = null;
+        }
+        if (this.hoverEl) {
+            this.hoverEl.removeClass(cName.HOVER_CLS);
+            this.hoverEl = null;
+        }
     }
 
     mouseHandler(evt) {
@@ -101,14 +115,7 @@ export default class Options {
             this.hoverEl = null;
             return;
         }
-        if (this.activeEl) {
-            this.activeEl.removeClass(cName.ACTIVE_CLS);
-            this.activeEl = null;
-        }
-        if (this.hoverEl) {
-            this.hoverEl.removeClass(cName.HOVER_CLS);
-            this.hoverEl = null;
-        }
+        this.removeActive();
         type === "mouseenter" ?
             tgt.addClass(cName.HOVER_CLS) :
             tgt.removeClass(cName.HOVER_CLS);
@@ -167,6 +174,10 @@ export default class Options {
 
     isDisabled(el) {
         return $(el).hasClass(cName.DISABLED_CLS);
+    }
+
+    isHidden(el) {
+        return $(el).hasClass(cName.HIDDEN_CLS);
     }
 
     setMultipleSlected(el) {
@@ -281,7 +292,7 @@ export default class Options {
                 index = 0;
             }
             curActive = lis[index];
-            if (!this.isDisabled(curActive)) {
+            if (!this.isDisabled(curActive) && !this.isHidden(curActive)) {
                 this.activeEl = curActive.addClass(aCls);
                 break;
             }
@@ -295,15 +306,15 @@ export default class Options {
 
     //键盘选择
     keySelect(dir) {
-        let { activeEl } = this;
         if (dir === "up") {
             return this.findEl(-1);
         } else if (dir === "down") {
             return this.findEl(1);
         } else if (dir === "enter") {
+            let activeEl = this.activeEl || this.hoverEl;
             activeEl && this.select(activeEl);
+            return activeEl;
         }
-        return activeEl;
     }
 
     clearSlected() {
@@ -331,10 +342,10 @@ export default class Options {
         if (!this.showSearch) return;
         let { groups, options } = this;
         for (let i = 0, len = groups.length; i < len; i++) {
-            groups[i].show();
+            groups[i].el.removeClass(cName.HIDDEN_CLS);
         }
         for (let i = 0, len = options.length; i < len; i++) {
-            options[i].show();
+            options[i].removeClass(cName.HIDDEN_CLS);
         }
         this.input.val("");
     }
@@ -358,6 +369,37 @@ export default class Options {
         this.input && this.input.remove();
     }
 
+    search() {
+        let value = this.input.val();
+        let reg = new RegExp(value, "i");
+        let {options, groups} = this;
+        for (let i = 0, len = options.length; i < len; i++) {
+            let tmp = options[i];
+            let text = tmp.data("text");
+            if (!value.trim()) {
+                tmp.removeClass(cName.HIDDEN_CLS);
+            } else {
+                if (reg.test(text)) {
+                    tmp.removeClass(cName.HIDDEN_CLS);
+                } else {
+                    tmp.addClass(cName.HIDDEN_CLS);
+                }
+            }
+        }
+        //group
+        for (let i = 0, len = groups.length; i < len; i++) {
+            let tmp = groups[i];
+            //过滤掉所有隐藏的元素
+            let visibleEl = tmp.children.filter(el => !this.isHidden(el));  
+            //如果所有元素都隐藏，则将该组隐藏
+            if (!visibleEl.length) {
+                tmp.el.addClass(cName.HIDDEN_CLS);
+            } else {
+                tmp.el.removeClass(cName.HIDDEN_CLS);
+            }
+        }
+    }
+
     onSearch() {
         //防止连续触发输入事件优化
         const DELAY = 350;
@@ -365,24 +407,12 @@ export default class Options {
             clearTimeout(this.searchTimer);
             this.searchTimer = null;
         }
-        this.searchTimer = setTimeout(() => {
-            let value = this.input.val();
-            let reg = new RegExp(value, "i");
-            let opts = this.options;
-            for (let i = 0, len = opts.length; i < len; i++) {
-                let tmp = opts[i];
-                let text = tmp.data("text");
-                if (!value.trim()) {
-                    tmp.show();
-                } else {
-                    if (reg.test(text)) {
-                        tmp.show();
-                    } else {
-                        tmp.hide();
-                    }
-                }
-            }
-        }, DELAY);
+        let search = this.search.bind(this);
+        //移除之前鼠标、键盘选择的元素
+        //否则当选择的选项跟搜索不匹配,选项是隐藏状态
+        //此时再按键盘选择选项则可能选中的是隐藏的选项
+        this.removeActive();
+        this.searchTimer = setTimeout(search, DELAY);
     }
 
     isIE9() {

@@ -109,8 +109,8 @@ $disabled_color: #aaa;
     list-style: none;
     font-size: 14px;
     z-index: 99999;
-    .r-select-hide {
-        display: none;
+    .r-select-hidden {
+        display: none !important;
     }
     .r-select-item {
         padding: 5px 8px;
