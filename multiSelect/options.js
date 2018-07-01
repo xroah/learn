@@ -1,4 +1,5 @@
-import * as cName from "./classNames";
+import * as cName from "./class_names";
+import { SEARCH } from "./event_names";
 
 export default class Options {
     constructor(config) {
@@ -399,7 +400,7 @@ export default class Options {
 
     search() {
         let value = this.input.val();
-        let reg = /([^\w\u4e00-\u9fa5])/g;
+        let reg = /([^\w\u4e00-\u9fa5\s\t])/g;
         //替换掉特殊字符如"\",否则new RegExp会报错
         value = value.replace(reg, "\\$1");
         reg = new RegExp(value, "i");
@@ -444,6 +445,7 @@ export default class Options {
         //此时再按键盘选择选项则可能选中的是隐藏的选项
         this.removeActive();
         this.searchTimer = setTimeout(search, DELAY);
+        this.input.trigger($.Event("ms.search", {match: this.input.val()}));
     }
 
     isIE9() {

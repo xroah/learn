@@ -1,6 +1,6 @@
 import Options from "./options";
-import { ITEM_CLS } from "./classNames";
-import * as eName from "./event_name";
+import { ITEM_CLS } from "./class_names";
+import * as eName from "./event_names";
 
 export default class Select {
     constructor(config, selector) {
@@ -177,6 +177,7 @@ export default class Select {
         if (this.config.showSearch) {
             this.list.input.on("blur", blur).on("keydown", keyDown);
         }
+        this.list.input.on(eName.SEARCH, evt => this.el.trigger(evt));
     }
 
     selectOne(el, deselectEl) {
