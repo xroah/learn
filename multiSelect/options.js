@@ -7,13 +7,12 @@ export default class Options {
             onClick: config.onClick,
             onSelect: config.onSelect
         };
-        this.options = null; //所有的选项
         this.multiple = !!config.multiple;
         this.wrapper = $('<div class="r-select-options-wrapper" tabindex="0"></div>');
         this.ul = $('<ul class="r-select-options"></ul>');
         this.showSearch = !!config.showSearch;
-        this.selected = {};
         this.searchTimer = null;
+        this.reset();
         this.initEvent();
         this.render();
     }
@@ -34,25 +33,28 @@ export default class Options {
                 </li>` : '<li class="r-select-item">{text}</li>';
         value = String(value);
         li = li.replace("{text}", text);
-        li = $(li).attr("title", text).data("value", value);
+        li = $(li).attr("title", text).data("value", value).data("text", text);
         if (disabled) {
             li.addClass(cName.DISABLED_CLS);
         }
         if (selected) {
             if (this.multiple) {
-                this.setMultipleSlected(value, text);
+                //多选直接选中,多选的时候this.selected是一个数组，避免后面还要循环去选中
+                this.setMultipleSlected(li);
                 li.addClass(cName.SELECTED_CLS);
             } else {
-                this.setSingleSelected(value, text);
-                this.lastSingleSelected = li;
+                //单选的时候不设置选中的,因为传入的数据可能会有多个selected，
+                //将selected的元素保存下来在render的时候设置选中(后面的覆盖前面的)
+                this.selected = li;
             }
         }
+        //将li push到options数组中
+        this.options.push(li);
         return li;
     }
 
     getItems(data) {
         let items = [];
-        this.lastSingleSelected = null;
         for (let i = 0, len = data.length; i < len; i++) {
             let tmp = data[i];
             if (!tmp.children) {
@@ -65,10 +67,6 @@ export default class Options {
                     items.push(tmp);
                 }
             }
-        }
-        if (this.lastSingleSelected) {
-            this.lastSingleSelected.addClass(cName.SELECTED_CLS);
-            delete this.lastSingleSelected;
         }
         return items;
     }
@@ -85,9 +83,11 @@ export default class Options {
             }
             items.push(li);
         }
-        //如果分组有选项则添加,没有则不添加
+        //如果分组有选项则添加，同时添加到groups数组中；
+        //没有则不添加
         if (items.length) {
             group.append(opts.append(items));
+            this.groups.push(group);
         } else {
             group = null;
         }
@@ -97,24 +97,43 @@ export default class Options {
     mouseHandler(evt) {
         let tgt = $(evt.currentTarget);
         let type = evt.type.toLowerCase();
-        this.ul
-            .find(`.${cName.ACTIVE_CLS}`)
-            .removeClass(cName.ACTIVE_CLS);
+        if (this.isDisabled(tgt)) {
+            this.hoverEl = null;
+            return;
+        }
+        if (this.activeEl) {
+            this.activeEl.removeClass(cName.ACTIVE_CLS);
+            this.activeEl = null;
+        }
+        if (this.hoverEl) {
+            this.hoverEl.removeClass(cName.HOVER_CLS);
+            this.hoverEl = null;
+        }
         type === "mouseenter" ?
             tgt.addClass(cName.HOVER_CLS) :
             tgt.removeClass(cName.HOVER_CLS);
+        this.hoverEl = tgt;
     }
 
     initEvent() {
         let selector = `.${cName.ITEM_CLS}`;
         let handler = this.mouseHandler.bind(this);
-        this.ul.on("mouseenter", selector, handler)
-            .on("mouseleave", selector, handler);
+        this.ul.on("mouseenter mouseleave", selector, handler);
+    }
+
+    reset() {
+        //所有的选项
+        this.options = [];
+        this.selected = this.multiple ? [] : null;
+        //所有的分组
+        this.groups = [];
+        this.activeEl = null; //当前键盘选择的元素
+        this.hoverEl = null; //当前鼠标hover的元素
     }
 
     refresh(data) {
         this.data = data;
-        this.selected = {};
+        this.reset();
         this.render();
     }
 
@@ -123,17 +142,23 @@ export default class Options {
             selected,
             multiple
         } = this;
-        let text = [];
-        let val = Object.keys(selected);
-        //由于babel不会转换es6新增API,只会转换语法,
-        //如使用Object.values,则要引入babel-polyfill
-        for (let i = 0, len = val.length; i < len; i++) {
-            text.push(selected[val[i]]);
-        }
+        let text;
+        let val;
         if (multiple) {
+            text = [];
+            val = [];
+            for (let i = 0, len = selected.length; i < len; i++) {
+                let tmp = selected[i];
+                val.push(tmp.data("value"));
+                text.push(tmp.data("text"));
+            }
             return getText ? text : val;
         }
-        return getText ? text.toString() : val.toString();
+        if (selected) {
+            val = selected.data("value");
+            text = selected.data("text");
+        }
+        return getText ? text : val;
     }
 
     isSelected(el) {
@@ -144,68 +169,60 @@ export default class Options {
         return $(el).hasClass(cName.DISABLED_CLS);
     }
 
-    /**
-     * 根据索引选择
-     * @param {number | Array} index 选择的索引
-     * @param {boolean} deselect 选择/取消选择，仅对multiple有效
-     */
-    selectByIndex(index) {
-        let lis = this.options;
-        let li = lis.eq(index);
-        //index可能越界
-        if (!li.length) return;
-        if (Array.isArray(index)) {
-            for (let i = index.length; i--;) {
-                this.selectByIndex(i);
+    setMultipleSlected(el) {
+        this.selected.push(el);
+    }
+
+    setSingleSelected(el) {
+        this.selected = el;
+    }
+
+    removeOneSelected(el, multiple) {
+        el && el.removeClass(cName.SELECTED_CLS);
+        if (multiple) {
+            let { selected } = this;
+            for (let i = 0, len = selected.length; i < len; i++) {
+                if (selected[i].is(el)) {
+                    selected.splice(i, 1);
+                    break;
+                }
             }
             return;
         }
-        this.select(li);
-    }
-
-    setMultipleSlected(val, text) {
-        this.selected[val] = text.trim();
-    }
-
-    setSingleSelected(val, text) {
-        this.selected = {
-            [val]: text.trim()
-        };
-    }
-
-    removeOneSelected(val) {
-        delete this.selected[val];
+        this.selected = null;
     }
 
     select(el) {
-        let cls = cName.SELECTED_CLS;
+        el = $(el);
         let val = el.data("value");
         let text = el.text();
         //多选时,如果当前是选中的则取消选中
         if (this.multiple && this.isSelected(el)) {
-            el.removeClass(cls);
-            this.removeOneSelected(val);
+            this.removeOneSelected(el, true);
             return;
         }
         if (this.multiple) {
-            this.setMultipleSlected(val, text);
+            this.setMultipleSlected(el);
         } else {
-            this.setSingleSelected(val, text);
-            this.ul.find(`.${cls}`).removeClass(cls);
+            //先取消之前选中的
+            this.removeOneSelected(this.selected);
+            this.setSingleSelected(el);
         }
-        el.addClass(cls);
+        el.addClass(cName.SELECTED_CLS);
     }
 
     //根据值选择
     selectByVal(val) {
         let {
-            data
+            multiple,
+            options
         } = this;
-        if (!this.multiple) {
+        if (!multiple) {
             val = String(val);
-            for (let i = 0, len = data.length; i < len; i++) {
-                if (val === data[i].value) {
-                    this.selectByIndex(i);
+            for (let i = 0, len = options.length; i < len; i++) {
+                let tmp = options[i];
+                if (val === tmp.data("value")) {
+                    this.select(tmp);
                     break;
                 }
             }
@@ -214,25 +231,44 @@ export default class Options {
         if (!Array.isArray(val)) {
             val = [String(val)];
         }
-        for (let i = 0, len = data.length; i < len; i++) {
-            if (val.indexOf(data[i].value) > -1) {
-                this.selectByIndex(i);
+        for (let i = 0, len = options.length; i < len; i++) {
+            let tmp = options[i];
+            if (val.indexOf(tmp.data("value")) > -1) {
+                this.select(tmp);
             }
         }
     }
 
+    //获取元素在options中的索引
+    index(el) {
+        let { options } = this;
+        let index = -1;
+        for (let i = 0, len = options.length; i < len; i++) {
+            if (options[i].is(el)) {
+                index = i;
+                break;
+            }
+        }
+        console.log(index)
+        return index;
+    }
+
     /**
-     * 
+     * 按下键盘上下键时候切换
      * @param {HTMLElement} curActive 当前active元素
      * @param {number} step 1或者-1 向上或者向下查找的个数
      */
-    findEl(curActive, step) {
+    findEl(step) {
         let aCls = cName.ACTIVE_CLS;
+        let index = -1;
         let max = 0;
         let lis = this.options;
         let len = lis.length;
-        let index = lis.index(curActive);
-        curActive.removeClass(aCls);
+        let curActive = this.activeEl || this.hoverEl;
+        if (curActive) {
+            curActive.removeClass(aCls);
+            index = this.index(curActive);
+        }
         if (index === -1) {
             index = step < 0 ? 0 : -1;
         }
@@ -244,9 +280,9 @@ export default class Options {
             } else if (index === len) {
                 index = 0;
             }
-            curActive = lis.eq(index);
-            if (!curActive.hasClass(cName.DISABLED_CLS)) {
-                curActive.addClass(aCls);
+            curActive = lis[index];
+            if (!this.isDisabled(curActive)) {
+                this.activeEl = curActive.addClass(aCls);
                 break;
             }
             if (max >= len) {
@@ -254,54 +290,66 @@ export default class Options {
             }
             max++;
         }
+        return curActive;
     }
 
     //键盘选择
     keySelect(dir) {
-        let aCls = cName.ACTIVE_CLS;
-        let ul = this.ul;
-        //当前鼠标hover的选项
-        let curActive = ul.find(`.${aCls}`);
-        if (!curActive.length) {
-            curActive = ul.find(`.${cName.HOVER_CLS}`);
-        }
+        let { activeEl } = this;
         if (dir === "up") {
-            this.findEl(curActive, -1);
+            return this.findEl(-1);
         } else if (dir === "down") {
-            this.findEl(curActive, 1);
+            return this.findEl(1);
         } else if (dir === "enter") {
-            if (curActive.length) {
-                this.select(curActive);
-                return curActive;
-            }
+            activeEl && this.select(activeEl);
         }
+        return activeEl;
     }
 
     clearSlected() {
-        let cls = cName.SELECTED_CLS;
-        this.ul.find(`.${cls}`).removeClass(cls);
-        this.selected = {};
-    }
-
-    getCurrentSlectedEl() {
-        return this.ul.find(`.${cName.SELECTED_CLS}`);
+        let { multiple, selected } = this;
+        if (multiple) {
+            for (let i = 0, len = selected.length; i < len; i++) {
+                selected[i].removeClass(cName.SELECTED_CLS);
+            }
+            selected = [];
+        } else {
+            selected && selected.removeClass(cName.SELECTED_CLS);
+            selected = null;
+        }
+        this.selected = selected;
     }
 
     show(cssObj) {
         this.wrapper.css(cssObj).fadeIn(150);
     }
 
-    hide() {
-        this.options
-            .removeClass(cName.ACTIVE_CLS)
-            .removeClass(cName.HOVER_CLS);
-        this.wrapper.fadeOut(150, () => {
-            if (this.input) {
-                this.input.val("");
-                this.options.show();
-            }
-        });
+    //搜索之后有隐藏的option和group
+    //当选项隐藏的时候显示出来，并且清空输入框的值
+    showAllOptions() {
+        //如果不显示搜索框,则不做操作
+        if (!this.showSearch) return;
+        let { groups, options } = this;
+        for (let i = 0, len = groups.length; i < len; i++) {
+            groups[i].show();
+        }
+        for (let i = 0, len = options.length; i < len; i++) {
+            options[i].show();
+        }
+        this.input.val("");
+    }
 
+    hide() {
+        if (this.activeEl) {
+            this.activeEl.removeClass(cName.ACTIVE_CLS);
+            this.activeEl = null;
+        }
+        if (this.hoverEl) {
+            this.hoverEl.removeClass(cName.HOVER_CLS);
+        }
+        this.wrapper.fadeOut(150, () => {
+            this.showAllOptions();
+        });
     }
 
     destroy() {
@@ -311,7 +359,8 @@ export default class Options {
     }
 
     onSearch() {
-        const DELAY = 200;
+        //防止连续触发输入事件优化
+        const DELAY = 350;
         if (this.searchTimer) {
             clearTimeout(this.searchTimer);
             this.searchTimer = null;
@@ -321,8 +370,8 @@ export default class Options {
             let reg = new RegExp(value, "i");
             let opts = this.options;
             for (let i = 0, len = opts.length; i < len; i++) {
-                let tmp = opts.eq(i);
-                let text = tmp.text().trim();
+                let tmp = opts[i];
+                let text = tmp.data("text");
                 if (!value.trim()) {
                     tmp.show();
                 } else {
@@ -379,11 +428,13 @@ export default class Options {
                 .append(this.ul)
                 .appendTo(document.body);
         }
-        this.options = this.ul.find(`.${cName.ITEM_CLS}`);
-        let selected = this.getCurrentSlectedEl();
+        let selected = this.selected;
+        if (!this.multiple && selected) {
+            this.select(selected);
+        }
         //默认选中第一项
-        if (!selected.length) {
-            this.select(this.options.first());
+        if (!selected || !selected.length) {
+            this.select(this.options[0]);
         }
     }
 }

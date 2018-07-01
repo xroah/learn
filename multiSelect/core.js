@@ -83,14 +83,6 @@ export default class Select {
         return data;
     }
 
-    getCurrentSingleSelectedEl() {
-        if (!this.config.multiple) {
-            //单选时,先获取之前选中,同点击选中
-            return this.list.getCurrentSlectedEl();
-        }
-        return null;
-    }
-
     keyDown(evt) {
         let key = evt.key.toLowerCase();
         switch (key) {
@@ -100,7 +92,7 @@ export default class Select {
                 break;
             case "enter":
                 if (this.opened) {
-                    let before = this.getCurrentSingleSelectedEl();
+                    let before = this.list.selected;
                     let el = this.list.keySelect("enter");
                     this.selectOne(el, before);
                 } else {
@@ -168,7 +160,7 @@ export default class Select {
         if (this.list.isDisabled(el)) return;
         //否则先获取先前的选中项,再选中当前,以便触发deslect和select事件
         if (!this.config.multiple) {
-            before = this.getCurrentSingleSelectedEl();
+            before = this.list.selected;
         }
         this.list.select(el);
         this.selectOne(el, before);
@@ -282,6 +274,7 @@ export default class Select {
             multiple,
             placeholder
         } = this.config;
+        console.log(text)
         if (text.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {
