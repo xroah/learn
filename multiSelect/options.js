@@ -322,10 +322,7 @@ export default class Options {
         let scrollTop = 0;
         let currentScrollTop = wrapper.scrollTop;
         if (dir === "down") {
-            offsetTop += elHeight;
-            if (offsetTop >= height + currentScrollTop) {
-                scrollTop = offsetTop - height;
-            }
+            scrollTop = offsetTop + elHeight - height;
         } else if (dir === "up") {
             scrollTop = offsetTop;
         }
