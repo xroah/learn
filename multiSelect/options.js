@@ -79,6 +79,7 @@ export default class Options {
         for (let i = 0, len = c.length; i < len; i++) {
             let li = this.getOneItem(c[i]);
             if (data.disabled) {
+                group.addClass(cName.DISABLED_CLS);
                 li.addClass(cName.DISABLED_CLS);
             }
             items.push(li);

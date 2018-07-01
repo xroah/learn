@@ -38,7 +38,6 @@ $disabled_color: #aaa;
     &.r-select-disabled {
         .r-select-span {
             user-select: none;
-            color: #999;
             background-color: #f5f5f5;
             cursor: not-allowed;
         }
@@ -233,4 +232,8 @@ $disabled_color: #aaa;
             padding-left: 20px;
         }
     }
+}
+
+.r-select-disabled {
+    color: #999;
 }
