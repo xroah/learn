@@ -138,7 +138,7 @@ export default class Select {
                 activeEl !== _wrapper &&
                 !wrapper.contains(activeEl) &&  //IE下的span会获取焦点成为activeElement
                 !_wrapper.contains(activeEl)
-        ) {
+            ) {
                 this.close();
             } else {
                 //使其获取焦点，使其能触发blur事件
@@ -175,9 +175,9 @@ export default class Select {
 
         this.list.ul.on("click", `.${ITEM_CLS}`, this.clickItem.bind(this));
         if (this.config.showSearch) {
-            this.list.input.on("blur", blur).on("keydown", keyDown);
+            this.list.input.on("blur", blur).on("keydown", keyDown)
+                .on(eName.SEARCH, evt => this.el.trigger(evt));
         }
-        this.list.input.on(eName.SEARCH, evt => this.el.trigger(evt));
     }
 
     selectOne(el, deselectEl) {
