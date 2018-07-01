@@ -41,8 +41,7 @@ export default class Options {
         if (selected) {
             if (this.multiple) {
                 //多选直接选中,多选的时候this.selected是一个数组，避免后面还要循环去选中
-                this.setMultipleSlected(li);
-                li.addClass(cName.SELECTED_CLS);
+                this.setSelected(li, true);
             } else {
                 //单选的时候不设置选中的,因为传入的数据可能会有多个selected，
                 //将selected的元素保存下来在render的时候设置选中(后面的覆盖前面的)
@@ -185,16 +184,17 @@ export default class Options {
         return $(el).hasClass(cName.HIDDEN_CLS);
     }
 
-    setMultipleSlected(el) {
-        this.selected.push(el);
-    }
-
-    setSingleSelected(el) {
-        this.selected = el;
+    setSelected(el, multiple) {
+        if (multiple) {
+            this.selected.push(el);
+        } else {
+            this.selected = el;
+        }
+        el.addClass(cName.SELECTED_CLS);
     }
 
     removeOneSelected(el, multiple) {
-        el && el.removeClass(cName.SELECTED_CLS);
+        el && el.removeClass(cName.SELECTED_CLS); //单选的时候el可能为null
         if (multiple) {
             let { selected } = this;
             for (let i = 0, len = selected.length; i < len; i++) {
@@ -213,18 +213,29 @@ export default class Options {
         let val = el.data("value");
         let text = el.text();
         //多选时,如果当前是选中的则取消选中
-        if (this.multiple && this.isSelected(el)) {
-            this.removeOneSelected(el, true);
+        if (this.multiple) {
+            this.isSelected(el) ?
+                this.removeOneSelected(el, true) :
+                this.setSelected(el, true);
             return;
         }
-        if (this.multiple) {
-            this.setMultipleSlected(el);
+        //先取消之前选中的
+        this.removeOneSelected(this.selected);
+        this.setSelected(el);
+    }
+
+    clearSlected() {
+        let { multiple, selected } = this;
+        if (multiple) {
+            for (let i = 0, len = selected.length; i < len; i++) {
+                selected[i].removeClass(cName.SELECTED_CLS);
+            }
+            selected = [];
         } else {
-            //先取消之前选中的
-            this.removeOneSelected(this.selected);
-            this.setSingleSelected(el);
+            selected && selected.removeClass(cName.SELECTED_CLS);
+            selected = null;
         }
-        el.addClass(cName.SELECTED_CLS);
+        this.selected = selected;
     }
 
     //根据值选择
@@ -233,6 +244,7 @@ export default class Options {
             multiple,
             options
         } = this;
+        this.clearSlected();
         if (!multiple) {
             val = String(val);
             for (let i = 0, len = options.length; i < len; i++) {
@@ -367,20 +379,6 @@ export default class Options {
         return activeEl;
     }
 
-    clearSlected() {
-        let { multiple, selected } = this;
-        if (multiple) {
-            for (let i = 0, len = selected.length; i < len; i++) {
-                selected[i].removeClass(cName.SELECTED_CLS);
-            }
-            selected = [];
-        } else {
-            selected && selected.removeClass(cName.SELECTED_CLS);
-            selected = null;
-        }
-        this.selected = selected;
-    }
-
     show(cssObj) {
         this.wrapper.css(cssObj).fadeIn(150);
     }
@@ -490,19 +488,25 @@ export default class Options {
         }
     }
 
+    renderSearch() {
+        let inputWrapper;
+        if (this.showSearch) {
+            this.input = $('<input type="text" class="r-select-search"/>');
+            inputWrapper = $('<div class="r-select-search-wrapper"></div>');
+            inputWrapper.append(this.input);
+            this.initSearch();
+        }
+        return inputWrapper;
+
+    }
+
     render() {
         let items = this.getItems(this.data);
         this.ul.empty().append(items);
         if (!this.wrapper.parent().length) {
-            let inputWrapper;
-            if (this.showSearch) {
-                this.input = $('<input type="text" class="r-select-search"/>');
-                inputWrapper = $('<div class="r-select-search-wrapper"></div>');
-                inputWrapper.append(this.input);
-                this.wrapper.append(inputWrapper);
-                this.initSearch();
-            }
+            let inputWrapper = this.renderSearch();
             this.wrapper
+                .append(inputWrapper)
                 .append(this.ul)
                 .appendTo(document.body);
         }
