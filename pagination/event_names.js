@@ -1,0 +1,1 @@
+export const CHANGE = "page.change";

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>分页</title>
+    <link rel="stylesheet" href="../dist/pagination/jquery.pagination.min.css">
+</head>
+
+<body>
+    <!-- <ul class="r-pagination">
+        <li class="r-pagination-item"><a href="#" class="r-pagination-link">上一页</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">1</a></li><li class="r-pagination-item r-pagination-disabled"><a href="#" class="r-pagination-link">2</a></li><li class="r-pagination-item"><a class="r-pagination-ellipsis">...</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">4</a></li><li class="r-pagination-item r-pagination-active"><a href="#" class="r-pagination-link">5</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">6</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">7</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">8</a></li><li class="r-pagination-item"><a href="#" class="r-pagination-link">下一页</a></li>
+     </ul> -->
+    <div id="p1"></div>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../dist/pagination/jquery.pagination.min.js"></script>
+    <script>
+        $("#p1").pagination({
+            total: 500,
+            visiblePages: 7,
+            pageSize: 20,
+            current: 5,
+            nextText: ">",
+            prevText: "<",
+            onChange: function (page) {
+                console.log("callback", page);
+            }
+        }).on("page.change", function(evt) {
+            console.log("event", evt.page);
+        });
+    </script>
+</body>
+
+</html>
