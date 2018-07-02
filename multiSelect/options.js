@@ -1,5 +1,7 @@
 import * as cName from "./class_names";
-import { SEARCH } from "./event_names";
+import {
+    SEARCH
+} from "./event_names";
 
 export default class Options {
     constructor(config) {
@@ -197,7 +199,9 @@ export default class Options {
     removeOneSelected(el, multiple) {
         el && el.removeClass(cName.SELECTED_CLS); //单选的时候el可能为null
         if (multiple) {
-            let { selected } = this;
+            let {
+                selected
+            } = this;
             for (let i = 0, len = selected.length; i < len; i++) {
                 if (selected[i].is(el)) {
                     selected.splice(i, 1);
@@ -226,7 +230,10 @@ export default class Options {
     }
 
     clearSlected() {
-        let { multiple, selected } = this;
+        let {
+            multiple,
+            selected
+        } = this;
         if (multiple) {
             for (let i = 0, len = selected.length; i < len; i++) {
                 selected[i].removeClass(cName.SELECTED_CLS);
@@ -270,7 +277,9 @@ export default class Options {
 
     //获取元素在options中的索引
     index(el) {
-        let { options } = this;
+        let {
+            options
+        } = this;
         let index = -1;
         for (let i = 0, len = options.length; i < len; i++) {
             if (options[i].is(el)) {
@@ -393,7 +402,10 @@ export default class Options {
     showAllOptions() {
         //如果不显示搜索框,则不做操作
         if (!this.showSearch) return;
-        let { groups, options } = this;
+        let {
+            groups,
+            options
+        } = this;
         for (let i = 0, len = groups.length; i < len; i++) {
             groups[i].el.removeClass(cName.HIDDEN_CLS);
         }
@@ -422,7 +434,10 @@ export default class Options {
         //替换掉特殊字符如"\",否则new RegExp会报错
         value = value.replace(reg, "\\$1");
         reg = new RegExp(value, "i");
-        let { options, groups } = this;
+        let {
+            options,
+            groups
+        } = this;
         for (let i = 0, len = options.length; i < len; i++) {
             let tmp = options[i];
             let text = tmp.data("text");
@@ -463,7 +478,9 @@ export default class Options {
         //此时再按键盘选择选项则可能选中的是隐藏的选项
         this.removeActive();
         this.searchTimer = setTimeout(search, DELAY);
-        this.input.trigger($.Event("ms.search", { match: this.input.val() }));
+        this.input.trigger($.Event("ms.search", {
+            match: this.input.val()
+        }));
     }
 
     isIE9() {
@@ -516,12 +533,12 @@ export default class Options {
                 .appendTo(document.body);
         }
         let selected = this.selected;
-        if (!this.multiple && selected) {
-            this.select(selected);
-        }
-        //默认选中第一项
-        if (!selected || !selected.length) {
-            this.select(this.options[0]);
+        if (!this.multiple) {
+            //单选,如果有selected则选中
+            //否则默认选中第一项
+            selected ?
+                this.select(selected) :
+                this.select(this.options[0])
         }
     }
 }
