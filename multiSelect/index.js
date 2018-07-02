@@ -2,13 +2,6 @@ import "jquery";
 import Select from "./core";
 import "./index.scss";
 
-const DEFAULT_CONFIG = {
-    data: [],
-    multiple: false,
-    showSearch: false,
-    placeholder: ""
-};
-
 function callMethod(jqEl, method, data) {
     let hasReturnValueFunc = {
         val: true
@@ -44,14 +37,6 @@ $.fn.extend({
         if (typeof config === "string") {
           return callMethod(this, config, data);
         } 
-        if (!$.isPlainObject(config)) {
-            config = DEFAULT_CONFIG;
-        }
-        config = {...DEFAULT_CONFIG, ...config};
-        if (!Array.isArray(config.data)) {
-            console.error("data不是数组");
-            config.data = [];
-        }
         return init(this, config);
     }
 });

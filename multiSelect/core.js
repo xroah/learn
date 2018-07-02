@@ -1,15 +1,32 @@
 import Options from "./options";
-import { ITEM_CLS } from "./class_names";
+import {
+    ITEM_CLS
+} from "./class_names";
 import * as eName from "./event_names";
+
+const DEFAULT_CONFIG = {
+    data: [],
+    multiple: false,
+    showSearch: false,
+    placeholder: ""
+};
 
 export default class Select {
     constructor(config, selector) {
+        if (!$.isPlainObject(config)) {
+            config = DEFAULT_CONFIG;
+        }
+        if (!Array.isArray(config.data)) {
+            console.error("data不是数组");
+            config.data = [];
+        }
+        this.config = { 
+            ...DEFAULT_CONFIG,
+            ...config
+        };
         this.input = $('<span class="r-select-span"></span>');
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
         this.el = $(selector);
-        this.config = {
-            ...config
-        };
         //优先使用配置的multiple,否则检查el有没有设置multiple属性
         if (!this.config.multiple) {
             this.config.multiple = !!this.el.prop("multiple");
@@ -136,7 +153,7 @@ export default class Select {
             //在选项列表右键弹出菜单不让选项关闭
             if (
                 activeEl !== _wrapper &&
-                !wrapper.contains(activeEl) &&  //IE下的span会获取焦点成为activeElement
+                !wrapper.contains(activeEl) && //IE下的span会获取焦点成为activeElement
                 !_wrapper.contains(activeEl)
             ) {
                 this.close();
@@ -189,8 +206,7 @@ export default class Select {
             //只有单选并且选中改变了才会触发
             //单选，选中当前li要取消之前选中的li
             //如果当前选中跟之前选中不是同一个则同时触发delselect和select事件
-            if (
-                !this.config.multiple &&
+            if (!this.config.multiple &&
                 deselectEl &&
                 deselectEl.length &&
                 !el.is(deselectEl)
