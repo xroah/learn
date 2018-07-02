@@ -51,7 +51,7 @@ module.exports = {
         new MINI_CSS_EXTRACT_PLUGIN({
             // Options similar to the same options in webpackOptions.output
             // both options are optional
-            filename: "[name]/[name].min.css"
+            filename: "[name]/jquery.[name].min.css"
           })
     ],
     externals: "jquery"
