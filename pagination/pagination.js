@@ -99,14 +99,15 @@ export default class Pagination {
             current,
             total
         } = this;
+        let {
+            visiblePages
+        } = this.config;
+        
         if (visiblePages < 3) {
             //小于3的时候只显示上一页、下一页
             return [prev, next];
         }
 
-        let {
-            visiblePages
-        } = this.config;
         let firstItem = this.getOneItem(1, 1);
         let lastItem = this.getOneItem(total, total);
         let ellipsis = $(`<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`);
@@ -127,7 +128,7 @@ export default class Pagination {
             } else {
                 //第一页后面及最后一页前面添加省略号
                 //省略号之间显示的页码数量,当前页码显示在中间
-                visiblePages -= 1;
+                visiblePages -= 2;
                 let mid = Math.ceil(visiblePages / 2),
                     before = visiblePages - mid,
                     after = visiblePages - before - 1;
