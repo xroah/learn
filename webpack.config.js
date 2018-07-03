@@ -12,8 +12,10 @@ if (mod) {
     }
 } else {
     entry = {
-        MultiSelect: "./multiSelect/index.js",
-        cookie: "./cookie/index.js"
+        multiSelect: "./multiSelect/index.js",
+        cookie: "./cookie/index.js",
+        autoHeightTextArea: "./autoHeightTextArea/index.js",
+        pagination: "./pagination/index.js"
     }
 }
 
