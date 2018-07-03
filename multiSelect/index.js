@@ -33,9 +33,20 @@ function init(jqEl, config) {
 $.fn.extend({
     select: function (config, data) {
         let len = this.length;
+        let api = {
+            open: true,
+            close: true,
+            disable: true,
+            enable: true,
+            val: true,
+            destroy: true
+        };
         if (!len) return this;
         if (typeof config === "string") {
-          return callMethod(this, config, data);
+          if (config in api) {
+            return callMethod(this, config, data);
+          }
+          return this;
         } 
         return init(this, config);
     }
