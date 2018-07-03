@@ -203,12 +203,31 @@ export default class Pagination {
             click,
             list,
             el
-        } = this;
+        } = this;;
         let selector = `.${PREFIX}-link`;
         el.off(CHANGE);
         list
             .off("click", selector, click)
             .on("click", selector, click)
+    }
+
+    destroy() {
+        let {
+            el,
+            list,
+            click
+        } = this;
+        let selector = `.${PREFIX}-link`;
+        if (el.is(list)) {
+            list.empty()
+                .off("click", selector, click);
+        } else {
+            list.remove();
+        }
+        for (let key in this) {
+            delete this[key];
+        }
+        el.data("page-instance", null);
     }
 
     render() {
