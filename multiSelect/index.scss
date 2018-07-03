@@ -41,6 +41,7 @@ $border_color: #ccc;
     }
     &.r-select-disabled {
         .r-select-span {
+            color: $disabled_text_color;
             user-select: none;
             background-color: #f5f5f5;
             cursor: not-allowed;

@@ -354,7 +354,6 @@ export default class Options {
         } else if (dir === "up") {
             scrollTop = offsetTop;
         }
-        console.log(borderTop, borderBottom)
         return scrollTop;
     }
 

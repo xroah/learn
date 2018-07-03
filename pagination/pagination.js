@@ -151,6 +151,7 @@ export default class Pagination {
     click(evt) {
         let a = $(evt.currentTarget);
         let parent = a.parent();
+        evt.preventDefault();
         if (
             this.isDisabled(parent) ||
             this.isActive(parent)
@@ -172,7 +173,6 @@ export default class Pagination {
                 current = parseInt(index);
         }
         this.current = current
-        evt.preventDefault();
         this.render();
         this.config.onChange(current);
         el.trigger($.Event(CHANGE, {

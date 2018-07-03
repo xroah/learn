@@ -16,14 +16,14 @@ export default class Select {
         if (!$.isPlainObject(config)) {
             config = DEFAULT_CONFIG;
         }
+        this.config = config = { 
+            ...DEFAULT_CONFIG,
+            ...config
+        };
         if (!Array.isArray(config.data)) {
             console.error("data不是数组");
             config.data = [];
         }
-        this.config = { 
-            ...DEFAULT_CONFIG,
-            ...config
-        };
         this.input = $('<span class="r-select-span"></span>');
         this.wrapper = $('<div class="r-select-wrapper" tabindex="0"></div>');
         this.el = $(selector);
