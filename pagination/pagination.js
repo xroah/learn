@@ -8,7 +8,6 @@ import {
  * @property {number} visiblePages 可见页码数量，最小为3，小于3的时候不显示
  * @property {number} pageSize 每页显示的数据数量
  * @property {number} current 当前页码
- * @property {boolean} showJump 是否显示跳转
  * @property {string} position 页码的位置 left/center/right
  * @property {string} prevText 上一页按钮显示的文本
  * @property {string} nextText 下一页按钮显示的文本
@@ -39,12 +38,13 @@ export default class Pagination {
         };
         this.total = Math.ceil(config.total / config.pageSize) || 1;
         this.current = config.current > this.total ? this.total : config.current;
-        this.list = null; //页码列表UL
+        this.list = null; 
         this.init();
     }
 
     init() {
-        let nodeName = this.el.get(0).nodeName.toLowerCase();
+        let {el} = this;
+        let nodeName = el.get(0).nodeName.toLowerCase();
         let {
             position
         } = this.config;
@@ -59,7 +59,7 @@ export default class Pagination {
         let ul = $(`<ul class="${PREFIX} ${PREFIX}-${position}"></ul>`);
         this.list = ul;
         if (nodeName === "ol" || nodeName === "ul") {
-            this.list = this.el;
+            this.list = el;
         }
         this.click = this.click.bind(this);
         this.render();
@@ -76,13 +76,17 @@ export default class Pagination {
         return items;
     }
 
-    getOneItem(text, index) {
-        let li = $(`<li class="${PREFIX}-item"></li>`);
-        let a = $(`<a href="#" data-i="${index}" class="${PREFIX}-link">${text}</a>`);
+    getOneItem(text, index, disabled) {
+        let cls = `${PREFIX}-item`;
         if (index === this.current) {
-            li.addClass(`${PREFIX}-active`);
+            cls = `${cls} ${PREFIX}-active`;
         }
-        return li.append(a);
+        if (disabled) {
+            cls = `${cls} ${PREFIX}-disabled`;
+        }
+        return `<li class="${cls}">
+                    <a href="#" data-i="${index}" class="${PREFIX}-link">${text}</a>
+                </li>`
     }
 
     //上一页  下一页按钮
@@ -91,14 +95,8 @@ export default class Pagination {
             prevText,
             nextText
         } = this.config;
-        let prev = this.getOneItem(prevText, "prev");
-        let next = this.getOneItem(nextText, "next");
-        if (current === 1) {
-            this.disable(prev)
-        } 
-        if (current === total) {
-            this.disable(next);
-        }
+        let prev = this.getOneItem(prevText, "prev", current === 1);
+        let next = this.getOneItem(nextText, "next", current === total);
         return {
             prev,
             next
@@ -125,8 +123,7 @@ export default class Pagination {
 
         let firstPage = this.getOneItem(1, 1);
         let lastPage = this.getOneItem(total, total);
-        let ellipsisStart = $(`<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`);
-        let ellipsisEnd = ellipsisStart.clone();
+        let ellipsis = `<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`;
         let start = [prev];
         let end = [next];
         let first = 1;
@@ -140,11 +137,11 @@ export default class Pagination {
             if (current < (tmp = visiblePages - 1)) {
                 //最后一页前面添加省略号
                 last = tmp;
-                end.unshift(ellipsisEnd);
+                end.unshift(ellipsis);
             } else if (current > (tmp = total - visiblePages + 2)) {
                 //第一页后面添加省略号
                 first = tmp;
-                start.push(ellipsisStart);
+                start.push(ellipsis);
             } else {
                 //第一页后面及最后一页前面添加省略号
                 //省略号之间显示的页码数量,当前页码显示在中间
@@ -154,8 +151,8 @@ export default class Pagination {
                     after = visiblePages - before - 1;
                 first = current - before;
                 last = current + after;
-                start.push(ellipsisStart);
-                end.unshift(ellipsisEnd);
+                start.push(ellipsis);
+                end.unshift(ellipsis);
             }
         }
         return [...start, ...this.getItems(first, last), ...end];
@@ -212,10 +209,9 @@ export default class Pagination {
             current
         } = this;
         if (isNaN(page) || page === current) return;
-        page = page < 1 ? 1 :
+        this.current = page < 1 ? 1 :
             page > total ? total :
             page
-        this.current = page;
         this.render();
     }
 
@@ -242,10 +238,9 @@ export default class Pagination {
             list,
             click
         } = this;
-        let selector = `.${PREFIX}-link`;
         if (el.is(list)) {
             list.empty()
-                .off("click", selector, click);
+                .off("click", `.${PREFIX}-link`, click);
         } else {
             list.remove();
         }
@@ -258,19 +253,12 @@ export default class Pagination {
     render() {
         let items = this.generatePages();
         let {
-            current,
-            total,
-            prev,
-            next,
             el,
             list
         } = this;
-
+        list.empty().html(items.join(""));
         if (!list.parent().length) {
             el.append(list);
         }
-        list
-            .empty()
-            .append(items);
     }
 }
