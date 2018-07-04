@@ -85,6 +85,26 @@ export default class Pagination {
         return li.append(a);
     }
 
+    //上一页  下一页按钮
+    getEdge(current, total) {
+        let {
+            prevText,
+            nextText
+        } = this.config;
+        let prev = this.getOneItem(prevText, "prev");
+        let next = this.getOneItem(nextText, "next");
+        if (current === 1) {
+            this.disable(prev)
+        } 
+        if (current === total) {
+            this.disable(next);
+        }
+        return {
+            prev,
+            next
+        }
+    }
+
     //生成页码
     generatePages() {
         let {
@@ -92,40 +112,39 @@ export default class Pagination {
             total
         } = this;
         let {
-            prevText,
-            nextText,
             visiblePages
         } = this.config;
-        let disabledCls = `${PREFIX}-disabled`;
-        let prev = this.getOneItem(prevText, "prev");
-        let next = this.getOneItem(nextText, "next");
-        if (current === 1) {
-            prev.addClass(disabledCls);
-        } else if (current === total) {
-            next.addClass(disabledCls);
-        }
+        let {
+            prev,
+            next
+        } = this.getEdge(current, total);
         if (visiblePages < 3) {
             //小于3的时候只显示上一页、下一页
             return [prev, next];
         }
 
-        let firstItem = this.getOneItem(1, 1);
-        let lastItem = this.getOneItem(total, total);
-        let ellipsis = $(`<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`);
-        let start = [prev, firstItem];
-        let end = [lastItem, next];
-        let first = 2;
-        let last = total - 1;
+        let firstPage = this.getOneItem(1, 1);
+        let lastPage = this.getOneItem(total, total);
+        let ellipsisStart = $(`<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`);
+        let ellipsisEnd = ellipsisStart.clone();
+        let start = [prev];
+        let end = [next];
+        let first = 1;
+        let last = total;
         let tmp;
         if (visiblePages < total) {
+            start = [prev, firstPage];
+            end = [lastPage, next];
+            first = 2;
+            last = total - 1;
             if (current < (tmp = visiblePages - 1)) {
                 //最后一页前面添加省略号
                 last = tmp;
-                end.unshift(ellipsis);
+                end.unshift(ellipsisEnd);
             } else if (current > (tmp = total - visiblePages + 2)) {
                 //第一页后面添加省略号
                 first = tmp;
-                start.push(ellipsis);
+                start.push(ellipsisStart);
             } else {
                 //第一页后面及最后一页前面添加省略号
                 //省略号之间显示的页码数量,当前页码显示在中间
@@ -135,14 +154,15 @@ export default class Pagination {
                     after = visiblePages - before - 1;
                 first = current - before;
                 last = current + after;
-                start.push(ellipsis.clone());
-                end.unshift(ellipsis.clone());
+                start.push(ellipsisStart);
+                end.unshift(ellipsisEnd);
             }
-        } else if (total === 1) {
-            end.shift();
-            next.addClass(disabledCls)
         }
         return [...start, ...this.getItems(first, last), ...end];
+    }
+
+    disable(el) {
+        el.addClass(`${PREFIX}-disabled`);
     }
 
     isDisabled(el) {
@@ -245,7 +265,7 @@ export default class Pagination {
             el,
             list
         } = this;
-        
+
         if (!list.parent().length) {
             el.append(list);
         }
