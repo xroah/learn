@@ -39,8 +39,6 @@ export default class Pagination {
         };
         this.total = Math.ceil(config.total / config.pageSize) || 1;
         this.current = config.current > this.total ? this.total : config.current;
-        this.prev = null; //上一页按钮
-        this.next = null; //下一页
         this.list = null; //页码列表UL
         this.init();
     }
@@ -48,8 +46,6 @@ export default class Pagination {
     init() {
         let nodeName = this.el.get(0).nodeName.toLowerCase();
         let {
-            prevText,
-            nextText,
             position
         } = this.config;
         let positionMap = {
@@ -65,8 +61,6 @@ export default class Pagination {
         if (nodeName === "ol" || nodeName === "ul") {
             this.list = this.el;
         }
-        this.prev = this.getOneItem(prevText, "prev");
-        this.next = this.getOneItem(nextText, "next");
         this.click = this.click.bind(this);
         this.render();
         this.initEvent();
@@ -94,15 +88,22 @@ export default class Pagination {
     //生成页码
     generatePages() {
         let {
-            prev,
-            next,
             current,
             total
         } = this;
         let {
+            prevText,
+            nextText,
             visiblePages
         } = this.config;
-        
+        let disabledCls = `${PREFIX}-disabled`;
+        let prev = this.getOneItem(prevText, "prev");
+        let next = this.getOneItem(nextText, "next");
+        if (current === 1) {
+            prev.addClass(disabledCls);
+        } else if (current === total) {
+            next.addClass(disabledCls);
+        }
         if (visiblePages < 3) {
             //小于3的时候只显示上一页、下一页
             return [prev, next];
@@ -137,6 +138,9 @@ export default class Pagination {
                 start.push(ellipsis.clone());
                 end.unshift(ellipsis.clone());
             }
+        } else if (total === 1) {
+            end.shift();
+            next.addClass(disabledCls)
         }
         return [...start, ...this.getItems(first, last), ...end];
     }
@@ -241,14 +245,7 @@ export default class Pagination {
             el,
             list
         } = this;
-        let disabledCls = `${PREFIX}-disabled`;
-        prev.removeClass(disabledCls);
-        next.removeClass(disabledCls);
-        if (current === 1) {
-            prev.addClass(disabledCls);
-        } else if (current === total) {
-            next.addClass(disabledCls);
-        }
+        
         if (!list.parent().length) {
             el.append(list);
         }
