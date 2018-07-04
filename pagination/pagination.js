@@ -38,12 +38,14 @@ export default class Pagination {
         };
         this.total = Math.ceil(config.total / config.pageSize) || 1;
         this.current = config.current > this.total ? this.total : config.current;
-        this.list = null; 
+        this.list = null;
         this.init();
     }
 
     init() {
-        let {el} = this;
+        let {
+            el
+        } = this;
         let nodeName = el.get(0).nodeName.toLowerCase();
         let {
             position
@@ -86,7 +88,7 @@ export default class Pagination {
         }
         return `<li class="${cls}">
                     <a href="#" data-i="${index}" class="${PREFIX}-link">${text}</a>
-                </li>`
+                </li>`;
     }
 
     //上一页  下一页按钮
@@ -121,17 +123,17 @@ export default class Pagination {
             return [prev, next];
         }
 
-        let firstPage = this.getOneItem(1, 1);
-        let lastPage = this.getOneItem(total, total);
-        let ellipsis = `<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`;
         let start = [prev];
         let end = [next];
         let first = 1;
         let last = total;
-        let tmp;
         if (visiblePages < total) {
-            start = [prev, firstPage];
-            end = [lastPage, next];
+            let tmp;
+            let ellipsis = `<li class="${PREFIX}-item"><a class="${PREFIX}-ellipsis">...</a></li>`;
+            first = this.getOneItem(1, 1);
+            last = this.getOneItem(total, total);
+            start.push(first);
+            end.unshift(last);
             first = 2;
             last = total - 1;
             if (current < (tmp = visiblePages - 1)) {
@@ -146,20 +148,16 @@ export default class Pagination {
                 //第一页后面及最后一页前面添加省略号
                 //省略号之间显示的页码数量,当前页码显示在中间
                 visiblePages -= 2;
-                let mid = Math.ceil(visiblePages / 2),
-                    before = visiblePages - mid,
-                    after = visiblePages - before - 1;
-                first = current - before;
-                last = current + after;
+                tmp = Math.ceil(visiblePages / 2);
+                prev = visiblePages - tmp;
+                next = visiblePages - prev - 1;
+                first = current - prev;
+                last = current + next;
                 start.push(ellipsis);
                 end.unshift(ellipsis);
             }
         }
         return [...start, ...this.getItems(first, last), ...end];
-    }
-
-    disable(el) {
-        el.addClass(`${PREFIX}-disabled`);
     }
 
     isDisabled(el) {
@@ -171,8 +169,8 @@ export default class Pagination {
     }
 
     click(evt) {
-        let a = $(evt.currentTarget);
-        let parent = a.parent();
+        let a = evt.currentTarget;
+        let parent = $(a.parentNode);
         evt.preventDefault();
         if (
             this.isDisabled(parent) ||
@@ -181,9 +179,10 @@ export default class Pagination {
 
         let {
             current,
-            el
+            el,
+            config
         } = this;
-        let index = a.attr("data-i");
+        let index = a.dataset.i;
         switch (index) {
             case "prev":
                 current--;
@@ -196,7 +195,7 @@ export default class Pagination {
         }
         this.current = current
         this.render();
-        this.config.onChange(current);
+        config.onChange(current);
         el.trigger($.Event(CHANGE, {
             page: current
         }));
