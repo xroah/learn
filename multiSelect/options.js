@@ -346,9 +346,7 @@ export default class Options {
         let height = wrapper.getBoundingClientRect().height - borderTop - borderBottom;
         let offsetTop = el.offsetTop;
         let elHeight = el.getBoundingClientRect().height;
-        let scrollHeight = wrapper.scrollHeight;
         let scrollTop = 0;
-        let currentScrollTop = wrapper.scrollTop;
         if (dir === "down") {
             scrollTop = offsetTop + elHeight - height;
         } else if (dir === "up") {
