@@ -291,7 +291,7 @@ export default class Select {
             multiple,
             placeholder
         } = this.config;
-        if (text.length) {
+        if (text && text.length) {
             this.input.removeClass("r-select-placeholder");
             if (multiple) {
                 this.input.text(text.join(","));

@@ -6,10 +6,6 @@ import {
 export default class Options {
     constructor(config) {
         this.data = config.data;
-        this.callback = {
-            onClick: config.onClick,
-            onSelect: config.onSelect
-        };
         this.multiple = !!config.multiple;
         this.wrapper = $('<div class="r-select-options-wrapper" tabindex="0"></div>');
         this.ul = $('<ul class="r-select-options"></ul>');
@@ -129,9 +125,8 @@ export default class Options {
     }
 
     initEvent() {
-        let selector = `.${cName.ITEM_CLS}`;
         let handler = this.mouseHandler.bind(this);
-        this.ul.on("mouseenter mouseleave", selector, handler);
+        this.ul.on("mouseenter mouseleave", `.${cName.ITEM_CLS}`, handler);
     }
 
     reset() {
@@ -215,8 +210,6 @@ export default class Options {
 
     select(el) {
         el = $(el);
-        let val = el.data("value");
-        let text = el.text();
         //多选时,如果当前是选中的则取消选中
         if (this.multiple) {
             this.isSelected(el) ?
