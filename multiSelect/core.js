@@ -16,7 +16,7 @@ export default class Select {
         if (!$.isPlainObject(config)) {
             config = DEFAULT_CONFIG;
         }
-        this.config = config = { 
+        this.config = config = {
             ...DEFAULT_CONFIG,
             ...config
         };
@@ -62,13 +62,19 @@ export default class Select {
     }
 
     refresh(data) {
-        let _data;
-        if (this.el.get(0).nodeName.toLowerCase() === "select") {
-            !data && console.warn("refresh方法未传入data,将使用option元素作为选项");
-            _data = data || this.getSelectData(this.el);
+        let _data = data;
+        let {
+            el,
+            list
+        } = this;
+        if (el.get(0).nodeName.toLowerCase() === "select") {
+            if (!data) {
+                console.warn("refresh方法未传入data,将使用option元素作为选项");
+                _data = this.getSelectData(el);
+            }
         }
         this.config.data = _data;
-        this.list.refresh(data);
+        list.refresh(data);
         this.updateVal(false);
     }
 
