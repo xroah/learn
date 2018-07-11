@@ -23,9 +23,13 @@ cookie.encode = encodeURIComponent;
 cookie.decode = decodeURIComponent;
 
 cookie.set = function (key, value, config) {
+    //JSON parse "undefined"会报错, "null"能正常解析
+    if (value === undefined) {
+        console.error("value不能为undefined");
+        return;
+    }
     let k = this.encode(String(key).trim()),
-        //JSON parse "undefined"会报错, "null"能正常解析
-        v = this.encode(JSON.stringify(value === undefined ? "" : value)),
+        v = this.encode(JSON.stringify(value)),
         cookie;
     if (!k.length) {
         console.error("key不能为空");
