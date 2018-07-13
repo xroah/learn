@@ -235,11 +235,12 @@ export default class Select {
     }
 
     showList() {
+        let offset = this.wrapper.offset();
         let rect = this.wrapper.get(0).getBoundingClientRect();
         this.list.show({
             width: rect.width,
             left: rect.left,
-            top: rect.bottom + 2
+            top: offset.top + rect.height + 2
         });
     }
 
