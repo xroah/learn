@@ -55,7 +55,7 @@ export default class Pagination {
             left: "left",
             center: "center"
         };
-        if (!(position in positionMap)) {
+        if (!positionMap[position]) {
             position = "right";
         }
         let ul = $(`<ul class="${PREFIX} ${PREFIX}-${position}"></ul>`);
@@ -99,10 +99,7 @@ export default class Pagination {
         } = this.config;
         let prev = this.getOneItem(prevText, "prev", current === 1);
         let next = this.getOneItem(nextText, "next", current === total);
-        return {
-            prev,
-            next
-        }
+        return [prev, next];
     }
 
     //生成页码
@@ -114,17 +111,14 @@ export default class Pagination {
         let {
             visiblePages
         } = this.config;
-        let {
-            prev,
-            next
-        } = this.getEdge(current, total);
+        let edge = this.getEdge(current, total);
         if (visiblePages < 3) {
             //小于3的时候只显示上一页、下一页
-            return [prev, next];
+            return edge;
         }
 
-        let start = [prev];
-        let end = [next];
+        let start = [edge[0]];
+        let end = [edge[1]];
         let first = 1;
         let last = total;
         if (visiblePages < total) {
