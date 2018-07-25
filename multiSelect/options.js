@@ -468,7 +468,7 @@ export default class Options {
         //此时再按键盘选择选项则可能选中的是隐藏的选项
         this.removeActive();
         this.searchTimer = setTimeout(search, DELAY);
-        this.input.trigger($.Event("ms.search", {
+        this.input.trigger($.Event(SEARCH, {
             match: this.input.val()
         }));
     }
