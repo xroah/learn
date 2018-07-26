@@ -11,6 +11,21 @@ function dfs(obj) {
     }
 }
 
+function loopDfs(obj) {
+    let {keys, values} = utils.getObjectKeysAndValues(obj);
+    while(keys.length) {
+        let key = keys.shift();
+        let value = values.shift();
+        if (utils.isObject(value)) {
+            let tmp = utils.getObjectKeysAndValues(value);
+            keys = tmp.keys.concat(keys);
+            values = tmp.values.concat(values);
+        } else {
+            console.log(`${key}=>${value}`);
+        }
+    }
+}
+
 let obj = {
     a: 1,
     b: 3,
@@ -40,5 +55,11 @@ let obj = {
         }
     }
 };
-
+console.log("---------递归----------");
+console.time("递归");
 dfs(obj);
+console.timeEnd("递归")
+console.log("---------循环----------");
+console.time("循环");
+loopDfs(obj);
+console.timeEnd("循环");
