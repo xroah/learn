@@ -25,13 +25,41 @@
         const ARROW_ANGLE = 30;
         ctx.lineWidth = 2;
         ctx.strokeStyle = "red";
+
+        function getEndCoord(xWidth, yHeight, endX, endY, startX, startY, reverse) {
+            let arcTan = Math.atan(yHeight / xWidth) * 180 / Math.PI;
+            let angle = 90 - ARROW_ANGLE - arcTan;
+            let _endX, _endY;
+            angle *= Math.PI / 180;
+            if (reverse) {
+                if (endY >= startY) {
+                    _endY = endY - Math.sin(angle) * arrowLen;
+                    _endX = endX - Math.cos(angle) * arrowLen;
+                } else {
+                    _endY = endY + Math.sin(angle) * arrowLen;
+                    _endX = endX + Math.cos(angle) * arrowLen;
+                }
+            } else {
+                if (endX >= startX) {
+                    _endX = endX - Math.sin(angle) * arrowLen;
+                    _endY = endY - Math.cos(angle) * arrowLen;
+                } else {
+                    _endX = endX + Math.sin(angle) * arrowLen;
+                    _endY = endY + Math.cos(angle) * arrowLen;
+                }
+            }
+            return {
+                endX: _endX,
+                endY: _endY
+            }
+        }
+
         canvas.onmousedown = function (evt) {
             let startX = evt.offsetX;
             let startY = evt.offsetY;
             let endX = startX;
             let endY = startY;
             let imgData = ctx.getImageData(0, 0, width, height);
-            console.log(startX, startY);
 
             canvas.onmousemove = function (ev) {
                 ctx.beginPath();
@@ -47,39 +75,22 @@
             canvas.onmouseup = function () {
                 let x = endX - startX;
                 let y = endY - startY;
-                let arcTan = Math.atan(y / x) * 180 / Math.PI;
-                let angle = 90 - ARROW_ANGLE - arcTan;
-                let _endX, _endY;
-                angle *= Math.PI / 180;
-                if (endX >= startX) {
-                    _endX = endX - Math.sin(angle) * arrowLen;
-                    _endY = endY - Math.cos(angle) * arrowLen;
-                } else {
-                    _endX = endX + Math.sin(angle) * arrowLen;
-                    _endY = endY + Math.cos(angle) * arrowLen;
-                }
-
+                let end = getEndCoord(x, y, endX, endY, startX);
+                let _endX = end.endX;
+                let _endY = end.endY;
                 ctx.beginPath();
                 ctx.moveTo(endX, endY);
                 ctx.lineTo(_endX, _endY);
                 ctx.stroke();
 
-                x = endX - startX;
-                y = endY - startY;
-                arcTan = Math.atan(x / y) * 180 / Math.PI;
-                angle = 90 - ARROW_ANGLE - arcTan;
-                angle *= Math.PI / 180;
-                if (endY >= startY) {
-                    _endY = endY - Math.sin(angle) * arrowLen;
-                    _endX = endX - Math.cos(angle) * arrowLen;
-                } else {
-                    _endY = endY + Math.sin(angle) * arrowLen;
-                    _endX = endX + Math.cos(angle) * arrowLen;
-                }
+                end = getEndCoord(y, x, endX, endY, startX, startY, true);
+                _endX = end.endX;
+                _endY = end.endY;
                 ctx.beginPath();
                 ctx.moveTo(endX, endY);
                 ctx.lineTo(_endX, _endY);
                 ctx.stroke();
+
                 this.onmousemove = this.mouseup = null;
             }
         }
