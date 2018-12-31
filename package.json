@@ -1,0 +1,26 @@
+{
+  "name": "fs-dir",
+  "version": "1.0.0",
+  "description": "复制、移动、删除文件夹",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xroah/fs-dir.git"
+  },
+  "keywords": [
+    "node",
+    "delete",
+    "copy",
+    "move",
+    "directory"
+  ],
+  "author": "xroah",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xroah/fs-dir/issues"
+  },
+  "homepage": "https://github.com/xroah/fs-dir#readme"
+}
