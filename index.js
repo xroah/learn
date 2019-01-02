@@ -26,7 +26,7 @@ function rmDir(dir, options, callback, async) {
     }
     fs.stat(dir, (err, stat) => {
         if (err) {
-            return callback(err)
+            return callback(err);
         }
         if (stat.isFile()) {
             fs.unlink(dir, callback);
@@ -61,7 +61,10 @@ function _rmDir(dir, options, callback) {
                         readDir(f);
                     } else if (s.isFile()) {
                         fs.unlink(f, err => {
-                            if (err) return callback(err);
+                            if (err) {
+                                callback(err);
+                                process.exit(0);
+                            }
                             printInfo(f, options.details);
                         });
                     }
@@ -76,7 +79,7 @@ function _rmDir(dir, options, callback) {
             fs.rmdir(d, err => {
                 if (err) {
                     if (err.code === "ENOTEMPTY") {
-                        dirs.push(d);
+                        dirs.unshift(d);
                         setTimeout(removeDir);
                         return;
                     }
@@ -114,8 +117,9 @@ function rmDirSync(dir, options) {
         }
     }
     while (dirs.length) {
+        let dir = dirs.pop();
         fs.rmdirSync(dirs.pop());
-        printInfo(file, options.details);
+        printInfo(dir, options.details);
     }
 }
 
@@ -127,3 +131,11 @@ module.exports = {
     remove,
     removeSync
 };
+
+remove("./pageUtils", {details: true}, err => {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    console.log("done");
+});
