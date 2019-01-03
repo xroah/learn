@@ -19,81 +19,54 @@ function factory(async = true, fn) {
     }
 }
 
-function rmDir(dir, options, callback, async) {
-    dir = path.resolve(dir);
-    if (!async) {
-        return rmDirSync(dir, options);
+function rmDir(dir, options, callback) {
+    function stat(p, callback) {
+        fs.stat(p, (err, stat) => {
+            if (err) {
+                return callback(err);
+            }
+            if (stat.isDirectory()) {
+                _rmDir(p, callback);
+            } else if (stat.isFile()) {
+                fs.unlink(p, callback);
+            }
+        })
     }
-    fs.stat(dir, (err, stat) => {
-        if (err) {
-            return callback(err);
-        }
-        if (stat.isFile()) {
-            fs.unlink(dir, callback);
-        } else if (stat.isDirectory()) {
-            _rmDir(dir, options, callback);
-        }
-    });
+
+    function _rmDir(dir, callback) {
+        fs.readdir(dir, (err, files) => {
+            if (err) {
+                return callback(err);
+            }
+            let fileNum = files.length;
+            let cb = err => {
+                if (err) {
+                    if (err.code === "EBUSY") {
+                        throw err;
+                    }
+                    if (err.code === "ENOENT") return;
+                    return callback(err);
+                }
+                if (--fileNum <= 0) {
+                    console.log(dir)
+                    fs.rmdir(dir, callback);
+                }
+            };
+            if (!fileNum) {
+                cb();
+                return;
+            }
+            for (let f of files) {
+                f = path.join(dir, f);
+                stat(f, cb);
+            }
+        });
+    }
+    stat(dir, callback);
 }
 
 function toAbsPath(dir, files) {
     return files.map(f => path.resolve(dir, f));
-}
-
-function printInfo(info, print) {
-    if (print) {
-        process.stdout.write(`removed ${info}\n`);
-    }
-}
-
-function _rmDir(dir, options, callback) {
-    let dirs = [dir];
-
-    function readDir(dir) {
-        fs.readdir(dir, (err, _files) => {
-            if (err) return callback(err);
-            _files = toAbsPath(dir, _files);
-            for (let f of _files) {
-                fs.stat(f, (err, s) => {
-                    if (err) return callback(err);
-                    if (s.isDirectory()) {
-                        dirs.push(f);
-                        readDir(f);
-                    } else if (s.isFile()) {
-                        fs.unlink(f, err => {
-                            if (err) {
-                                callback(err);
-                                process.exit(0);
-                            }
-                            printInfo(f, options.details);
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    function removeDir() {
-        if (dirs.length) {
-            let d = dirs.pop();
-            fs.rmdir(d, err => {
-                if (err) {
-                    if (err.code === "ENOTEMPTY") {
-                        dirs.unshift(d);
-                        setTimeout(removeDir);
-                        return;
-                    }
-                    return callback(err);
-                }
-                printInfo(d, options.details);
-                setTimeout(removeDir);
-            })
-        } else {
-            callback();
-        }
-    }
-    readDir(dir);
-    removeDir();
 }
 
 function rmDirSync(dir, options) {
@@ -110,32 +83,28 @@ function rmDirSync(dir, options) {
         stat = fs.statSync(file);
         if (stat.isFile()) {
             fs.unlinkSync(file);
-            printInfo(file, options.details);
         } else if (stat.isDirectory()) {
             dirs.push(file);
             files.push(...toAbsPath(file, fs.readdirSync(file)));
         }
     }
     while (dirs.length) {
-        let dir = dirs.pop();
         fs.rmdirSync(dirs.pop());
-        printInfo(dir, options.details);
     }
 }
 
-let remove = factory(true, rmDir);
-let removeSync = factory(false, rmDirSync);
-
+let rm = factory(true, rmDir);
+let rmSync = factory(false, rmDirSync);
 
 module.exports = {
-    remove,
-    removeSync
+    rm,
+    rmSync
 };
 
-remove("./pageUtils", {details: true}, err => {
+rm("electron-music", err => {
     if (err) {
         console.log(err);
         return;
     }
-    console.log("done");
+    console.log("all done");
 });
