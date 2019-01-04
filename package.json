@@ -1,6 +1,6 @@
 {
   "name": "fs-dir",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "复制、移动、删除文件夹",
   "main": "index.js",
   "scripts": {
