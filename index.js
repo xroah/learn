@@ -1,5 +1,15 @@
-const {rm, rmSync} = require("./lib/rm");
-const {cp, cpSync} = require("./lib/cp");
+const {
+    rm,
+    rmSync
+} = require("./lib/rm");
+const {
+    cp,
+    cpSync
+} = require("./lib/cp");
+const {
+    mkdir,
+    mkdirSync
+} = require("./lib/mkdir");
 
 function mv(src, dest, options, callback) {
     if (typeof options === "function") {
@@ -23,5 +33,7 @@ module.exports = {
     cp,
     cpSync,
     mv,
-    mvSync
+    mvSync,
+    mkdir,
+    mkdirSync
 };

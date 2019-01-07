@@ -15,7 +15,8 @@
     "delete",
     "copy",
     "move",
-    "directory"
+    "directory",
+	"mkdir"
   ],
   "author": "xroah",
   "license": "MIT",
