@@ -22,5 +22,9 @@
   "bugs": {
     "url": "https://github.com/xroah/fs-dir/issues"
   },
-  "homepage": "https://github.com/xroah/fs-dir#readme"
+  "homepage": "https://github.com/xroah/fs-dir#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  }
 }

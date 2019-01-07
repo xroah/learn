@@ -7,7 +7,6 @@ function mv(src, dest, options, callback) {
         options = {};
     }
     cp(src, dest, options, err => {
-        console.log("........", err)
         if (err) return callback(err);
         rm(src, options, callback);
     });
