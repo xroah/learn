@@ -4,7 +4,7 @@
   "description": "复制、移动、删除文件夹",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "copy",
     "move",
     "directory",
-	"mkdir"
+    "mkdir"
   ],
   "author": "xroah",
   "license": "MIT",
