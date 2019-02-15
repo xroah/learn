@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const fs = require("fs");
 
 async function start(browser, link) {
     let page = await browser.newPage();
@@ -9,6 +10,9 @@ async function start(browser, link) {
         document.getElementById("content").style.paddingBottom = "0px";
         Array.from(els).forEach(el => el.style.display = "none");
     });
+    if (!fs.existsSync("./pdf")) {
+        fs.mkdirSync("./pdf");
+    }
     await page.pdf({
         path: `./pdf/${link.text}.pdf`,
         printBackground: true,
@@ -30,7 +34,9 @@ function timeout(ms) {
 }
 
 async function init() {
+    process.stdout.write("正在打开浏览器\n");
     let browser = await puppeteer.launch();
+    process.stdout.write("正在打开页面\n");
     let page = await browser.newPage();
     await page.goto("http://es6.ruanyifeng.com/");
     await timeout(2000);
