@@ -32,13 +32,12 @@ function mkdir(p) {
     if (fs.existsSync(p)) return;
     let pArr = p.split(path.sep);
     let _p = [p];
-    while(pArr.length > 1) {
+    while (pArr.length > 1) {
         pArr.pop();
         _p.unshift(pArr.join(path.sep));
     }
     for (let i = 0, l = _p.length; i < l; i++) {
         let tmp = _p[i];
-        console.log(tmp)
         if (!fs.existsSync(tmp)) {
             fs.mkdirSync(tmp);
         }
@@ -49,11 +48,12 @@ function writeFile(buffer, img) {
     let ext = path.extname(img.url);
     let name = img.copyright;
     let date = new Date();
-    let year = date.getFullYear(); 
+    let year = date.getFullYear();
     let mon = date.getMonth() + 1;
     let p = `./pictures/${year}/${mon}`;
+    let day = date.getDate();
     mkdir(p);
-    fs.writeFileSync(`${p}/${name.replace(/\//g, '、')}${ext}`, buffer);
+    fs.writeFileSync(`${p}/${year}-${mon}-${day} ${name.replace(/\//g, '、')}${ext}`, buffer);
     process.stdout.write("下载成功!\n");
 }
 
@@ -76,7 +76,7 @@ function handleBaseInfo(data) {
         res.on("end", () => {
             writeFile(buf, img);
         });
-    
+
         res.on("data", chunk => {
             buf = Buffer.concat([buf, chunk], chunk.length + buf.length);
         });
