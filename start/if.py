@@ -12,4 +12,3 @@ for item in list:
         print(item)
     elif item % 3 == 0 or item % 5 == 0:
         print(f"item={item}")
-
