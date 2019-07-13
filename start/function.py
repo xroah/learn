@@ -8,6 +8,10 @@ def print_info(name, age):
 def sum(a, b):
     return a + b
 
+def pow_list(list):
+    for index, value in enumerate(list):
+        list[index] = value ** 2
+
 greet_user()
 greet_user("jack")
 print_info(20, "Jack")
@@ -17,3 +21,11 @@ print_info(age = 20, name = "Jack")
 #print_info()
 
 print(sum(1, 1))
+
+list = [value for value in range(1, 10)]
+
+print("before:")
+print(list)
+pow_list(list)
+print("after:")
+print(list)
