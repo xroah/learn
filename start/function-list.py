@@ -1,6 +1,7 @@
 def pow_list(list):
     for index, value in enumerate(list):
         list[index] = value ** 2
+    return list
 
 list = [value for value in range(1, 10)]
 
