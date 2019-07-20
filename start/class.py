@@ -17,3 +17,7 @@ print(f"My dog is {my_dog.age} years old")
 
 my_dog.sit()
 my_dog.roll_over()
+
+my_dog.age = 7
+
+print(f"My dog is {my_dog.age} years old")
