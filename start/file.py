@@ -12,3 +12,7 @@ with open("./test.txt", "w") as file_object:
 
 with open("./test1.txt", "a") as file_object:
     file_object.write("aaa\n")
+
+with open("./test1.txt", "r+") as file_object:
+    print(file_object.read())
+    file_object.write("哈哈哈哈哈\n")
