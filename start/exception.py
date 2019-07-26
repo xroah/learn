@@ -12,5 +12,6 @@ try:
     q = a / b
 except Exception as e:
     # print("Error", e)
+    pass
 else:
     print("result=%s" % q)
