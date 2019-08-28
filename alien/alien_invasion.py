@@ -1,15 +1,19 @@
 import sys
 import pygame
 from ship import Ship
+from settings import Settings
 
 class AlienInvasion:
     def __init__(self):
         pygame.init()
 
-        self.screen = pygame.display.set_mode((1200, 800))
+        self.screen = pygame.display.set_mode((
+            Settings.screen_width,
+            Settings.screen_height
+        ))
 
         pygame.display.set_caption("Alien Invasion")
-        self.bg_color = (230, 230, 230)
+        self.bg_color = Settings.bg_color
 
         self.ship = Ship(self)
 
