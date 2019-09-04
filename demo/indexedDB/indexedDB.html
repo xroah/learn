@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Index DB</title>
+    <style>
+        label {
+            display: inline-block;
+            width: 50px;
+            margin-right: 10px;
+            text-align: right;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 5px 0;
+            text-align: center;
+            width: 20%;
+        }
+    </style>
+</head>
+
+<body>
+    <p>
+        <label>ssn: </label>
+        <input type="number" id="ssn" autocomplete="off"></p>
+    </p>
+    <p>
+        <label>age: </label>
+        <input type="number" id="age"></p>
+    </p>
+    <p>
+        <label>name: </label>
+        <input type="text" id="name" autocomplete="off"></p>
+    </p>
+    <p>
+        <label>email: </label>
+        <input type="email" id="email" autocomplete="off"></p>
+    </p>
+    <p>
+        <button id="add">add</button>
+        <button id="update">update</button>
+    </p>
+    <table>
+        <thead>
+            <th>ssn</th>
+            <th>age</th>
+            <th>name</th>
+            <th>email</th>
+            <th>operation</th>
+        </thead>
+        <tbody id="tbody">
+
+        </tbody>
+    </table>
+    <p><button id="clear">clear</button></p>
+    <script src="db.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
