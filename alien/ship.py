@@ -1,4 +1,5 @@
 import pygame
+from settings import Settings
 
 
 class Ship:
@@ -18,6 +19,6 @@ class Ship:
     
     def update(self):
         if self.moving_right:
-            self.rect.x += 1
+            self.rect.x += Settings.ship_speed
         elif self.moving_left:
-            self.rect.x -= 1
+            self.rect.x -= Settings.ship_speed
