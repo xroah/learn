@@ -30,18 +30,25 @@ class AlienInvasion:
             if type == pygame.QUIT:
                 sys.exit()
             elif type == pygame.KEYDOWN:
-                self._check_keydown_events()
+                self._check_keydown_events(event)
             elif type == pygame.KEYUP:
-                self._check_keyup_events()
+                self._check_keyup_events(event)
 
     def _check_keydown_events(self, event):
-        self.ship.moving_right = event.key == pygame.K_RIGHT
-        self.ship.moving_left = event.key == pygame.K_LEFT
+        key = event.key
+
+        self.ship.moving_right = key == pygame.K_RIGHT
+        self.ship.moving_left = key == pygame.K_LEFT
+
+        if key == pygame.K_q:
+            sys.exit()
 
     def _check_keyup_events(self, event):
-        if event.key == pygame.K_RIGHT:
+        key = event.key
+
+        if key == pygame.K_RIGHT:
             self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
+        elif key == pygame.K_LEFT:
             self.ship.moving_left = False
 
     def _update_screen(self):
