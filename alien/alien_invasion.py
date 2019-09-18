@@ -26,6 +26,12 @@ class AlienInvasion:
             self.ship.update()
             self.bullets.update()
 
+            for bullet in self.bullets.copy():
+                if bullet.rect.bottom <= 0:
+                    self.bullets.remove(bullet)
+
+            print(len(self.bullets))
+
     def _fire_bullet(self):
         new_bullet = Bullet(self)
 
