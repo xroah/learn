@@ -33,6 +33,9 @@ class AlienInvasion:
             print(len(self.bullets))
 
     def _fire_bullet(self):
+        if len(self.bullets) >= Settings.bullets_allowed:
+            return
+
         new_bullet = Bullet(self)
 
         self.bullets.add(new_bullet)

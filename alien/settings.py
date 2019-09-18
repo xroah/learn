@@ -7,3 +7,4 @@ class Settings:
     bullet_height = 15
     bullet_width = 3
     bullet_speed = 2
+    bullets_allowed = 3
