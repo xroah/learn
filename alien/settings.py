@@ -6,5 +6,5 @@ class Settings:
     bullet_color = (60, 60, 60)
     bullet_height = 15
     bullet_width = 3
-    bullet_speed = 2
+    bullet_speed = 1
     bullets_allowed = 3

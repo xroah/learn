@@ -24,13 +24,7 @@ class AlienInvasion:
             self._check_events()
             self._update_screen()
             self.ship.update()
-            self.bullets.update()
-
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <= 0:
-                    self.bullets.remove(bullet)
-
-            print(len(self.bullets))
+            self._update_bullets()
 
     def _fire_bullet(self):
         if len(self.bullets) >= Settings.bullets_allowed:
@@ -39,6 +33,13 @@ class AlienInvasion:
         new_bullet = Bullet(self)
 
         self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        self.bullets.update()
+
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
     def _check_events(self):
         for event in pygame.event.get():
