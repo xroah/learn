@@ -8,17 +8,16 @@ from bullet import Bullet
 class AlienInvasion:
     def __init__(self):
         pygame.init()
-
         self.screen = pygame.display.set_mode((
             Settings.screen_width,
             Settings.screen_height
         ))
-
+        
         pygame.display.set_caption("Alien Invasion")
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-
+        
     def run_game(self):
         while True:
             self._check_events()
@@ -43,13 +42,13 @@ class AlienInvasion:
 
     def _check_events(self):
         for event in pygame.event.get():
-            type = event.type
+            e_type = event.type
 
-            if type == pygame.QUIT:
+            if e_type == pygame.QUIT:
                 sys.exit()
-            elif type == pygame.KEYDOWN:
+            elif e_type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
-            elif type == pygame.KEYUP:
+            elif e_type == pygame.KEYUP:
                 self._check_keyup_events(event)
 
     def _check_keydown_events(self, event):
