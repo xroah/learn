@@ -21,6 +21,7 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+        self.run_game()
         
     def run_game(self):
         while True:
