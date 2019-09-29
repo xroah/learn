@@ -18,7 +18,7 @@ class AlienInvasion:
 
         self._create_fleet()
         self.run_game()
-        
+
     def run_game(self):
         while True:
             self._check_events()
@@ -41,6 +41,13 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_alien(self, alien_number):
+        alien = Alien()
+        alien_width = alien.rect.width
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        self.aliens.add(alien)
+
     def _create_fleet(self):
         alien = Alien()
         alien_width = alien.rect.width
@@ -48,10 +55,7 @@ class AlienInvasion:
         number_aliens_x = available_space_x // (2 * alien_width)
 
         for alien_number in range(number_aliens_x):
-            alien = Alien()
-            alien.x = alien_width + 2 * alien_width * alien_number
-            alien.rect.x = alien.x
-            self.aliens.add(alien)
+            self._create_alien(alien_number)
 
     def _check_events(self):
         for event in pygame.event.get():
