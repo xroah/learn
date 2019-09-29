@@ -43,8 +43,15 @@ class AlienInvasion:
 
     def _create_fleet(self):
         alien = Alien()
+        alien_width = alien.rect.width
+        available_space_x = Settings.screen_width - alien_width
+        number_aliens_x = available_space_x // (2 * alien_width)
 
-        self.aliens.add(alien)
+        for alien_number in range(number_aliens_x):
+            alien = Alien()
+            alien.x = alien_width + 2 * alien_width * alien_number
+            alien.rect.x = alien.x
+            self.aliens.add(alien)
 
     def _check_events(self):
         for event in pygame.event.get():
