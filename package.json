@@ -1,8 +1,8 @@
 {
   "name": "fs-dir",
   "version": "0.1.0",
-  "description": "复制、移动、删除文件夹",
-  "main": "index.js",
+  "description": "Copy, create, remove and move directories.",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "mocha"
   },
@@ -12,11 +12,12 @@
   },
   "keywords": [
     "node",
-    "delete",
+    "fs",
     "copy",
     "move",
     "directory",
-    "mkdir"
+    "mkdir",
+    "remove"
   ],
   "author": "xroah",
   "license": "MIT",
@@ -25,7 +26,13 @@
   },
   "homepage": "https://github.com/xroah/fs-dir#readme",
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0"
-  }
+    "jasmine": "^3.5.0",
+    "jasmine-core": "^3.5.0"
+  },
+  "dependencies": {
+    "at-least-node": "^1.0.0"
+  },
+  "files": [
+      "lib"
+  ]
 }
