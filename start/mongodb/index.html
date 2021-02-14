@@ -50,17 +50,14 @@
                 <td>gender</td>
             </tr>
         </thead>
-        <tbody id="userList">
-
-        </tbody>
+        <tbody id="userList"></tbody>
     </table>
     <script>
         function fetchData() {
             fetch("/users", {
                 method: "get"
-            }).then(res => {
-                return res.json()
-            }).then(ret => {
+            }).then(res => res.json())
+            .then(ret => {
                 const data = ret.data
                 let html = data.map(item => (
                     `
@@ -78,7 +75,8 @@
 
         document.getElementById("submit").addEventListener("click", () => {
             const form = document.forms.form
-            const username = form.username.value
+            const usernameEl = form.username
+            const username = usernameEl.value
             const gender = form.gender.value
 
             if (!username || !gender) {
@@ -86,7 +84,6 @@
             }
             
             form.username.value = ""
-            form.gender.value = ""
             
             fetch("/save_user", {
                 method: "post",
@@ -94,9 +91,8 @@
                     username,
                     gender
                 })
-            }).then(res => {
-                return res.json()
-            }).then(ret => {
+            }).then(res =>res.json())
+            .then(ret => {
                 console.log(ret)
                 fetchData()
             })
