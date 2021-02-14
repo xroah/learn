@@ -85,6 +85,9 @@
                 return
             }
             
+            form.username.value = ""
+            form.gender.value = ""
+            
             fetch("/save_user", {
                 method: "post",
                 body: JSON.stringify({
