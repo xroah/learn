@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            min-width: 600px;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        table td {
+            border: 1px solid #eee;
+        }
+
+        form div {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <form name="form">
+       <div>
+           <span>username:</span>
+           <input name="username" id="username">
+       </div> 
+       <div>
+           <span>gender:</span>
+           <label>
+                <input type="radio" value="female" name="gender">
+                female
+           </label>
+           <label>
+                <input type="radio" value="male" name="gender">
+                male
+           </label>
+       </div>
+       <div>
+            <button type="button" id="submit">submit</button>
+       </div>
+    </form>    
+    <table>
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>username</td>
+                <td>gender</td>
+            </tr>
+        </thead>
+        <tbody id="userList">
+
+        </tbody>
+    </table>
+    <script>
+        function fetchData() {
+            fetch("/users", {
+                method: "get"
+            }).then(res => {
+                return res.json()
+            }).then(ret => {
+                const data = ret.data
+                let html = data.map(item => (
+                    `
+                    <tr>
+                        <td>${item._id}</td>
+                        <td>${item.username}</td>
+                        <td>${item.gender}</td>
+                    </tr>
+                    `
+                ))
+
+                document.getElementById("userList").innerHTML = html.join("")
+            })
+        }
+
+        document.getElementById("submit").addEventListener("click", () => {
+            const form = document.forms.form
+            const username = form.username.value
+            const gender = form.gender.value
+
+            if (!username || !gender) {
+                return
+            }
+            
+            fetch("/save_user", {
+                method: "post",
+                body: JSON.stringify({
+                    username,
+                    gender
+                })
+            }).then(res => {
+                return res.json()
+            }).then(ret => {
+                console.log(ret)
+                fetchData()
+            })
+        })
+
+        fetchData()
+    </script>
+</body>
+</html>
