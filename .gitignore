@@ -1,2 +1,5 @@
 node_modules
 chat-server
+dist
+.idea
+__pycache__
