@@ -8,14 +8,21 @@ async def _start(websocket, path):
 
     await websocket.send("Hello")
 
-    async for msg in websocket:
-        print(f"{mark}{msg}{mark}")
+    try:
+        while True:
+            msg = await websocket.recv()
 
-        await websocket.send(f"received: {int(time.time())}")
+            print(f"{mark}{msg}{mark}")
+            await websocket.send(f"received: {int(time.time())}")
+    except websockets.ConnectionClosedError:
+        await websocket.close()
+        print("disconnected")
+    except Exception as e:
+        print("Error:", e.args)
 
 
-def start_server():
-    server = websockets.serve(_start, "localhost", 8888)
+def start_server(host="localhost"):
+    server = websockets.serve(_start, host, 8888)
 
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
