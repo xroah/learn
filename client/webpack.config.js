@@ -7,7 +7,7 @@ module.exports = env => {
     const isDev = mode === "development"
     const devPlugins = []
     let devServer
-
+    
     process.env.NODE_ENV = process.env.BABEL_ENV = mode
 
     if (isDev) {
@@ -32,7 +32,7 @@ module.exports = env => {
         resolve: {
             extensions: [".js", ".jsx"]
         },
-        externals: {
+        externals: isDev ? undefined : {
             "react": "React",
             "react-dom": "ReactDOM",
             "react-router-dom": "ReactRouterDOM"
@@ -59,12 +59,7 @@ module.exports = env => {
                 template: "./index.html",
                 hash: true,
                 inject: "body",
-                reactCDN: isDev ? 
-                `
-                <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
-                <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-                <script crossorigin src="https://unpkg.com/react-router-dom@5.2.0/umd/react-router-dom.js"></script>
-                ` :
+                reactCDN: isDev ? "" :
                 `
                 <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
                 <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
