@@ -1,24 +1,14 @@
 import React from "react"
+import socket from "../commons/socket"
 
-function createSocket() {
-    const ws = new WebSocket("ws://localhost:8888")
+let username = location.search.split("username=")[1]
 
-    ws.onmessage = evt => {
-        const msg = evt.data
-
-        console.log("receive: ", msg)
-    }
-    ws.onclose = evt => {
-        closed
-    }
-
-    return ws
-}
+socket.setUsername(username)
 
 function createRTCPeerConnection() {
     const pc = new RTCPeerConnection({
         iceServers: [{
-            urls: "stun:192.168.238.132:3478",
+            urls: "stun:stun.voipbuster.com:3478",
             username: "test",
             credential: "123456"
         }]
@@ -37,6 +27,20 @@ function createRTCPeerConnection() {
         console.log(evt, "negotiationneeded")
     }
 
+    socket.initSocket(
+        "ws://localhost:8888",
+        {
+            onmessage(evt) {
+                console.log("received:", evt.data)
+            },
+            onclose() {
+                console.log("=====closed=====")
+            },
+            onopen() {
+                socket.send("test")
+            }
+        }
+    )
 
     return pc
 }

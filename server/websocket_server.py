@@ -1,6 +1,9 @@
 import asyncio
 import websockets
 import time
+import json
+
+users = set()
 
 
 async def _start(websocket, path):
@@ -11,8 +14,9 @@ async def _start(websocket, path):
     try:
         while True:
             msg = await websocket.recv()
+            msg = json.loads(msg)
 
-            print(f"{mark}{msg}{mark}")
+            print(f"{mark}username={msg['username']}, data={msg['data']}")
             await websocket.send(f"received: {int(time.time())}")
     except websockets.ConnectionClosedError:
         await websocket.close()
