@@ -9,7 +9,7 @@ function createRTCPeerConnection() {
             credential: "123456"
         }]
     })
-    
+
     pc.onicecandidate = evt => {
         console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     }
@@ -23,27 +23,16 @@ function createRTCPeerConnection() {
         console.log(evt, "negotiationneeded")
     }
 
-    socket.initSocket(
-        "ws://localhost:8888",
-        {
-            onmessage(evt) {
-                console.log("received:", evt.data)
-            },
-            onclose() {
-                console.log("=====closed=====")
-            },
-            onopen() {
-                socket.send("test")
-            }
-        }
-    )
-
     return pc
 }
 
 export default class Main extends React.Component {
+    msgContainer = React.createRef()
     videoRef = React.createRef()
     pc = createRTCPeerConnection()
+    state = {
+        message: ""
+    }
 
     componentDidMount() {
         /* navigator.mediaDevices.getDisplayMedia({
@@ -57,12 +46,53 @@ export default class Main extends React.Component {
         }).catch(e => {
             console.log(e)
         }) */
+        this.initSocket()
+    }
+
+    handleOnMessage = evt => {
+
+    }
+
+    handleSend() {
+        const {message} = this.state
+
+        if (message) {
+            socket.send(message)
+            this.setState({
+                message: ""
+            })
+        }
+
+    }
+
+    handleMessageChange = evt => {
+        this.setState({
+            message: evt.target.value
+        })
+    }
+
+    initSocket = () => {
+        socket.init(
+            "ws://localhost:8888",
+            {
+                onmessage: this.handleOnMessage,
+                onclose() {
+                    console.log("=====closed=====")
+                }
+            }
+        )
     }
 
     render() {
         return (
             <>
                 <video ref={this.videoRef} autoPlay width={600}></video>
+                <div ref={this.msgContainer}></div>
+                <input
+                    className="form-control"
+                    value={this.state.message}
+                    onChange={this.handleMessageChange} />
+                <button className="btn btn-primary">Send</button>
             </>
         )
     }
