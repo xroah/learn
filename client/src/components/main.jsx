@@ -1,10 +1,6 @@
 import React from "react"
 import socket from "../commons/socket"
 
-let username = location.search.split("username=")[1]
-
-socket.setUsername(username)
-
 function createRTCPeerConnection() {
     const pc = new RTCPeerConnection({
         iceServers: [{
@@ -50,7 +46,7 @@ export default class Main extends React.Component {
     pc = createRTCPeerConnection()
 
     componentDidMount() {
-        navigator.mediaDevices.getDisplayMedia({
+        /* navigator.mediaDevices.getDisplayMedia({
             video: true,
             audio: false
         }).then(stream => {
@@ -60,7 +56,7 @@ export default class Main extends React.Component {
             stream.getTracks().forEach(track => this.pc.addTrack(track))
         }).catch(e => {
             console.log(e)
-        })
+        }) */
     }
 
     render() {

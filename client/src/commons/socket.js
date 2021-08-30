@@ -1,10 +1,6 @@
-let username = ''
 let ws = null
 
 export default {
-    setUsername(name){
-        username = name
-    },
     initSocket(url, options = {}) {
         this.close()
 
@@ -20,10 +16,7 @@ export default {
             return
         }
 
-        ws.send(JSON.stringify({
-            data,
-            username
-        }))
+        ws.send(JSON.stringify(data))
     },
     close() {
         if (!ws) {

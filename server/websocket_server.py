@@ -6,18 +6,42 @@ import json
 users = set()
 
 
+def get_cookie(websocket, key):
+    cookies = websocket.request_headers.get("Cookie", "").split(";")
+    ret = dict()
+
+    for cookie in cookies:
+        if cookie:
+            cookie = cookie.strip()
+            item = cookie.split("=")
+            ret[item[0]] = item[1]
+
+    return ret.get(key, "")
+
+
 async def _start(websocket, path):
     mark = "*" * 20
 
-    await websocket.send("Hello")
+    await websocket.send(
+        json.dumps({"code": 0, "data": "Hello"})
+    )
 
     try:
         while True:
             msg = await websocket.recv()
-            msg = json.loads(msg)
+            username = get_cookie(websocket, "username")
 
-            print(f"{mark}username={msg['username']}, data={msg['data']}")
-            await websocket.send(f"received: {int(time.time())}")
+            if not username:
+                await websocket.send(
+                    json.dumps({"code": -1})
+                )
+            else:
+                await websocket.send(json.dumps({
+                    "code": 0,
+                    "data": f"received: {int(time.time())}"
+                }))
+
+
     except websockets.ConnectionClosedError:
         await websocket.close()
         print("disconnected")
