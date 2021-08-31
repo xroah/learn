@@ -11,12 +11,16 @@ export default {
 
         return ws
     },
-    send(data) {
+    send(from, to, data) {
         if (!ws || ws.readyState !== ws.OPEN) {
             return
         }
 
-        ws.send(JSON.stringify(data))
+        ws.send(JSON.stringify({
+            from,
+            to,
+            data
+        }))
     },
     close() {
         if (!ws) {

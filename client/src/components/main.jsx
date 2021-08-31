@@ -31,7 +31,9 @@ export default class Main extends React.Component {
     videoRef = React.createRef()
     pc = createRTCPeerConnection()
     state = {
-        message: ""
+        message: "",
+        from: "",
+        to: ""
     }
 
     componentDidMount() {
@@ -50,24 +52,55 @@ export default class Main extends React.Component {
     }
 
     handleOnMessage = evt => {
+        const data = JSON.parse(evt.data)
 
+        if (data.code !== 0) {
+            return
+        }
+
+        const message = data.data
+
+        if (message.from) {
+            this.addMessageItem(message.from, message.data, "green")
+        }
     }
 
-    handleSend() {
-        const {message} = this.state
+
+    handleSend = () => {
+        const {
+            from,
+            to,
+            message
+        } = this.state
 
         if (message) {
-            socket.send(message)
+            socket.send(from, to, message)
             this.setState({
                 message: ""
             })
+
+            this.addMessageItem("me", message, "red")
         }
 
     }
 
-    handleMessageChange = evt => {
+    addMessageItem(user, message, color) {
+        const container = this.msgContainer.current
+        const item = document.createElement("div")
+
+        item.innerHTML = `
+            <p style="color: ${color}">${user}:</p>
+            <p style="color: ${color}">${message}</p>
+        `
+
+        container.append(item)
+    }
+
+    handleChange = evt => {
+        const name = evt.target.name
+
         this.setState({
-            message: evt.target.value
+            [name]: evt.target.value
         })
     }
 
@@ -84,15 +117,32 @@ export default class Main extends React.Component {
     }
 
     render() {
+        const {
+            from,
+            to,
+            message
+        } = this.state
+
         return (
             <>
-                <video ref={this.videoRef} autoPlay width={600}></video>
-                <div ref={this.msgContainer}></div>
+                <video ref={this.videoRef} autoPlay width={600}/>
+                <div ref={this.msgContainer}/>
                 <input
+                    value={from}
+                    name="from"
+                    placeholder="from"
+                    onChange={this.handleChange}/>
+                <input
+                    value={to}
+                    name="to"
+                    placeholder="to"
+                    onChange={this.handleChange}/>
+                <textarea
                     className="form-control"
-                    value={this.state.message}
-                    onChange={this.handleMessageChange} />
-                <button className="btn btn-primary">Send</button>
+                    name="message"
+                    value={message}
+                    onChange={this.handleChange}/>
+                <button className="btn btn-primary" onClick={this.handleSend}>Send</button>
             </>
         )
     }

@@ -1,9 +1,9 @@
 import asyncio
 import websockets
-import time
+from datetime import datetime
 import json
 
-users = set()
+users = dict()
 
 
 def get_cookie(websocket, key):
@@ -19,34 +19,80 @@ def get_cookie(websocket, key):
     return ret.get(key, "")
 
 
-async def _start(websocket, path):
-    mark = "*" * 20
+def get_current_time():
+    now = datetime.now()
 
+    return f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
+
+
+async def send(websocket, code, data):
     await websocket.send(
-        json.dumps({"code": 0, "data": "Hello"})
+        json.dumps({
+            "code": code,
+            "data": data
+        })
     )
 
+
+async def send_message(websocket, f, to, data):
+    if not to:
+        await send(websocket, -2, "no receiver")
+    else:
+        target = users.get(to)
+
+        await send(
+            target,
+            0,
+            {
+                "from": f,
+                "to": to,
+                "data": data
+            }
+        )
+
+
+async def handle_receive(websocket):
     try:
         while True:
             msg = await websocket.recv()
-            username = get_cookie(websocket, "username")
+            message = json.loads(msg)
 
-            if not username:
-                await websocket.send(
-                    json.dumps({"code": -1})
-                )
-            else:
-                await websocket.send(json.dumps({
-                    "code": 0,
-                    "data": f"received: {int(time.time())}"
-                }))
-
-
+            await send_message(
+                websocket,
+                message.get("from", ""),
+                message.get("to", ""),
+                message.get("data", "")
+            )
     except websockets.ConnectionClosedError:
-        await websocket.close()
         print("disconnected")
     except Exception as e:
-        print("Error:", e.args)
+        print("Error:", e)
+    finally:
+        await websocket.close()
+        try:
+            username = getattr(websocket, "username")
+        except AttributeError:
+            pass
+        else:
+            if username in users:
+                del users[username]
+        print(f"{get_current_time()}: Websocket closeed")
+
+
+async def _start(websocket, path):
+    print(f"{get_current_time()}: connected")
+
+    username = get_cookie(websocket, "username")
+
+    if not username:
+        await send(websocket, -1, "unauthenticated")
+    else:
+        await send(websocket, 0, "hello")
+
+        websocket.username = username
+        users[username] = websocket
+
+    await handle_receive(websocket)
 
 
 def start_server(host="localhost"):
