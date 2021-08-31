@@ -51,6 +51,18 @@ async def send_message(websocket, f, to, data):
         )
 
 
+async def close(websocket):
+    await websocket.close()
+    try:
+        username = getattr(websocket, "username")
+    except AttributeError:
+        pass
+    else:
+        if username in users:
+            del users[username]
+    print(f"{get_current_time()}: Websocket closeed")
+
+
 async def handle_receive(websocket):
     try:
         while True:
@@ -68,15 +80,7 @@ async def handle_receive(websocket):
     except Exception as e:
         print("Error:", e)
     finally:
-        await websocket.close()
-        try:
-            username = getattr(websocket, "username")
-        except AttributeError:
-            pass
-        else:
-            if username in users:
-                del users[username]
-        print(f"{get_current_time()}: Websocket closeed")
+        await close(websocket)
 
 
 async def _start(websocket, path):
