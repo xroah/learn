@@ -15,7 +15,7 @@ export default class Main extends React.Component {
     createRTCPeerConnection() {
         const pc = new RTCPeerConnection({
             iceServers: [{
-                urls: "stun:stun.stunprotocol.org"
+                urls: "stun:stun.voipbuster.com:3478"
             }]
         })
 
@@ -75,7 +75,7 @@ export default class Main extends React.Component {
             ))
     }
 
-    handleVideoAnwser(data) {
+    handleVideoAnswer(data) {
         this.pc.setRemoteDescription(data.sdp).catch(e => console.log(e))
     }
 
@@ -103,8 +103,8 @@ export default class Main extends React.Component {
                 case "video-offer":
                     this.handleVideoOffer(data)
                     break
-                case "video-anwser":
-                    this.handleVideoAnwser(data)
+                case "video-answer":
+                    this.handleVideoAnswer(data)
                     break
                 case "new-ice-candidate":
                     this.handleNewCandidate(data)
@@ -149,7 +149,8 @@ export default class Main extends React.Component {
             if (this.videoRef.current) {
                 this.videoRef.current.srcObject = stream
             }
-            stream.getTracks().forEach(track => this.pc.addTrack(track))
+            console.log(stream)
+            stream.getTracks().forEach(track => this.pc.addTrack(track, stream))
         }).catch(e => {
             console.log(e)
         })
@@ -225,7 +226,7 @@ export default class Main extends React.Component {
 
         return (
             <>
-                <video ref={this.videoRef} autoPlay width={600}/>
+                <video ref={this.videoRef} controls autoPlay width={600}/>
                 <div ref={this.msgContainer}/>
                 <input
                     value={to}
