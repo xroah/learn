@@ -1,67 +1,115 @@
 import React from "react"
 import socket from "../commons/socket"
 
-function createRTCPeerConnection() {
-    const pc = new RTCPeerConnection({
-        iceServers: [{
-            urls: "stun:stun.voipbuster.com:3478",
-            username: "test",
-            credential: "123456"
-        }]
-    })
-
-    pc.onicecandidate = evt => {
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    }
-    pc.onconnectionstatechange = evt => {
-        console.log(evt, pc.connectionState)
-    }
-    pc.ontrack = evt => {
-        console.log(evt, "ontrack")
-    }
-    pc.onnegotiationneeded = evt => {
-        console.log(evt, "negotiationneeded")
-    }
-
-    return pc
-}
-
 export default class Main extends React.Component {
     msgContainer = React.createRef()
     videoRef = React.createRef()
-    pc = createRTCPeerConnection()
+    pc = null
     state = {
         message: "",
         from: "",
-        to: ""
+        to: "",
+        hasLogin: false
     }
 
-    componentDidMount() {
-        /* navigator.mediaDevices.getDisplayMedia({
-            video: true,
-            audio: false
-        }).then(stream => {
-            if (this.videoRef.current) {
-                this.videoRef.current.srcObject = stream
+    createRTCPeerConnection() {
+        const pc = new RTCPeerConnection({
+            iceServers: [{
+                urls: "stun:stun.stunprotocol.org"
+            }]
+        })
+
+        pc.onicecandidate = evt => {
+            const {from, to} = this.state
+            const {candidate} = evt
+
+            if (candidate) {
+                socket.send(from, to, {
+                    type: "new-ice-candidate",
+                    candidate
+                })
             }
-            stream.getTracks().forEach(track => this.pc.addTrack(track))
-        }).catch(e => {
-            console.log(e)
-        }) */
-        this.initSocket()
+
+            console.log("onCandidate:", evt)
+        }
+        pc.onconnectionstatechange = evt => {
+
+        }
+        pc.ontrack = evt => {
+            console.log("onTrack", evt)
+            this.videoRef.current.srcObject = evt.streams[0]
+        }
+        pc.onnegotiationneeded = evt => {
+            const {
+                from,
+                to
+            } = this.state
+
+            this.pc.createOffer()
+                .then(offer => this.pc.setLocalDescription(offer))
+                .then(() => socket.send(from, to, {
+                    type: "video-offer",
+                    sdp: this.pc.localDescription
+                }))
+
+            console.log("onNegotiationNeed:", evt)
+        }
+
+        return pc
+    }
+
+    handleVideoOffer(data) {
+        const {from} = this.state
+        this.pc = this.createRTCPeerConnection()
+
+        this.pc.setRemoteDescription(data.sdp)
+            .then(() => this.pc.createAnswer())
+            .then(answer => this.pc.setLocalDescription(answer))
+            .then(() => socket.send(
+                from,
+                data.from,
+                {
+                    type: "video-answer",
+                    sdp: this.pc.localDescription
+                }
+            ))
+    }
+
+    handleVideoAnwser(data) {
+        this.pc.setRemoteDescription(data.sdp).catch(e => console.log(e))
+    }
+
+    handleNewCandidate(data) {
+        const newCandidate = new RTCIceCandidate(data.candidate)
+
+        this.pc.addIceCandidate(newCandidate)
+            .catch(e => console.log(e))
     }
 
     handleOnMessage = evt => {
-        const data = JSON.parse(evt.data)
+        const received = JSON.parse(evt.data)
 
-        if (data.code !== 0) {
+        if (received.code !== 0) {
             return
         }
 
-        const message = data.data
+        const data = received.data
 
-        if (message.from) {
-            this.addMessageItem(message.from, message.data, "green")
+        if (data.from) {
+            switch (data.type) {
+                case "message":
+                    this.addMessageItem(data.from, data.message, "green")
+                    break
+                case "video-offer":
+                    this.handleVideoOffer(data)
+                    break
+                case "video-anwser":
+                    this.handleVideoAnwser(data)
+                    break
+                case "new-ice-candidate":
+                    this.handleNewCandidate(data)
+                    break
+            }
         }
     }
 
@@ -74,7 +122,10 @@ export default class Main extends React.Component {
         } = this.state
 
         if (message) {
-            socket.send(from, to, message)
+            socket.send(from, to, {
+                type: "message",
+                message
+            })
             this.setState({
                 message: ""
             })
@@ -82,6 +133,26 @@ export default class Main extends React.Component {
             this.addMessageItem("me", message, "red")
         }
 
+    }
+
+    handleShare = () => {
+        if (this.pc) {
+            return
+        }
+
+        this.pc = this.createRTCPeerConnection()
+
+        navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: false
+        }).then(stream => {
+            if (this.videoRef.current) {
+                this.videoRef.current.srcObject = stream
+            }
+            stream.getTracks().forEach(track => this.pc.addTrack(track))
+        }).catch(e => {
+            console.log(e)
+        })
     }
 
     addMessageItem(user, message, color) {
@@ -106,7 +177,7 @@ export default class Main extends React.Component {
 
     initSocket = () => {
         socket.init(
-            "ws://localhost:8888",
+            `ws://localhost:8888/${this.state.from}`,
             {
                 onmessage: this.handleOnMessage,
                 onclose() {
@@ -116,22 +187,46 @@ export default class Main extends React.Component {
         )
     }
 
+    handleLogin = () => {
+        const {from} = this.state
+
+        if (!from) {
+            return
+        }
+
+        this.setState({
+            hasLogin: true
+        })
+
+        this.initSocket()
+    }
+
     render() {
         const {
             from,
             to,
-            message
+            message,
+            hasLogin
         } = this.state
+
+        if (!hasLogin) {
+            return (
+                <>
+                    <input
+                        value={from}
+                        name="from"
+                        placeholder="username"
+                        className="form-control"
+                        onChange={this.handleChange}/>
+                    <button className="btn btn-secondary" onClick={this.handleLogin}>Login</button>
+                </>
+            )
+        }
 
         return (
             <>
                 <video ref={this.videoRef} autoPlay width={600}/>
                 <div ref={this.msgContainer}/>
-                <input
-                    value={from}
-                    name="from"
-                    placeholder="from"
-                    onChange={this.handleChange}/>
                 <input
                     value={to}
                     name="to"
@@ -143,6 +238,7 @@ export default class Main extends React.Component {
                     value={message}
                     onChange={this.handleChange}/>
                 <button className="btn btn-primary" onClick={this.handleSend}>Send</button>
+                <button className="btn btn-secondary" onClick={this.handleShare}>Share screen</button>
             </>
         )
     }

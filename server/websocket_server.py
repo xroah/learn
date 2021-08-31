@@ -6,19 +6,6 @@ import json
 users = dict()
 
 
-def get_cookie(websocket, key):
-    cookies = websocket.request_headers.get("Cookie", "").split(";")
-    ret = dict()
-
-    for cookie in cookies:
-        if cookie:
-            cookie = cookie.strip()
-            item = cookie.split("=")
-            ret[item[0]] = item[1]
-
-    return ret.get(key, "")
-
-
 def get_current_time():
     now = datetime.now()
 
@@ -46,7 +33,7 @@ async def send_message(websocket, f, to, data):
             {
                 "from": f,
                 "to": to,
-                "data": data
+                **data
             }
         )
 
@@ -60,7 +47,7 @@ async def close(websocket):
     else:
         if username in users:
             del users[username]
-    print(f"{get_current_time()}: Websocket closeed")
+    print(f"{get_current_time()}: Websocket closed")
 
 
 async def handle_receive(websocket):
@@ -73,7 +60,7 @@ async def handle_receive(websocket):
                 websocket,
                 message.get("from", ""),
                 message.get("to", ""),
-                message.get("data", "")
+                message.get("data", {})
             )
     except websockets.ConnectionClosedError:
         print("disconnected")
@@ -84,9 +71,8 @@ async def handle_receive(websocket):
 
 
 async def _start(websocket, path):
+    username = path.replace("/", "")
     print(f"{get_current_time()}: connected")
-
-    username = get_cookie(websocket, "username")
 
     if not username:
         await send(websocket, -1, "unauthenticated")
