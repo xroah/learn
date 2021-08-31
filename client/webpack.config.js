@@ -13,10 +13,8 @@ module.exports = env => {
     if (isDev) {
         devServer = {
             port: 8000,
-            // open: true,
-            hot: true,
-            https: true,
-            host: "0.0.0.0"
+            open: true,
+            hot: true
         }
 
         devPlugins.push(
