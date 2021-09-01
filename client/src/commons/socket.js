@@ -1,7 +1,7 @@
 let ws = null
 
 export default {
-    init(url, options = {}) {
+    connect(url, options = {}) {
         this.close()
 
         ws = new WebSocket(url)

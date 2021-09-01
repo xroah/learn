@@ -16,6 +16,9 @@ export default class Main extends React.Component {
         const pc = new RTCPeerConnection({
             iceServers: [{
                 urls: "stun:stun.voipbuster.com:3478"
+                /*urls: "turn:rtctest.channelsoft.com:3478",
+                username: "test001",
+                credential: "test001",*/
             }]
         })
 
@@ -33,7 +36,7 @@ export default class Main extends React.Component {
             console.log("onCandidate:", evt)
         }
         pc.onconnectionstatechange = evt => {
-
+            console.log("connectionStateChange", evt)
         }
         pc.ontrack = evt => {
             console.log("onTrack", evt)
@@ -176,8 +179,8 @@ export default class Main extends React.Component {
         })
     }
 
-    initSocket = () => {
-        socket.init(
+    connectSocket = () => {
+        socket.connect(
             `ws://localhost:8888/${this.state.from}`,
             {
                 onmessage: this.handleOnMessage,
@@ -199,7 +202,7 @@ export default class Main extends React.Component {
             hasLogin: true
         })
 
-        this.initSocket()
+        this.connectSocket()
     }
 
     render() {
