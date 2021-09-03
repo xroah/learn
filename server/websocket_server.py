@@ -86,11 +86,11 @@ async def _start(websocket, path):
 
 
 def start_server(host="localhost"):
-    server = websockets.serve(_start, host, 8888)
+    server = websockets.serve(_start, host, 5678)
 
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
 
 
 if __name__ == "__main__":
-    start_server()
+    start_server("0.0.0.0")
