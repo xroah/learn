@@ -13,8 +13,16 @@ module.exports = env => {
     if (isDev) {
         devServer = {
             port: 8000,
-            open: true,
-            hot: true
+            // open: true,
+            https: true,
+            host: "0.0.0.0",
+            hot: true,
+            proxy: {
+                "/websocket": {
+                    target: "ws://localhost:5678",
+                    ws: true
+                }
+            }
         }
 
         devPlugins.push(

@@ -181,7 +181,7 @@ export default class Main extends React.Component {
 
     connectSocket = () => {
         socket.connect(
-            `ws://localhost:8888/${this.state.from}`,
+            `wss://${location.host}/websocket/${this.state.from}`,
             {
                 onmessage: this.handleOnMessage,
                 onclose() {
