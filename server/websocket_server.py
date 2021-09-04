@@ -13,12 +13,14 @@ def get_current_time():
 
 
 async def send(websocket, code, data):
-    await websocket.send(
-        json.dumps({
-            "code": code,
-            "data": data
-        })
-    )
+    res_data = json.dumps({
+        "code": code,
+        "data": data
+    })
+
+    await websocket.send(res_data)
+
+    print(f"{get_current_time()} sent: {res_data}")
 
 
 async def send_message(websocket, f, to, data):
@@ -47,7 +49,7 @@ async def close(websocket):
     else:
         if username in users:
             del users[username]
-    print(f"{get_current_time()}: Websocket closed")
+    print(f"{get_current_time()} Websocket closed")
 
 
 async def handle_receive(websocket):
@@ -56,6 +58,8 @@ async def handle_receive(websocket):
             msg = await websocket.recv()
             message = json.loads(msg)
 
+            print(f"{get_current_time()} received: {msg}")
+
             await send_message(
                 websocket,
                 message.get("from", ""),
@@ -63,7 +67,7 @@ async def handle_receive(websocket):
                 message.get("data", {})
             )
     except websockets.ConnectionClosedError:
-        print("disconnected")
+        print(f"{get_current_time()} disconnected")
     except Exception as e:
         print("Error:", e)
     finally:
@@ -72,7 +76,7 @@ async def handle_receive(websocket):
 
 async def _start(websocket, path):
     username = path.replace("/", "")
-    print(f"{get_current_time()}: connected")
+    print(f"{get_current_time()} connected")
 
     if not username:
         await send(websocket, -1, "unauthenticated")
@@ -90,6 +94,8 @@ def start_server(host="localhost"):
 
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
+
+    print(f"{get_current_time()} server started")
 
 
 if __name__ == "__main__":
