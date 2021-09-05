@@ -12,6 +12,12 @@ def get_current_time():
     return f'{now:%Y-%m-%d %H:%M:%S}'
 
 
+def log(msg, sign=""):
+    s = f" {sign}" if sign else ""
+
+    print(f"{get_current_time()}{s}: {msg}")
+
+
 async def send(websocket, code, data):
     res_data = json.dumps({
         "code": code,
@@ -20,7 +26,7 @@ async def send(websocket, code, data):
 
     await websocket.send(res_data)
 
-    print(f"{get_current_time()} sent: {res_data}")
+    log(res_data, "sent")
 
 
 async def send_message(websocket, f, to, data):
@@ -49,7 +55,7 @@ async def close(websocket):
     else:
         if username in users:
             del users[username]
-    print(f"{get_current_time()} Websocket closed")
+    log("Websocket closed")
 
 
 async def handle_receive(websocket):
@@ -67,9 +73,9 @@ async def handle_receive(websocket):
                 message.get("data", {})
             )
     except websockets.ConnectionClosedError:
-        print(f"{get_current_time()} disconnected")
+        log("disconnected")
     except Exception as e:
-        print("Error:", e)
+        log(f"Error {e}")
     finally:
         await close(websocket)
 
@@ -95,7 +101,7 @@ def start_server(host="localhost"):
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
 
-    print(f"{get_current_time()} server started")
+    log("server started")
 
 
 if __name__ == "__main__":
