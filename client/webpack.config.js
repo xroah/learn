@@ -47,8 +47,8 @@ module.exports = env => {
         },
         module: {
             rules: [{
-                test: /\.css$/,
-                use: [isDev && "style-loader", "css-loader"].filter(Boolean)
+                test: /\.s?css$/,
+                use: [isDev && "style-loader", "css-loader", "sass-loader"].filter(Boolean)
             }, {
                 test: /\.[jt]sx?$/,
                 use: {
