@@ -16,9 +16,6 @@ export default class Main extends React.Component {
         const pc = new RTCPeerConnection({
             iceServers: [{
                 urls: "stun:stun.voipbuster.com:3478"
-                /*urls: "turn:rtctest.channelsoft.com:3478",
-                username: "test001",
-                credential: "test001",*/
             }]
         })
 
@@ -32,8 +29,6 @@ export default class Main extends React.Component {
                     candidate
                 })
             }
-
-            console.log("onCandidate:", evt)
         }
         pc.onconnectionstatechange = evt => {
             console.log("connectionStateChange", evt)
@@ -54,8 +49,6 @@ export default class Main extends React.Component {
                     type: "video-offer",
                     sdp: this.pc.localDescription
                 }))
-
-            console.log("onNegotiationNeed:", evt)
         }
 
         return pc
@@ -209,40 +202,12 @@ export default class Main extends React.Component {
         const {
             from,
             to,
-            message,
-            hasLogin
+            message
         } = this.state
-
-        if (!hasLogin) {
-            return (
-                <>
-                    <input
-                        value={from}
-                        name="from"
-                        placeholder="username"
-                        className="form-control"
-                        onChange={this.handleChange}/>
-                    <button className="btn btn-secondary" onClick={this.handleLogin}>Login</button>
-                </>
-            )
-        }
 
         return (
             <>
                 <video ref={this.videoRef} controls autoPlay width={600}/>
-                <div ref={this.msgContainer}/>
-                <input
-                    value={to}
-                    name="to"
-                    placeholder="to"
-                    onChange={this.handleChange}/>
-                <textarea
-                    className="form-control"
-                    name="message"
-                    value={message}
-                    onChange={this.handleChange}/>
-                <button className="btn btn-primary" onClick={this.handleSend}>Send</button>
-                <button className="btn btn-secondary" onClick={this.handleShare}>Share screen</button>
             </>
         )
     }
