@@ -1,7 +1,14 @@
-let ws = null
+let ws: WebSocket | null = null
+
+interface Options {
+    onclose?: ((this: WebSocket, ev: CloseEvent) => any) | null;
+    onerror?: ((this: WebSocket, ev: Event) => any) | null;
+    onmessage?: ((this: WebSocket, ev: MessageEvent) => any) | null;
+    onopen?: ((this: WebSocket, ev: Event) => any) | null;
+}
 
 export default {
-    connect(url, options = {}) {
+    connect(url: string, options: Options = {}) {
         this.close()
 
         ws = new WebSocket(url)
@@ -11,7 +18,7 @@ export default {
 
         return ws
     },
-    send(from, to, data) {
+    send(from: string, to: string, data: any) {
         if (!ws || ws.readyState !== ws.OPEN) {
             return
         }

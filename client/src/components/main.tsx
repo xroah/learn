@@ -2,8 +2,8 @@ import React from "react"
 import socket from "../commons/socket"
 
 export default class Main extends React.Component {
-    msgContainer = React.createRef()
-    videoRef = React.createRef()
+    msgContainer = React.createRef<HTMLDivElement>()
+    videoRef = React.createRef<HTMLVideoElement>()
     pc = null
     state = {
         message: "",

@@ -34,11 +34,11 @@ module.exports = env => {
     return {
         mode,
         entry: {
-            index: "./src/index.jsx"
+            index: "./src/index.tsx"
         },
         devtool: "eval-source-map",
         resolve: {
-            extensions: [".js", ".jsx"]
+            extensions: [".js", ".jsx", ".ts", ".tsx"]
         },
         externals: isDev ? undefined : {
             "react": "React",
@@ -50,7 +50,7 @@ module.exports = env => {
                 test: /\.css$/,
                 use: [isDev && "style-loader", "css-loader"].filter(Boolean)
             }, {
-                test: /\.jsx?$/,
+                test: /\.[jt]sx?$/,
                 use: {
                     loader: "babel-loader",
                     options: {
