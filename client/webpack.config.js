@@ -17,6 +17,7 @@ module.exports = env => {
             https: true,
             host: "0.0.0.0",
             hot: true,
+            historyApiFallback: true,
             proxy: {
                 "/websocket": {
                     target: "ws://localhost:5678",
