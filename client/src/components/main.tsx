@@ -11,7 +11,7 @@ export default class Main extends React.Component {
         to: "",
         hasLogin: false
     }
-
+    
     createRTCPeerConnection() {
         const pc = new RTCPeerConnection({
             iceServers: [{
@@ -94,7 +94,6 @@ export default class Main extends React.Component {
         if (data.from) {
             switch (data.type) {
                 case "message":
-                    this.addMessageItem(data.from, data.message, "green")
                     break
                 case "video-offer":
                     this.handleVideoOffer(data)
@@ -125,8 +124,6 @@ export default class Main extends React.Component {
             this.setState({
                 message: ""
             })
-
-            this.addMessageItem("me", message, "red")
         }
 
     }
@@ -149,26 +146,6 @@ export default class Main extends React.Component {
             stream.getTracks().forEach(track => this.pc.addTrack(track, stream))
         }).catch(e => {
             console.log(e)
-        })
-    }
-
-    addMessageItem(user, message, color) {
-        const container = this.msgContainer.current
-        const item = document.createElement("div")
-
-        item.innerHTML = `
-            <p style="color: ${color}">${user}:</p>
-            <p style="color: ${color}">${message}</p>
-        `
-
-        container.append(item)
-    }
-
-    handleChange = evt => {
-        const name = evt.target.name
-
-        this.setState({
-            [name]: evt.target.value
         })
     }
 
@@ -199,16 +176,6 @@ export default class Main extends React.Component {
     }
 
     render() {
-        const {
-            from,
-            to,
-            message
-        } = this.state
-
-        return (
-            <>
-                <video ref={this.videoRef} controls autoPlay width={600}/>
-            </>
-        )
+        return null
     }
 }
