@@ -20,7 +20,10 @@ module.exports = env => {
             proxy: {
                 "/websocket": {
                     target: "ws://localhost:5678",
-                    ws: true
+                    ws: true,
+                    pathRewrite: {
+                        "^/websocket/": "/"
+                    }
                 }
             }
         }
