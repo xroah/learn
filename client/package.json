@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --env dev"
+    "start": "ts-node ./config/dev.ts",
+    "build": "ts-node ./config/build.ts"
   },
   "author": "",
   "license": "MIT",
@@ -15,19 +16,21 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.0-rc.5",
+    "@types/mini-css-extract-plugin": "^2.2.0",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.1.8",
+    "@types/webpack-dev-server": "^4.1.0",
     "babel-loader": "^8.2.2",
     "css-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^2.3.0",
     "react-refresh": "^0.10.0",
     "sass": "^1.39.0",
     "sass-loader": "^12.1.0",
     "style-loader": "^3.2.1",
     "typescript": "^4.4.2",
     "webpack": "^5.51.1",
-    "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.0.0"
   },
   "dependencies": {
