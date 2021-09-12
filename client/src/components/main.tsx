@@ -4,7 +4,7 @@ import socket from "../commons/socket"
 export default class Main extends React.Component {
     msgContainer = React.createRef<HTMLDivElement>()
     videoRef = React.createRef<HTMLVideoElement>()
-    pc = null
+/*     pc = null
     state = {
         message: "",
         from: "",
@@ -173,7 +173,7 @@ export default class Main extends React.Component {
         })
 
         this.connectSocket()
-    }
+    } */
 
     render() {
         return null
