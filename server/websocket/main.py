@@ -1,8 +1,9 @@
-import asyncio
-import websockets
 from datetime import datetime
+from fastapi import FastAPI, WebSocket
 import json
+from typing import Any
 
+websocket_app = FastAPI()
 users = dict()
 
 
@@ -12,24 +13,24 @@ def get_current_time():
     return f'{now:%Y-%m-%d %H:%M:%S}'
 
 
-def log(msg, sign=""):
+def log(msg: str, sign: str=""):
     s = f" {sign}" if sign else ""
 
     print(f"{get_current_time()}{s}: {msg}")
 
 
-async def send(websocket, code, data):
+async def send(websocket: WebSocket, code: int, data: Any):
     res_data = json.dumps({
         "code": code,
         "data": data
     })
 
-    await websocket.send(res_data)
+    await websocket.send_text(res_data)
 
     log(res_data, "sent")
 
 
-async def send_message(websocket, f, to, data):
+async def send_message(websocket: WebSocket, f, to: str, data: Any):
     if not to:
         await send(websocket, -2, "no receiver")
     else:
@@ -46,8 +47,8 @@ async def send_message(websocket, f, to, data):
         )
 
 
-async def close(websocket):
-    await websocket.close()
+async def close(websocket: WebSocket, code: int = 0):
+    await websocket.close(code)
     try:
         username = getattr(websocket, "username")
     except AttributeError:
@@ -58,10 +59,10 @@ async def close(websocket):
     log("Websocket closed")
 
 
-async def handle_receive(websocket):
+async def handle_receive(websocket: WebSocket):
     try:
         while True:
-            msg = await websocket.recv()
+            msg = await websocket.receive_text()
             message = json.loads(msg)
 
             print(f"{get_current_time()} received: {msg}")
@@ -72,37 +73,22 @@ async def handle_receive(websocket):
                 message.get("to", ""),
                 message.get("data", {})
             )
-    except websockets.ConnectionClosedError:
-        log("disconnected")
     except Exception as e:
         log(f"Error {e}")
     finally:
         await close(websocket)
 
 
-async def _start(websocket, path):
-    username = path.replace("/", "")
+@websocket_app.websocket("/{username}")
+async def start(websocket: WebSocket, username: str):
     print(f"{get_current_time()} connected")
 
     if not username:
         await send(websocket, -1, "unauthenticated")
     else:
-        await send(websocket, 0, "hello")
+        await websocket.accept()
 
         websocket.username = username
         users[username] = websocket
 
     await handle_receive(websocket)
-
-
-def start_server(host="localhost"):
-    server = websockets.serve(_start, host, 5678)
-
-    asyncio.get_event_loop().run_until_complete(server)
-    asyncio.get_event_loop().run_forever()
-
-    log("server started")
-
-
-if __name__ == "__main__":
-    start_server("0.0.0.0")
