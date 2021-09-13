@@ -14,10 +14,7 @@ function startServer() {
         proxy: {
             "/websocket": {
                 target: "ws://localhost:5678",
-                ws: true,
-                pathRewrite: {
-                    "^/websocket/": "/"
-                }
+                ws: true
             }
         }
     }
