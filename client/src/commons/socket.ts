@@ -1,10 +1,10 @@
 let ws: WebSocket | null = null
 
 interface Options {
-    onclose?: ((this: WebSocket, ev: CloseEvent) => any) | null;
-    onerror?: ((this: WebSocket, ev: Event) => any) | null;
-    onmessage?: ((this: WebSocket, ev: MessageEvent) => any) | null;
-    onopen?: ((this: WebSocket, ev: Event) => any) | null;
+    onclose?: ((this: WebSocket, ev: CloseEvent) => any)
+    onerror?: ((this: WebSocket, ev: Event) => any)
+    onmessage?: ((this: WebSocket, ev: MessageEvent) => any)
+    onopen?: ((this: WebSocket, ev: Event) => any)
 }
 
 export default {
@@ -12,9 +12,9 @@ export default {
         this.close()
 
         ws = new WebSocket(url)
-        ws.onmessage = options.onmessage
-        ws.onclose = options.onclose
-        ws.onopen = options.onopen
+        ws.onmessage = options.onmessage || null
+        ws.onclose = options.onclose || null
+        ws.onopen = options.onopen || null
 
         return ws
     },
