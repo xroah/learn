@@ -8,3 +8,4 @@ def main(res: Response):
     res.headers["Content-Type"] = "text/html"
 
     return "Hello world"
+
