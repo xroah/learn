@@ -41,10 +41,7 @@ export default (env: any) => {
        proxy: {
             "/websocket": {
                 target: "ws://localhost:5678",
-                ws: true,
-                pathRewrite: {
-                    "^/websocket/": "/"
-                }
+                ws: true
             }
        }
    }
