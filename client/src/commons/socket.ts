@@ -5,6 +5,7 @@ interface Options {
     onerror?: ((this: WebSocket, ev: Event) => any)
     onmessage?: ((this: WebSocket, ev: MessageEvent) => any)
     onopen?: ((this: WebSocket, ev: Event) => any)
+    reconnectOnError?: boolean
 }
 
 export default {
@@ -15,6 +16,17 @@ export default {
         ws.onmessage = options.onmessage || null
         ws.onclose = options.onclose || null
         ws.onopen = options.onopen || null
+        ws.onerror = (ev: Event) => {
+            this.close()
+
+            if (options.reconnectOnError) {
+                this.connect(url, options)
+            }
+
+            if (options.onerror) {
+                options.onerror.call(ws!, ev)
+            }
+        }
 
         return ws
     },
