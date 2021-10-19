@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/xroah/fs-dir#readme",
   "devDependencies": {
-    "jasmine": "^3.5.0",
-    "jasmine-core": "^3.5.0",
-    "jasmine-spec-reporter": "^5.0.1"
+    "jasmine": "^3.10.0",
+    "jasmine-core": "^3.10.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "nyc": "^15.1.0",
+    "typescript": "^4.4.4"
   },
-  "dependencies": {
-    "at-least-node": "^1.0.0"
-  },
+  "dependencies": {},
   "files": [
     "lib"
   ]
