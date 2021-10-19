@@ -1,2 +1,2 @@
-# fs-fs
+# fs-cp
 copy files or directories for nodejs
