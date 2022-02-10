@@ -6,3 +6,4 @@ node_modules
 chat-server
 dist
 .idea
+.spyproject
