@@ -1,0 +1,74 @@
+$default_color: #007bff;
+$default_background_color: #fff;
+$default_border_color: #dee2e6;
+$hover_color: #0056b3;
+$hover_background_color: #e9ecef;
+$hover_border_color: $default_border_color;
+$disabled_color: #6c757d;
+$disabled_background_color: #f3f3f3;
+$disabled_border_color: $default_border_color;
+$active_color: #fff;
+$active_border_color: #007bff;
+$active_background_color: $active_border_color;
+@mixin color($color, $border_color, $bg_color) {
+    color: $color;
+    border-color: $border_color;
+    background-color: $bg_color;
+}
+
+.r-pagination {
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    list-style: none;
+    font-size: 14px;
+    &.r-pagination-left {
+        text-align: left !important;
+    }
+    &.r-pagination-right {
+        text-align: right !important;
+    }
+    &.r-pagination-center {
+        text-align: center !important;
+    }
+    > li {
+        display: inline-block;
+    }
+    .r-pagination-link,
+    .r-pagination-ellipsis {
+        display: inline-block;
+        padding: 6px 12px;
+        border: 1px solid;
+        @include color($default_color, $default_border_color, $default_background_color);
+        text-decoration: none;
+    }
+    .r-pagination-ellipsis {
+        cursor: not-allowed;
+    }
+    .r-pagination-item {
+        ~ li {
+            margin-left: -1px;
+        }
+        .r-pagination-link {
+            &:hover {
+                color: $hover_color;
+                border-color: $hover_border_color;
+                background-color: $hover_background_color;
+            }
+        }
+        &.r-pagination-disabled .r-pagination-link {
+            &,
+            &:hover {
+                @include color($disabled_color, $disabled_border_color, $disabled_background_color);
+                cursor: not-allowed;
+            }
+        }
+        &.r-pagination-active .r-pagination-link {
+            &,
+            &:hover {
+                @include color($active_color, $active_border_color, $active_background_color);
+                cursor: default;
+            }
+        }
+    }
+}

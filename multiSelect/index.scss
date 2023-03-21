@@ -1,0 +1,244 @@
+$color: #40a9ff;
+$disabled_color: #d6d6d6;
+$default_text_color: #333;
+$disabled_text_color: #999;
+$white: #fff;
+$border_color: #ccc;
+@mixin ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@mixin focused {
+    border: 1px solid $color;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, .15);
+}
+
+.r-select-wrapper {
+    display: inline-block;
+    position: relative;
+    height: 32px;
+    line-height: 30px;
+    min-width: 150px;
+    width: 100%;
+    border: 1px solid $border_color;
+    outline: none;
+    transition: all .3s;
+    cursor: pointer;
+    &,
+    & * {
+        box-sizing: border-box;
+    }
+    &.r-select-opened,
+    &:focus:not(.r-select-disabled) {
+        @include focused();
+    }
+    &.r-select-opened .r-select-caret {
+        -ms-transform: rotate(180deg);
+        /*for IE9*/
+        transform: rotate(180deg);
+    }
+    &.r-select-disabled {
+        .r-select-span {
+            color: $disabled_text_color;
+            user-select: none;
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .r-select-caret {
+            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTI5NTY3MTg0MTI1IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEwMzAiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTgwNC41NzE0MjkgNDAyLjI4NTcxNHEwIDE0Ljg1NzE0My0xMC44NTcxNDMgMjUuNzE0Mjg2bC0yNTYgMjU2cS0xMC44NTcxNDMgMTAuODU3MTQzLTI1LjcxNDI4NiAxMC44NTcxNDN0LTI1LjcxNDI4Ni0xMC44NTcxNDNsLTI1Ni0yNTZxLTEwLjg1NzE0My0xMC44NTcxNDMtMTAuODU3MTQzLTI1LjcxNDI4NnQxMC44NTcxNDMtMjUuNzE0Mjg2IDI1LjcxNDI4Ni0xMC44NTcxNDNsNTEyIDBxMTQuODU3MTQzIDAgMjUuNzE0Mjg2IDEwLjg1NzE0M3QxMC44NTcxNDMgMjUuNzE0Mjg2eiIgcC1pZD0iMTAzMSIgZmlsbD0iIzk5OSI+PC9wYXRoPjwvc3ZnPg==);
+            cursor: not-allowed;
+        }
+    }
+    .r-select-span {
+        display: inline-block;
+        width: 100%;
+        padding-left: 8px;
+        padding-right: 28px;
+        border: none;
+        box-sizing: border-box;
+        color: $default_text_color;
+        @include ellipse();
+        cursor: pointer;
+        &.r-select-placeholder {
+            color: $disabled_color;
+        }
+    }
+    .r-select-caret {
+        position: absolute;
+        width: 20px !important;
+        height: 20px !important;
+        right: 5px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTI5NTY3MTg0MTI1IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEwMzAiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTgwNC41NzE0MjkgNDAyLjI4NTcxNHEwIDE0Ljg1NzE0My0xMC44NTcxNDMgMjUuNzE0Mjg2bC0yNTYgMjU2cS0xMC44NTcxNDMgMTAuODU3MTQzLTI1LjcxNDI4NiAxMC44NTcxNDN0LTI1LjcxNDI4Ni0xMC44NTcxNDNsLTI1Ni0yNTZxLTEwLjg1NzE0My0xMC44NTcxNDMtMTAuODU3MTQzLTI1LjcxNDI4NnQxMC44NTcxNDMtMjUuNzE0Mjg2IDI1LjcxNDI4Ni0xMC44NTcxNDNsNTEyIDBxMTQuODU3MTQzIDAgMjUuNzE0Mjg2IDEwLjg1NzE0M3QxMC44NTcxNDMgMjUuNzE0Mjg2eiIgcC1pZD0iMTAzMSI+PC9wYXRoPjwvc3ZnPg==) no-repeat center center / 100% 100%;
+        transition: all .3s;
+    }
+}
+
+.r-select-options-wrapper {
+    display: none;
+    overflow: auto;
+    position: absolute;
+    max-height: 240px;
+    border: 1px solid $border_color;
+    outline: none;
+    box-sizing: border-box;
+    box-shadow: 1px 1px 1px 2px #eee;
+    background-color: $white;
+    .r-select-search-wrapper {
+        padding: 8px;
+    }
+    .r-select-search {
+        width: 100%;
+        height: 32px;
+        padding: 0 8px;
+        outline: none;
+        border: 1px solid $border_color;
+        box-sizing: border-box;
+        transition: all .3s;
+        &:focus {
+            @include focused();
+        }
+    }
+}
+
+.r-select-options {
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-sizing: border-box;
+    list-style: none;
+    font-size: 14px;
+    z-index: 99999;
+    .r-select-hidden {
+        display: none !important;
+    }
+    .r-select-item {
+        padding: 5px 8px;
+        line-height: 1.5;
+        @include ellipse();
+        transition: all .3s;
+        cursor: default;
+        &.r-select-disabled {
+            &,
+            &:hover,
+            &.r-select-hover {
+                color: $disabled_color;
+                background-color: transparent;
+                .r-checkbox-outer {
+                    border-color: $disabled_color;
+                }
+            }
+            &.r-select-selected {
+                &,
+                &:hover,
+                &.r-select-hover {
+                    color: $disabled_color;
+                    background-color: #eee;
+                    .r-checkbox-outer {
+                        border-color: $disabled_color;
+                        background-color: $disabled_color;
+                    }
+                }
+            }
+            &,
+            & * {
+                cursor: not-allowed;
+            }
+        }
+        &.r-select-selected {
+            color: $default_text_color;
+            background-color: #dadada;
+            .r-checkbox-outer::before {
+                border-color: $white;
+                -ms-transform: rotate(-45deg) scale(1);
+                transform: rotate(-45deg) scale(1);
+            }
+            .r-checkbox-outer {
+                border-color: $color;
+                background-color: $color;
+            }
+        }
+        &.r-select-active {
+            color: $white !important;
+            background-color: $color !important;
+        }
+        .r-checkbox-wrapper {
+            display: inline-block;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+            box-sizing: border-box;
+            font-size: 14px;
+            span {
+                vertical-align: middle;
+            }
+        }
+        .r-checkbox-outer {
+            display: inline-block;
+            position: relative;
+            width: 14px;
+            height: 14px;
+            border: 1px solid $border_color;
+            overflow: hidden;
+            vertical-align: middle;
+            box-sizing: border-box;
+            transition: all .3s;
+            &::before {
+                content: "";
+                display: inline-block;
+                position: absolute;
+                left: 1px;
+                top: 2px;
+                border: 2px solid transparent;
+                border-right: none;
+                border-top: none;
+                z-index: 10;
+                height: 45%;
+                width: 80%;
+                box-sizing: inherit;
+                transition: inherit;
+                transition: inherit;
+                -ms-transform: rotate(-45deg) scale(0);
+                transform: rotate(-45deg) scale(0);
+            }
+        }
+    }
+    .r-select-item {
+        &:hover,
+        &.r-select-hover,
+        &.r-select-active {
+            color: $white;
+            background-color: $color;
+            .r-checkbox-outer {
+                border-color: $white;
+            }
+        }
+    }
+    .r-select-group {
+        @include ellipse();
+        >span {
+            display: inline-block;
+            max-width: 100%;
+            padding: 8px;
+            font-weight: bold;
+        }
+    }
+    .r-select-group-options {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        .r-select-item {
+            padding-left: 20px;
+        }
+    }
+}
+
+.r-select-disabled {
+    color: $disabled_text_color;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #ta {
+            width: 500px;
+            overflow: auto;
+            resize: none;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="ta"></textarea>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../dist/autoHeightTextArea/jquery.autoHeightTextArea.min.js"></script>
+    <script>
+        $("#ta").autoHeightTextArea();
+    </script>
+</body>
+</html>

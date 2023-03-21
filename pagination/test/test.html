@@ -1,0 +1,54 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link href="../../node_modules/mocha/mocha.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../../dist/pagination/jquery.pagination.min.css">
+</head>
+
+<body>
+  <div id="pageDiv"></div>
+  <div id="mocha"></div>
+
+  <script src="../../node_modules/jquery/dist/jquery.js"></script>
+  <script src="../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
+  <script src="../../node_modules/chai/chai.js"></script>
+  <script src="../../node_modules/mocha/mocha.js"></script>
+  <script src="../../dist/pagination/jquery.pagination.min.js"></script>
+  <script>
+    mocha.setup('bdd')
+  </script>
+  <script>
+    $("#pageDiv").pagination({
+      current: 1,
+      total: 8,
+      pageSize: 10,
+    });
+    var items = $("#pageDiv").find(".r-pagination-item");
+    describe("分页插件测试1", function () {
+      it("上一页按钮应该被禁用", function () {
+        var disabled = items.first().hasClass("r-pagination-disabled");
+        chai.expect(disabled).to.be.ok;
+      });
+      it("下一页按钮应该被禁用", function () {
+        var disabled = items.last().hasClass("r-pagination-disabled");
+        chai.expect(disabled).to.be.ok;
+      });
+      it("第一页应该active", function () {
+        var active = items.eq(1).hasClass("r-pagination-active");
+        chai.expect(active).to.be.ok;
+      });
+      it("应该有三个item", function() {
+        chai.expect(items.length).to.be.equal(3);
+      });
+    });
+  </script>
+  <script>
+    mocha.checkLeaks();
+    mocha.globals(['$']);
+    mocha.run();
+  </script>
+</body>
+
+</html>
