@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .play-state {
+            position: relative;
+            width: 92px;
+            height: 36px;
+            border-bottom: 1px solid #00c895;
+        }
+
+        .play-state .column {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 100%;
+            background: #00c895;
+            animation: bounce-note .25s ease-in-out infinite alternate backwards;
+        }
+
+        .play-state .column:nth-child(1) {
+            left: 0;
+            animation-delay: .1s;
+        }
+
+        .play-state .column:nth-child(2) {
+            left: 12px;
+            animation-delay: .2s;
+        }
+
+        .play-state .column:nth-child(3) {
+            left: 24px;
+            animation-delay: .3s;
+        }
+
+        .play-state .column:nth-child(4) {
+            left: 36px;
+            animation-delay: .5s;
+        }
+
+        .play-state .column:nth-child(5) {
+            left: 48px;
+            animation-delay: .4s;
+        }
+
+        .play-state .column:nth-child(6) {
+            left: 60px;
+            animation-delay: .3s;
+        }
+
+        .play-state .column:nth-child(7) {
+            left: 72px;
+            animation-delay: .2s;
+        }
+
+        .play-state .column:nth-child(8) {
+            left: 84px;
+            animation-delay: .4s;
+        }
+
+        .play-state.stopped .column {
+            animation-play-state: paused;
+        }
+
+        @keyframes bounce-note {
+            0% {
+                height: 0;
+            }
+            100% {
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="play-state">
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS Tooltip</title>
+    <style>
+        body {
+            background-color: skyblue;
+            font-size: 16px;
+        }
+
+        .tooltip {
+            position: relative;
+            margin: 120px auto;
+            width: 200px;
+        }
+
+        .tooltip p {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tooltip:before,
+        .tooltip:after {
+            content: '';
+            display: none;
+            position: absolute;
+            color: #fff;
+        }
+
+        .tooltip:hover:after,
+        .tooltip:hover:before {
+            display: block;
+        }
+
+        .tooltip:after {
+            content: attr(data-title);
+            padding: .5em;
+            border-radius: .3em;
+            min-width: 5em;
+            width: 100%;
+            max-width: 30em;
+            background-color: rgba(0, 0, 0, .8);
+            text-align: center;
+        }
+
+        .tooltip:before {
+            border: .5em solid transparent;
+        }
+
+        .tooltip.tooltip-bottom:before,
+        .tooltip.tooltip-bottom:after,
+        .tooltip.tooltip-top:before,
+        .tooltip.tooltip-top:after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tooltip.tooltip-top:before,
+        .tooltip.tooltip-top:after {
+            bottom: 100%;
+        }
+
+        .tooltip.tooltip-top:before {
+            border-top-color: rgba(0, 0, 0, .8);
+        }
+
+        .tooltip.tooltip-top:after {
+            transform: translate(-50%, -.8em);
+        }
+
+        .tooltip.tooltip-bottom:before,
+        .tooltip.tooltip-bottom:after {
+            top: 100%;
+        }
+
+        .tooltip.tooltip-bottom:before {
+            border-bottom-color: rgba(0, 0, 0, .8);
+        }
+
+        .tooltip.tooltip-bottom:after {
+            transform: translate(-50%, .8em);
+        }
+
+        .tooltip.tooltip-left:before,
+        .tooltip.tooltip-left:after,
+        .tooltip.tooltip-right:before,
+        .tooltip.tooltip-right:after {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .tooltip.tooltip-left:before,
+        .tooltip.tooltip-left:after {
+            right: 100%;
+        }
+
+        .tooltip.tooltip-left:before {
+            border-left-color: rgba(0, 0, 0, .8);
+        }
+
+        .tooltip.tooltip-left:after {
+            transform: translate(-.8em, -50%);
+        }
+
+        .tooltip.tooltip-right:before,
+        .tooltip.tooltip-right:after {
+            left: 100%;
+        }
+
+        .tooltip.tooltip-right:before {
+            border-right-color: rgba(0, 0, 0, .8);
+        }
+
+        .tooltip.tooltip-right:after {
+            transform: translate(.8em, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div data-title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium" class="tooltip tooltip-top">
+        <p>top-->Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium</p>
+    </div>
+    <div data-title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium" class="tooltip tooltip-bottom">
+        <p>bottom-->Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium</p>
+    </div>
+    <div data-title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium" class="tooltip tooltip-left">
+        <p>left-->Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium</p>
+    </div>
+    <div data-title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium" class="tooltip tooltip-right">
+        <p>right-->Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum eius in ipsum iste omnis praesentium</p>
+    </div>
+</body>
+</html>

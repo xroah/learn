@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Circular progress</title>
+    <style>
+        div {
+            box-sizing: border-box;
+        }
+
+        .progress-container,
+        .progress-container .left-circle,
+        .progress-container .right-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .progress-container {
+            position: relative;
+            margin: 50px auto;
+            animation:  rotate 3s ease infinite;
+        }
+
+        .progress-container .left-box,
+        .progress-container .right-box {
+            position: absolute;
+            top: 0;
+            overflow: hidden;
+            width: 100px;
+            height: 200px;
+        }
+
+        .progress-container .left-circle,
+        .progress-container .right-circle {
+            position: absolute;
+            top: 0;
+            border: 20px solid #42c794;
+            transform: rotate(-225deg);
+        }
+
+        .progress-container .left-box {
+            left: 0;
+        }
+
+        .animation {
+            animation: spin 1s ease forwards;
+        }
+
+        .animation-reverse {
+            animation: spin-reverse 1s ease forwards;
+        }
+
+        .progress-container .left-circle {
+            left: 0;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+        }
+
+        .progress-container .left-circle.animation,
+        .progress-container .left-circle.animation-reverse {
+            animation-delay: 1s;
+        }
+
+        .progress-container .right-circle {
+            right: 0;
+            border-top-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .progress-container .right-box {
+            right: 0;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(135deg);
+            }
+            100% {
+                transform: rotate(315deg);
+            }
+        }
+
+        @keyframes spin-reverse {
+            0% {
+                transform: rotate(-45deg);
+            }
+            100% {
+                transform: rotate(135deg);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="progress-container">
+    <div class="left-box">
+        <div class="left-circle animation"></div>
+    </div>
+    <div class="right-box">
+        <div class="right-circle animation"></div>
+    </div>
+</div>
+<script>
+    var left = document.getElementsByClassName("left-circle")[0],
+        right = document.getElementsByClassName("right-circle")[0];
+    left.addEventListener("animationend", function () {
+       if (this.classList.contains("animation")) {
+           this.classList.remove("animation");
+           this.classList.add("animation-reverse");
+           this.style.transform = "rotate(-45deg)";
+           right.classList.remove("animation");
+           right.classList.add("animation-reverse");
+       } else  {
+           this.classList.remove("animation-reverse");
+           this.classList.add("animation");
+           this.style.transform = "rotate(-225deg)";
+           right.classList.remove("animation-reverse");
+           right.classList.add("animation");
+       }
+    });
+</script>
+</body>
+</html>

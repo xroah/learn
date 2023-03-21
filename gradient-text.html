@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>渐变文字</title>
+    <style>
+        .gradient-text {
+            width: 700px;
+            font-size: 100px;
+            background: url(text-bg.jpg) no-repeat 0 center;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: bg 10s linear alternate infinite;
+        }
+        @keyframes bg {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-text">测试哈哈哈哈哈</div>
+</body>
+</html>

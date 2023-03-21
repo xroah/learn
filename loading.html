@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loading</title>
+    <style>
+        .loading-box {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 80px auto;
+            border-radius: 20px;
+            background-color: rgba(0, 0, 0, .3);
+        }
+
+        .loading-box .loading-wrapper {
+            width: inherit;
+            height: inherit;
+            animation: spin 1s steps(8, end) infinite;
+        }
+
+        .loading-box .loading-item {
+            position: absolute;
+            left: calc(50% - 4px);
+            top: calc(50% - 20px);
+            width: 8px;
+            height: 20px;
+            border-radius: 20px;
+            background: #fff;
+            transform-origin: bottom center;
+        }
+
+        .loading-box .loading-item:nth-child(1) {
+            transform: rotate(0) translateY(-20px);
+            opacity: 1;
+        }
+
+        .loading-box .loading-item:nth-child(2) {
+            transform: rotate(45deg) translateY(-20px);
+            opacity: .3;
+        }
+
+        .loading-box .loading-item:nth-child(3) {
+            transform: rotate(90deg) translateY(-20px);
+            opacity: .4;
+        }
+
+        .loading-box .loading-item:nth-child(4) {
+            transform: rotate(135deg) translateY(-20px);
+            opacity: .5;
+        }
+
+        .loading-box .loading-item:nth-child(5) {
+            transform: rotate(180deg) translateY(-20px);
+            opacity: .6;
+        }
+
+        .loading-box .loading-item:nth-child(6) {
+            transform: rotate(225deg) translateY(-20px);
+            opacity: .7;
+        }
+
+        .loading-box .loading-item:nth-child(7) {
+            transform: rotate(270deg) translateY(-20px);
+            opacity: .8;
+        }
+
+        .loading-box .loading-item:nth-child(8) {
+            transform: rotate(315deg) translateY(-20px);
+            opacity: .9;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-box">
+        <div class="loading-wrapper">
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+            <div class="loading-item"></div>
+        </div>
+    </div>
+</body>
+</html>

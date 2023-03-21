@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Circular progress</title>
+    <style>
+        div,
+        div:after {
+            box-sizing: border-box;
+        }
+
+        .progress-container,
+        .progress-container .left-box:after,
+        .progress-container .right-box:after {
+            width: 200px;
+            height: 200px;
+            border: 20px solid #eee;
+            border-radius: 50%;
+        }
+
+        .progress-container {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .progress-container .left-box,
+        .progress-container .right-box {
+            position: absolute;
+            top: -20px;
+            overflow: hidden;
+            width: 100px;
+            height: 200px;
+        }
+
+        .progress-container .left-box:after,
+        .progress-container .right-box:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            border-color: #42c794;
+            transform: rotate(-225deg);
+            animation: spin 1s linear forwards;
+        }
+
+        .progress-container .left-box {
+            left: -20px;
+        }
+
+        .progress-container .left-box:after {
+            left: 0;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            animation-delay: 1s;
+        }
+
+        .progress-container .right-box:after {
+            right: 0;
+            border-top-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .progress-container .right-box {
+            right: -20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(-225deg);
+            }
+            100% {
+                transform: rotate(-45deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="left-box"></div>
+        <div class="right-box"></div>
+    </div>
+</body>
+</html>

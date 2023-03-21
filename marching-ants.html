@@ -1,0 +1,31 @@
+<!DO
+        replace("{{start}}", item.start).CTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marching Ants</title>
+    <style>
+        .marching-ants {
+            width: 200px;
+            height: 100px;
+            margin: 100px auto;
+            border: 1px solid transparent;
+            background: linear-gradient(#fff, #fff) padding-box,
+                        repeating-linear-gradient(135deg, #000 0, #000 25%, #fff 0, #fff 50%) 0 0 / .6em .6em;
+            animation: marching 8s linear infinite;
+        }
+
+        @keyframes marching {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="marching-ants"></div>
+</body>
+</html>

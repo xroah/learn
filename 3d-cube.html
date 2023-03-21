@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Cube</title>
+    <style>
+        .cube-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 100px auto;
+            transform: rotateX(-30deg) rotateY(-45deg);
+            transform-style: preserve-3d;
+            animation: spin 6s ease-in-out 2s infinite;
+        }
+
+        .cube-box .cube-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: inherit;
+            height: inherit;
+            line-height: 200px;
+            background-image: radial-gradient(white, skyblue);
+            font-size: 42px;
+            text-align: center;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px yellow;
+            opacity: .8;
+        }
+
+        .cube-box .cube-surface:nth-child(1) {
+            transform: translateZ(100px);
+        }
+
+        .cube-box .cube-surface:nth-child(2) {
+            transform: rotateY(90deg) translateZ(100px);
+        }
+
+        .cube-box .cube-surface:nth-child(3) {
+            transform: rotateY(180deg) translateZ(100px);
+        }
+
+        .cube-box .cube-surface:nth-child(4) {
+            transform: rotateY(-90deg) translateZ(100px);
+        }
+
+        .cube-box .cube-surface:nth-child(5) {
+            transform: rotateX(90deg) translateZ(100px);
+        }
+
+        .cube-box .cube-surface:nth-child(6) {
+            transform: rotateX(90deg) translateZ(-100px);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotateX(-30deg) rotateY(-45deg);
+            }
+            60%, 100% {
+                transform: rotateX(-30deg) rotateY(-405deg);
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="cube-box">
+        <div class="cube-surface">front</div>
+        <div class="cube-surface">right</div>
+        <div class="cube-surface">back</div>
+        <div class="cube-surface">left</div>
+        <div class="cube-surface">top</div>
+        <div class="cube-surface">bottom</div>
+    </div>
+</body>
+</html>
