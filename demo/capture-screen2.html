@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <video id="video" controls width="900"></video>
+    <br>
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <script>
+        (function () {
+            if (!window.showSaveFilePicker) {
+                return alert("Don not support window.showSaveFilePicker api")
+            }
+
+            const videoEl = document.getElementById("video")
+            const startEl = document.getElementById("start")
+            const stopEl = document.getElementById("stop")
+
+            let started = false
+            let recorder
+            let stream
+            let fileWritableStream
+
+            function initMediaRecorder() {
+                recorder = new MediaRecorder(stream, {mimeType: "video/webm"})
+
+                recorder.ondataavailable = async evt => {
+                    if (evt.data.size > 0 && fileWritableStream) {
+                        await fileWritableStream.write(evt.data)
+
+                        if (recorder.state === "inactive") {
+                            fileWritableStream.close()
+                        }
+                    }
+                }
+
+                recorder.start(1000)
+            }
+
+            startEl.addEventListener("click", () => {
+                window.showSaveFilePicker({
+                    types: [{
+                        accept: {
+                            "video/webm": [".webm"]
+                        }
+                    }]
+                })
+                    .then(fileHandle => fileHandle.createWritable())
+                    .then(writable => fileWritableStream = writable)
+                    .then(() => navigator.mediaDevices.getDisplayMedia())
+                    .then(s => {
+                        started = true
+                        startEl.disabled = true
+                        stopEl.disabled = false
+                        videoEl.srcObject = stream = s
+
+                        initMediaRecorder()
+                        videoEl.play()
+                    })
+            })
+
+            stopEl.addEventListener("click", () => {
+                started = false
+                startEl.disabled = false
+                stopEl.disabled = true
+
+                if (stream) {
+                    stream.getTracks().forEach(t => t.stop())
+                }
+
+                if (recorder) {
+                    recorder.stop()
+                }
+            })
+        })()
+    </script>
+</body>
+
+</html>

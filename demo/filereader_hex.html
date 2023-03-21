@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件16进制</title>
+</head>
+<body>
+<input type="file" id="file">
+<script>
+    let file = document.getElementById("file");
+    file.addEventListener("change", function () {
+        let file = this.files[0];
+        let fr = new FileReader();
+        fr.readAsText(file);
+        fr.addEventListener("load", function () {
+            toHex(this.result);
+            console.log(this.result[0])
+        })
+    });
+    function toHex(buffer) {
+        let hex = [];
+        let typedArr = new Uint8Array(buffer);
+        for(let i = 0, len = typedArr.length; i < len; i++) {
+            hex.push(typedArr[i].toString(16));
+        }
+        console.log(hex)
+    }
+</script>
+</body>
+</html>

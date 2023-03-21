@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <video id="video" controls width="900"></video>
+    <br>
+    <button id="start">Start</button>
+    <button id="save">Save</button>
+    <script>
+        const videoEl = document.getElementById("video")
+        const startEl = document.getElementById("start")
+        const saveEl = document.getElementById("save")
+        const videos = []
+        let recorder
+        let stream
+
+        function initMediaRecorder() {
+            recorder = new MediaRecorder(stream, {mimeType: "video/webm"})
+
+            recorder.ondataavailable = evt => {
+                if (evt.data.size > 0) {
+                    videos.push(evt.data)
+                }
+            }
+
+            recorder.start()
+        }
+
+        startEl.addEventListener("click", () => {
+            const started = startEl.started
+
+            if (!started) {
+                startEl.started = true
+                startEl.innerHTML = "Stop"
+                videos.length = 0
+
+                navigator.mediaDevices.getDisplayMedia()
+                    .then(s => {
+                        videoEl.srcObject = stream = s
+
+                        initMediaRecorder()
+                        videoEl.play()
+                    })
+            } else {
+                startEl.started = false
+                startEl.innerHTML = "Start"
+
+                if (stream) {
+                    stream.getTracks().forEach(t => t.stop())
+                }
+
+                if (recorder) {
+                    recorder.stop()
+                }
+            }
+        })
+
+        saveEl.addEventListener("click", () => {
+            if (videos.length) {
+                const a = document.createElement("a")
+                a.href = URL.createObjectURL(new Blob(videos))
+                a.download = "screen-record.webm"
+
+                document.body.append(a)
+                a.click()
+            }
+        })
+    </script>
+</body>
+
+</html>

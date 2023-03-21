@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas draw video</title>
+    <style>
+        .canvas-wrapper {
+            text-align: center;
+        }
+        .canvas-wrapper canvas {
+            border: 1px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas-wrapper">
+        <canvas width="960" height="540" id="canvas"></canvas>
+    </div>
+    <script>
+        let video = document.createElement("video");
+        let canvas = document.getElementById("canvas");
+        let ctx = canvas.getContext("2d");
+        video.crossorigin="anonymous";
+        video.src = "test.mp4";
+        function drawVideo() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.font = "50px Microsoft Yahei";
+            ctx.fillStyle = "skyblue";
+            ctx.fillText(video.currentTime, 100, 100);
+        }
+        video.play();
+        setInterval(drawVideo, 24);
+    </script>
+</body>
+</html>

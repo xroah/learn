@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FormData上传</title>
+</head>
+<body>
+<input type="file" id="file" multiple>
+
+<script>
+    let file = document.getElementById("file");
+    let xhr = new XMLHttpRequest();
+    file.addEventListener("change", function () {
+        let f = this.files;
+        let fm = new FormData();
+        fm.append("userName", "test");
+        for(let i = 0, len = f.length; i < len; i++) {
+            fm.append(`file${i}`, f[i]);
+        }
+        fm.append("cn", "中文");
+        xhr.open("POST", "/post", true);
+        xhr.send(fm);
+    });
+
+</script>
+</body>
+</html>
